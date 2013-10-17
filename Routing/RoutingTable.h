@@ -4,9 +4,9 @@
 #define ROUTING_TABLE_H
 
 #include "Link.h"
-#include "Router.h"
 
 #include <map>
+#include <cstddef>
 
 class Link;
 class Router;

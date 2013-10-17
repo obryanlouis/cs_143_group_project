@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <list>
+#include <map>
 
 class Link;
 class RoutingTable;
