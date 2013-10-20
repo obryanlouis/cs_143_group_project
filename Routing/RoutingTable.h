@@ -7,6 +7,7 @@
 
 #include <map>
 #include <cstddef>
+#include <utility>
 
 class Link;
 class Router;
@@ -16,12 +17,13 @@ class RoutingTable
 public:
 	friend class Router;
 
-	Link& operator[] (Router *r) { return *mapping[r]; }
+	std::pair<int, Link*> & operator[] (Router *r) { return mapping[r]; }
 
 	Link* nextLink(Router *r);
 	Router* nextRouter(Router *r);
+	
 private:
-	std::map<Router*, Link*> mapping;
+	std::map<Router*, std::pair<int, Link*> > mapping;
 
 };
 

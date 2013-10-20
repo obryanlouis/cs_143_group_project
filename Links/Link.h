@@ -20,6 +20,7 @@ public:
 	int getLength() { return this->length; }
 	Router *getEnd1() { return this->end1; }
 	Router *getEnd2() { return this->end2; }
+    void setEnds(Router *r1, Router *r2);
 
 };
 

@@ -22,6 +22,8 @@ public:
 	Link *getNextLink(Router *destination);
 	Router *getNextRouter(Router *destination);
 	void bellmanFord(std::list<Router*> nodes, std::list<Link*> edges);
+	bool updateRoutingTable(RoutingTable *t, Link *l);
+    void addLink(Link *l);      
 
 private:
 	RoutingTable *routingTable;

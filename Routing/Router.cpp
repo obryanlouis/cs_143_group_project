@@ -16,53 +16,21 @@ Router* Router::getNextRouter(Router *destination) {
 }
 
 
-/*
- *	The Bellman Ford algorithm. Updates the source router's routing
- *	table.
- *	
- *	nodes: all routers in the system
- *	edges: all edges in the system
- */
-void Router::bellmanFord(list<Router*> nodes, list<Link*> edges)
-{
-	map<Router*, int> distance;
-	map<Router*, Router*> predecessor;
-
-	/*	Initialize the graph	*/
-	for (list<Router*>::iterator it = nodes.begin(); it != nodes.end(); ++it) {
-		if (*it == this) {
-			distance[*it] = 0;
-		}
-		else {
-			distance[*it] = -1;
-		}
-		predecessor[*it] = NULL;
-	}
-
-	/*	Relax edged repeatedly	*/	
-	for (int i = 0; i < nodes.size(); i++) {
-		for (list<Link*>::iterator it = edges.begin(); 
-			it != edges.end(); ++it) {
-				int weight = (*it)->getLength();
-				Router* u = (*it)->getEnd1();
-				Router* v = (*it)->getEnd2();
-				if (distance[u] != -1 &&
-					distance[u] + weight < distance[v]) {
-						distance[v] = distance[u] + weight;
-						predecessor[v] = u;
-				}
-		}
-	}
-
-	/*	Set the Routing table mapping	*/
-	RoutingTable *t = this->routingTable;
-	for (list<Router*>::iterator it = nodes.begin(); 
-		it != nodes.end(); ++it) {
-			if (*it != this) {
-				(*t)[*it] = *walkBackwards(*it, this, &predecessor);
-			}
-	}
+/*  Updates the routing table of this router based on a neighbor's table   */
+bool Router::updateRoutingTable(RoutingTable *t, Link *l) {
+    bool changed = false;
+    for (std::map<Router*, std::pair<int, Link*> >::iterator it = t->mapping.begin();
+        it != t->mapping.end(); ++it) {
+        Router *r = it->first;
+        if ((*routingTable)[r].first > t->mapping[r].first) {
+            (*routingTable)[r].first = t->mapping[r].first;
+            (*routingTable)[r].second = l;
+            changed = true;
+        }
+    }
+    return changed;
 }
+
 
 Link* Router::walkBackwards(Router *u, Router *v, map<Router *, Router *> *predecessor)
 {
@@ -84,4 +52,8 @@ Link* Router::walkBackwards(Router *u, Router *v, map<Router *, Router *> *prede
 	/*	If the execution gets here, there is no link between the router
 		and its predecessor :O	*/
 	throw "No Link available";
+}
+
+void Router::addLink(Link * l) {
+    this->links.push_back(l);
 }

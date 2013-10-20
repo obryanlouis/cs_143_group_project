@@ -6,7 +6,7 @@ Link* RoutingTable::nextLink(Router *r)
 {
 	if (r == NULL)
 		throw "Router is null";
-	return mapping[r];
+	return mapping[r].second;
 }
 
 Router* RoutingTable::nextRouter(Router *r)
