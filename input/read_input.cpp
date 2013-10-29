@@ -25,21 +25,83 @@ int main(int argc, char **argv) {
     pugi::xml_parse_result result = doc.load_file(input);
 
     cout << "Load result: "  << result.description() << endl;
+    
+    pugi::xml_node network = doc.child("Network");
 
-    pugi::xml_node network = doc.child("network");
+    cout << network.name() << "-------------" << endl;
 
-    for (pugi::xml_node node = network.first_child();
-         node; node = node.next_sibling())
+    // network elements
+
+    // snapshot time
+    cout << "snapshot time:             "
+         << network.child_value("snapshotTime")
+         << endl;
+
+    // routing table update time
+    cout << "routing table update time: "
+         << network.child_value("routingTableUpdateTime")
+         << endl;
+
+    // network hosts
+    cout << "network hosts: " << endl;
+    pugi::xml_node networkHosts = network.child("networkHosts");
+    for (pugi::xml_node host = networkHosts.first_child();
+         host; host = host.next_sibling())
     {
-        cout << node.name() << ": ";
+        pugi::xml_attribute id = host.attribute("id");
+        cout << "    " << host.name() << ": "
+             << id.name() << "=" << id.value() << endl;
+    }
 
-        for (pugi::xml_attribute attr = node.first_attribute();
-             attr; attr = attr.next_attribute())
+    // network routers
+    cout << "network routers: " << endl;
+    pugi::xml_node networkRouters = network.child("networkRouters");
+    for (pugi::xml_node router = networkRouters.first_child();
+         router; router = router.next_sibling())
+    {
+        pugi::xml_attribute id = router.attribute("id");
+        cout << "    " << router.name() << ": "
+             << id.name() << "=" << id.value() << endl;
+    }
+
+    // network links
+    cout << "network links: " << endl;
+    pugi::xml_node networkLinks = network.child("networkLinks");
+    for (pugi::xml_node link = networkLinks.first_child();
+         link; link = link.next_sibling())
+    {
+        // first look at id
+        pugi::xml_attribute id = link.attribute("id");
+        cout << "    " << link.name() << ": "
+             << id.name() << "=" << id.value() << endl;
+
+        // next look at the other elements of the link
+        for (pugi::xml_node elem = link.first_child();
+             elem; elem = elem.next_sibling())
         {
-            cout << " " << attr.name() << "=" << attr.value();
+            cout << "          " << elem.name()
+                 << "=" << elem.child_value() << endl;
         }
+    }
 
-        cout << endl;
+
+    // network flows
+    cout << "network flows: " << endl;
+    pugi::xml_node networkFlows = network.child("networkFlows");
+    for (pugi::xml_node flow = networkFlows.first_child();
+         flow; flow = flow.next_sibling())
+    {
+        pugi::xml_attribute id = flow.attribute("id");
+        cout << "    " << flow.name() << ": "
+             << id.name() << "=" << id.value() << endl;
+
+        // next look at the other elements of the flow
+        for (pugi::xml_node elem = flow.first_child();
+             elem; elem = elem.next_sibling())
+        {
+            cout << "          " << elem.name()
+                 << "=" << elem.child_value() << endl;
+        }
     }
 
     return 0;
