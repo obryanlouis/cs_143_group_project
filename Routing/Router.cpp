@@ -7,7 +7,7 @@
 
 using namespace std;
 
-void handlePacket(Packet *){
+void Router::handlePacket(Packet *){
   cout << "Router is handling packet"; 
   }
 

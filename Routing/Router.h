@@ -34,8 +34,8 @@ public:
 	Node *getNextNode(Node *destination);
 	void bellmanFord(std::list<Node*> nodes, std::list<Link*> edges);
 	bool updateRoutingTable(RoutingTable *t, Link *l);
-  void addLink(Link *l);      
-  void handlePacket(Packet* packet); 
+    void addLink(Link *l);      
+    virtual void handlePacket(Packet* packet); 
 
 private:
 	RoutingTable *routingTable;
