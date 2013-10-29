@@ -3,6 +3,7 @@
 #define ROUTER_H
 
 #include "Link.h"
+#include "Node.h"
 #include "RoutingTable.h"
 
 #include <stdlib.h>
@@ -12,24 +13,33 @@
 
 class Link;
 class RoutingTable;
+class Node;
 
-class Router {
 
+/*! Router class */
+class Router : public Node {
 public:
+  // Constructor and destructors 
 	Router() { 
 		this->routingTable = new RoutingTable;
 	}
-	Link *getNextLink(Router *destination);
-	Router *getNextRouter(Router *destination);
-	void bellmanFord(std::list<Router*> nodes, std::list<Link*> edges);
+  Router(int in_id):
+    Node(in_id) {}
+  ~Router() { delete this->routingTable; }
+
+  /* Basic manipulating thingies */
+
+  /* Functions */
+	Link *getNextLink(Node *destination);
+	Node *getNextNode(Node *destination);
+	void bellmanFord(std::list<Node*> nodes, std::list<Link*> edges);
 	bool updateRoutingTable(RoutingTable *t, Link *l);
-    void addLink(Link *l);      
+  void addLink(Link *l);      
+  void handlePacket(Packet* packet); 
 
 private:
 	RoutingTable *routingTable;
-	std::list<Link*> links;
-	
-	Link* walkBackwards(Router *u, Router *v, std::map<Router *, Router *> *predecessor);
+	Link* walkBackwards(Node *u, Node *v, std::map<Node *, Node *> *predecessor);
 };
 
 #endif
