@@ -1,42 +1,32 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="ISO-8859-1"?>
 
-<routers name="routers">
-    <router id="r1" />
-    <router id="r2" />
-    <router id="r3" />
-    <router id="r4" />
-</routers>
+<Network name="thenetwork">
+    <snapshotTime>3</snapshotTime>
+    <routingTableUpdateTime>5</routingTableUpdateTime>
+    <networkHosts>
+        <host id="h1" />
+        <host id="h2" />
+    </networkHosts>
+    <networkRouters>
+        <router id="r1" />
+        <router id="r2" />
+    </networkRouters>
+    <networkLinks>
+        <link id="l1" tits="dicks">
+            <linkRate>10</linkRate>
+            <linkDelay>1</linkDelay>
+            <bufferSize>100</bufferSize>
+            <router1>r1</router1>
+            <router2>r2</router2>
+        </link>
+    </networkLinks>
+    <networkFlows>
+        <flow id="f1">
+            <source>h1</source>
+            <destination>h2</destination>
+            <flowSize>25</flowSize>
+            <flowStartTime>0</flowStartTime>
+        </flow>
+    </networkFlows>
+</Network>
 
-<hosts name="hosts">
-    <host id="h1" />
-    <host id="h2" />
-</hosts>
-
-<links name="links">
-    <link>
-        <id>l1</id>
-        <linkRate>10</linkRate>
-        <linkDelay>1</linkDelay>
-        <bufferSize>100</bufferSize>
-        <router1Id>r1</router1Id>
-        <router2Id>r2</router2Id>
-    </link>
-</links>
-
-<flows name="flows">
-    <flow>
-        <id>f1</id>
-        <sourceId>h1</sourceId>
-        <destinationId>h2</destinationId>
-        <size>1000</size>
-        <flowStartTime>5</flowStartTime>
-    </flow>
-</flows>
-
-<network name="network">
-    <snapshotTime seconds="5" />
-    <routingTableUpdateTime seconds="3" />
-    <routers routers="routers" />
-    <links links="links" />
-    <flows flows="flows" />
-</network>
