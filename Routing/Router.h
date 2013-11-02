@@ -18,28 +18,29 @@ class Node;
 
 /*! Router class */
 class Router : public Node {
+
+private:
+	RoutingTable *routingTable;
+	Link* walkBackwards(Node *u, Node *v, std::map<Node *, Node *> *predecessor);
+	
 public:
-  // Constructor and destructors 
+    // Constructor and destructors 
 	Router() { 
 		this->routingTable = new RoutingTable;
 	}
-  Router(int in_id):
+    Router(int in_id):
     Node(in_id) {}
-  ~Router() { delete this->routingTable; }
+    ~Router() { delete this->routingTable; }
 
-  /* Basic manipulating thingies */
+    /* Basic manipulating thingies */
 
-  /* Functions */
+    /* Functions */
 	Link *getNextLink(Node *destination);
 	Node *getNextNode(Node *destination);
 	void bellmanFord(std::list<Node*> nodes, std::list<Link*> edges);
 	bool updateRoutingTable(RoutingTable *t, Link *l);
     void addLink(Link *l);      
     virtual void handlePacket(Packet* packet); 
-
-private:
-	RoutingTable *routingTable;
-	Link* walkBackwards(Node *u, Node *v, std::map<Node *, Node *> *predecessor);
 };
 
 #endif
