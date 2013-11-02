@@ -10,20 +10,20 @@
 #include <utility>
 
 class Link;
-class Router;
+class Node;
 
 class RoutingTable
 {
 public:
 	friend class Router;
 
-	std::pair<int, Link*> & operator[] (Router *r) { return mapping[r]; }
+	std::pair<int, Link*> & operator[] (Node *r) { return mapping[r]; }
 
-	Link* nextLink(Router *r);
-	Router* nextRouter(Router *r);
+	Link* nextLink(Node *r);
+	Node* nextNode(Node *r);
 	
 private:
-	std::map<Router*, std::pair<int, Link*> > mapping;
+	std::map<Node*, std::pair<int, Link*> > mapping;
 
 };
 
