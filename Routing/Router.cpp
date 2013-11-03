@@ -31,10 +31,6 @@ void Router::handlePacket(Packet *packet){
     }
 }
 
-
-/*	Walks backwards from u to v on a predecessor map of Routers	*/
-Link* walkBackwards(Node *u, Node *v, map<Router *, Router *> predecessor);
-
 Link* Router::getNextLink(Node *destination) {
 	return this->routingTable->nextLink(destination);
 }
@@ -57,29 +53,6 @@ bool Router::updateRoutingTable(RoutingTable *t, Link *l) {
         }
     }
     return changed;
-}
-
-
-Link* Router::walkBackwards(Node *u, Node *v, map<Node *, Node *> *predecessor)
-{
-	/*	Loop until the predecessor is the source	*/
-	Node *finder = v;
-	while ((*predecessor)[finder] != u) {
-		finder = (*predecessor)[finder];
-	}
-
-	/*	Find the link that corresponds to the connection between these
-		routers	*/
-	for (list<Link*>::iterator it = u->links.begin(); 
-		it != u->links.end(); ++it) {
-			if ((*it)->getEnd1() == finder || (*it)->getEnd2() == finder) {
-				return *it;
-			}
-	}
-
-	/*	If the execution gets here, there is no link between the router
-		and its predecessor :O	*/
-	throw "No Link available";
 }
 
 void Router::addLink(Link * l) {

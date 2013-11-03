@@ -14,25 +14,26 @@ class Packet;
 /* Nodes are an abstraction for the links. */
 class Node {
 private:
-  friend class Router;
-  friend class Host;
-  int nodeId;
-  std::list<Link*> links;
+    friend class Router;
+    friend class Host;
+    int nodeId;
+    std::list<Link*> links;
 
 public:
-  Node();
-  Node(int in_id);
-  virtual ~Node(){}
+    Node();
+    Node(int in_id);
+    virtual ~Node(){}
 
-  virtual void handlePacket(Packet* packet) = 0;
+    virtual void handlePacket(Packet* packet) = 0;
 
 };
 
 Node::Node() {}
 
-Node::Node(int in_id)
+Node::Node(int in_id, std::list<Link*> l)
     : nodeId(in_id)
+    , links(l)
 {}
 
-
 #endif
+
