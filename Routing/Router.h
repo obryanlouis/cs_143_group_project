@@ -16,7 +16,6 @@ class Link;
 class RoutingTable;
 class Node;
 
-/*! Router class */
 class Router : public Node {
 
 	RoutingTable *routingTable_p;
