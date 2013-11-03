@@ -1,82 +1,94 @@
+// Control.h
+
 
 #ifndef CONTROL_H
 #define CONTROL_H
 
-#include "Link.h"
-#include "Router.h"
-
 #include <stdlib.h>
 #include <list>
-#include <set>
-#include <stdio>
-#include <iostream>
-#include <fstream>
+#include <queue>
 
+#include "Flow.h"
+#include "Link.h"
+#include "Node.h"
+#include "Router.h"
+
+/* Constants */
+static const unsigned int ROUTING_UPDATE_PERIOD = 6000;
+static const unsigned int SNAPSHOT_PERIOD = 6000;
+static const unsigned int END_PERIOD = 100; // number of events to execute
+                                            // after flows done (for data 
+                                            // collection)
 
 /* Different type of events */
 enum event_t{
-  UPDATE_ROUTING,
-  PRINT_STATS,
-  UPDATE_FLOWS,
-  UPDATE_LINKS
+    UPDATE_ROUTING,
+    PRINT_STATS,
+    UPDATE_FLOWS,
+    UPDATE_LINKS
 };
 
 /* Events that get put into the scheduler */
 class Event {
 private:
-  event_t type;
-  int ID;
-  unsigned int time;
+    event_t type;
+    unsigned int time;
+    void *actOn;
 
 public:
-  Event(event_t in_type, int in_ID, unsigned int in_time):
-    type(in_type),
-    ID(in_ID),
-    time(in_time)
+    Event(event_t in_type, unsigned int in_time, void *in_actOn = 0)
+        :type(in_type)
+        ,time(in_time)
+        ,actOn(in_actOn)
     {}
 
-  ~Event(){}
+    ~Event(){}
 
-  execute();
+    unsigned int getTime() const { return time; }
+    event_t getType() const { return type;}
+    Event *execute();
 };
 
 /* Used in the scheduler to order elements in list by time.
  */
 struct timecomp{
-  bool operator() (const Event *lhs, const Event *rhs) const{
-    return lhs->time < rhs->time;
-  }
+    bool operator() (Event *lhs, Event *rhs){
+        return (lhs->getTime() > rhs->getTime());
+    }
 };
 
 /* Schedules and executes events*/
 class Scheduler{
 private:
-  std::multiset<Event*, timecomp> events;
+  std::priority_queue<Event*, std::vector<Event*>, timecomp> *events_p;
 
 public:
   Scheduler();
   ~Scheduler();
-  add(event_t in_type, int in_ID, unsigned int in_time);
-  doNext();
-  printSchedule();
+
+  void add(event_t in_type,  unsigned int in_time, void *in_actOn = 0);
+  void add(Event* event_p);
+  bool doNext();
+
+  void printAndDestroySchedule();
+
 };
 
 
 /* Master controller for everything */ 
 class Controller {
 private:
-  std::list<Router*> routers;
-  std::list<Link*> links;
-  std::list<Flows*> flows;
-  Scheduler *schedule;
+  std::list<Router*> *routers_p;
+  std::list<Link*> *links_p;
+  std::list<Flow*> *flows_p;
+  Scheduler *schedule_p;
+  int flowsLeft;
 
 public:
   Controller();
   ~Controller();
 
-  run();
-  debug();
-
+  void run();
 };
 
 
