@@ -15,21 +15,32 @@ class RoutingTable;
 
 class Router {
 
+	RoutingTable *routingTable_p;
+        // the router's routing table
+	std::list<Link*> links;
+        // the links the router is connected to
+	
+	Link* walkBackwards(
+            Router *u, Router *v, std::map<Router *, Router *> *predecessor);
+
 public:
-	Router() { 
-		this->routingTable = new RoutingTable;
-	}
+    Router();
+        // Create an instance of class Router
 	Link *getNextLink(Router *destination);
+        // Returns the next link to route to based on a destination
 	Router *getNextRouter(Router *destination);
+        // Returns the next router to route to based on destination
 	void bellmanFord(std::list<Router*> nodes, std::list<Link*> edges);
 	bool updateRoutingTable(RoutingTable *t, Link *l);
-    void addLink(Link *l);      
+        // Updatesthe routing table based on received routing table
+        // from link l. Returns true if updated, false otherwise.
+    void addLink(Link *l);
+        // 
 
-private:
-	RoutingTable *routingTable;
-	std::list<Link*> links;
-	
-	Link* walkBackwards(Router *u, Router *v, std::map<Router *, Router *> *predecessor);
 };
+
+Router::Router() { 
+    this->routingTable = new RoutingTable();
+}
 
 #endif
