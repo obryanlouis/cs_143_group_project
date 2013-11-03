@@ -2,14 +2,14 @@
 #include "RoutingTable.h"
 
 
-Link* RoutingTable::nextLink(Router *r)
+Link* RoutingTable::nextLink(Node *r)
 {
 	if (r == NULL)
 		throw "Router is null";
 	return mapping[r].second;
 }
 
-Router* RoutingTable::nextRouter(Router *r)
+Node* RoutingTable::nextNode(Node *r)
 {
 	Link *l = this->nextLink(r);
 	if (l->getEnd1() == r) {
