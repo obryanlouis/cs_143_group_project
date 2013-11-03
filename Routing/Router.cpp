@@ -5,6 +5,17 @@
 #include "Packet.h"
 #include <iostream>
 
+Router::Router() { 
+    this->routingTable_p = new RoutingTable();
+}
+
+Router::Router(int in_id)
+    : Node(in_id)
+{}
+
+Router::~Router() {
+    delete this->routingTable_p;
+}
 
 void Router::handlePacket(Packet *packet){
     std::cout << "Router is handling packet" << std::endl;

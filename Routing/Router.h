@@ -46,17 +46,5 @@ public:
     void handlePacket(Packet* packet); 
 };
 
-Router::Router() { 
-    this->routingTable_p = new RoutingTable();
-}
-
-Router::Router(int in_id)
-    : Node(in_id)
-{}
-
-Router::~Router() {
-    delete this->routingTable_p;
-}
-
 #endif
 
