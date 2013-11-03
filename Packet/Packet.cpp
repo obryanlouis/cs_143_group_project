@@ -6,22 +6,23 @@ Packet::~Packet() {
     delete data;
 }
 
-Packet::Packet(char *d, PacketType t, Host *s, Host *de, time_t start,
-        int size, Flow *f) {
+Packet::Packet(char *d, Packet::PacketType t, Host *s, Host *de, time_t start,
+        int size, Flow *f, string id) {
     data = d;
     type = t;
     source = s;
-    destination = d;
+    destination = de;
     startTime = start;
     size = size;
     flowId = f;
+    id = id;
 }
 
 const char * Packet::getData() {
     return data;
 }
 
-PacketType Packet::getType() {
+Packet::PacketType Packet::getType() {
     return type;
 }
 

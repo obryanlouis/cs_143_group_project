@@ -21,15 +21,15 @@ class Router : public Node {
 
 private:
 	RoutingTable *routingTable;
-	Link* walkBackwards(Node *u, Node *v, std::map<Node *, Node *> *predecessor);
 	
 public:
     // Constructor and destructors 
 	Router() { 
 		this->routingTable = new RoutingTable;
 	}
-    Router(int in_id):
-    Node(in_id) {}
+    Router(int in_id, RoutingTable *table, std::list<Link*> links):
+    Node(in_id, links),
+    routingTable(table) {}
     ~Router() { delete this->routingTable; }
 
     /* Basic manipulating thingies */

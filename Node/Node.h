@@ -21,8 +21,9 @@ private:
 
 public:
   Node(){}
-  Node(int in_id):
-    ID(in_id){}
+  Node(int in_id, std::list<Link*> l):
+    ID(in_id),
+    links(l) {}
   virtual ~Node(){}
 
 

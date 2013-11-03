@@ -3,7 +3,9 @@
 #ifndef PACKET_H
 #define PACKET_H
 
+#include <string>
 #include "Flow.h"
+
 class Packet{
     private:
         enum PacketType {
@@ -13,7 +15,7 @@ class Packet{
         };
         char *data;
         PacketType type;
-        string id;
+        std::string id;
         Host *source;
         Host *destination;
         time_t startTime;
@@ -23,7 +25,7 @@ class Packet{
     public:
         PacketType getType();
         Packet(char *d, PacketType t, Host *s, Host *de, time_t start, 
-                int size, Flow *f);
+                int size, Flow *f, std::string id);
         ~Packet();
         const char * getData();
         void setData(char * d);
