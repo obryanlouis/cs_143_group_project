@@ -3,8 +3,11 @@
 #ifndef PACKET_H
 #define PACKET_H
 
+#include <cassert>
 #include <string>
 #include "Flow.h"
+
+class RoutingTable;
 
 class Packet{
 
@@ -15,7 +18,7 @@ public:
         ACK
     };
 private:
-    char *data;
+    RoutingTable *table;
     PacketType type;
     std::string id;
     Host *source;
@@ -25,12 +28,12 @@ private:
     Flow *flowId;
 
 public:
-    PacketType getType();
-    Packet(char *d, PacketType t, Host *s, Host *de, time_t start, 
+    Packet(RoutingTable *t, PacketType typ, Host *s, Host *de, time_t start, 
             int size, Flow *f, std::string id);
     ~Packet();
-    const char * getData();
-    void setData(char * d);
+    RoutingTable * getRoutingTable();
+    int getSize();
+    PacketType getType();
 
 };
 
