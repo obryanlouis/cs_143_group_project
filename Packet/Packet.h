@@ -22,14 +22,14 @@ private:
     RoutingTable *table;
     PacketType type;
     std::string id;
-    Host *source;
-    Host *destination;
+    Node *source;
+    Node *destination;
     time_t startTime;
     int size;
     Flow *flowId;
 
 public:
-    Packet(RoutingTable *t, PacketType typ, Host *s, Host *de, time_t start, 
+    Packet(RoutingTable *t, PacketType typ, Node *s, Node *de, time_t start, 
             int size, Flow *f, std::string id);
     ~Packet();
     RoutingTable * getRoutingTable();

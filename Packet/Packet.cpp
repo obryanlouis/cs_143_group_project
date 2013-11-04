@@ -4,7 +4,7 @@ using namespace std;
 
 Packet::~Packet() { } 
 
-Packet::Packet(RoutingTable *tab, Packet::PacketType t, Host *s, Host *de, time_t start,
+Packet::Packet(RoutingTable *tab, Packet::PacketType t, Node *s, Node *de, time_t start,
         int size, Flow *f, string id) {
     this->table = tab;
     this->type = t;
@@ -28,3 +28,8 @@ RoutingTable * Packet::getRoutingTable() {
 int Packet::getSize() {
     return this->size;
 }
+
+Node* Packet::getDestination() {
+    return this->destination;
+}
+

@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS=-c -Wall
 SOURCES=Routing/Router.cpp Routing/RoutingTable.cpp Links/Link.cpp Main/Main.cpp\
- Flow/Flow.cpp Packet/Packet.cpp Control/Control.cpp
+ Flow/Flow.cpp Packet/Packet.cpp Control/Control.cpp Node/Node.cpp
 PLOTSOURCES=gnuplot/make_plot.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=test
