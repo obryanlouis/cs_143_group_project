@@ -9,8 +9,8 @@ Router::Router() {
     this->routingTable_p = new RoutingTable();
 }
 
-Router::Router(int in_id)
-    : Node(in_id)
+Router::Router(int in_id, std::list<Link*> l)
+    : Node(in_id, l)
 {}
 
 Router::~Router() {
@@ -20,11 +20,20 @@ Router::~Router() {
 void Router::handlePacket(Packet *packet){
     std::cout << "Router is handling packet" << std::endl;
 
+    bool  updated;   // to be used if the packet is for Routing Table Updates
+    Link *nextLink;  // to be used for handling data packets
+
     switch (packet->getType())
     {
     case Packet::ROUTE:
         // handing routing table information
-        bool updated = updateRoutingTable(packet->getRoutingTable(), 0);
+        updated = updateRoutingTable(packet->getRoutingTable(), 0);
+        if (updated == 0) {
+            // successfully updated routing table
+        } else {
+            // failed to update...throw some exception?
+        }
+
             // the 0 should be the Link * we received this packet from
             // will depend on implementation
         break;
@@ -32,7 +41,7 @@ void Router::handlePacket(Packet *packet){
         // handle acknowledgement packets: same as data packets
     case Packet::DATA:
         // handle data packets
-        Link *nextLink = getNextLink(packet->getDestination());
+        nextLink = getNextLink(packet->getDestination());
         nextLink->handlePacket(packet);
         break;
     default:
@@ -43,11 +52,11 @@ void Router::handlePacket(Packet *packet){
 }
 
 Link* Router::getNextLink(Node *destination) {
-	return this->routingTable->nextLink(destination);
+	return this->routingTable_p->nextLink(destination);
 }
 
 Node* Router::getNextNode(Node *destination) {
-	return this->routingTable->nextNode(destination);
+	return this->routingTable_p->nextNode(destination);
 }
 
 
@@ -57,9 +66,9 @@ bool Router::updateRoutingTable(RoutingTable *t, Link *l) {
     for (std::map<Node*, std::pair<int, Link*> >::iterator it = t->mapping.begin();
         it != t->mapping.end(); ++it) {
         Node *r = it->first;
-        if ((*routingTable)[r].first > t->mapping[r].first) {
-            (*routingTable)[r].first = t->mapping[r].first;
-            (*routingTable)[r].second = l;
+        if ((*routingTable_p)[r].first > t->mapping[r].first) {
+            (*routingTable_p)[r].first = t->mapping[r].first;
+            (*routingTable_p)[r].second = l;
             changed = true;
         }
     }

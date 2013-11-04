@@ -8,6 +8,7 @@
 #include "Flow.h"
 
 class RoutingTable;
+class Node;
 
 class Packet{
 
@@ -34,6 +35,7 @@ public:
     RoutingTable * getRoutingTable();
     int getSize();
     PacketType getType();
+    Node* getDestination();
 
 };
 

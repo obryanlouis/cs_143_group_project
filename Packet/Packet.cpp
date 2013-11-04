@@ -21,7 +21,7 @@ Packet::PacketType Packet::getType() {
 }
 
 RoutingTable * Packet::getRoutingTable() {
-    assert(this->type == Packet::INF);
+    assert(this->type == Packet::ROUTE);
     return this->table;
 }
 
