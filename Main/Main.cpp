@@ -1,20 +1,23 @@
+#include <iostream>
 
-
+#include "Control.h"
+#include "Flow.h"
 #include "Link.h"
+#include "Node.h"
 #include "Router.h"
 #include "RoutingTable.h"
-#include "Node.h"
-
-using namespace std;
 
 int main( int argc, const char* argv[] ) {
-	Router r1, r2;
-//  RoutingTable t;
 
-//  r1.handlePacket(0);
-//    Link l;
+    Event *my_event = new Event(UPDATE_FLOWS, 13);
 
-//    l.setEnds(&r1, &r2);
+    Scheduler *my_scheduler = new Scheduler();
+    my_scheduler->add(my_event);
+    my_scheduler->add(UPDATE_LINKS, 2);
+    my_scheduler->add(UPDATE_LINKS, 5);
+    my_scheduler->printAndDestroySchedule();
 
+    Controller *my_controller = new Controller();
+    my_controller->run();
 	return 0;
 }

@@ -6,6 +6,7 @@
 
 /* Controller functions */
 Controller::Controller(){
+    SYSTEM_CONTROLLER = this; 
     this->schedule_p = new Scheduler();
     // TODO: Update the number of flows. 
     this->flowsLeft = 0;
@@ -28,8 +29,22 @@ void Controller::run(){
         }
     }
 
-    std::cout << "Network simulated successfully" << std::endl;
+    std::cout << "Network simulated successfully. YAY!" << std::endl;
 }
+
+void Controller::printSystem(){
+    std::cout << "  Outputting Flow information." << std::endl;
+    // TODO: Actually print the system to files.
+    std::cout << "  Outputting Link information." << std::endl;
+        
+    std::cout << "--Done printing system." << std::endl;
+}
+
+void Controller::routerUpdate(){
+    std::cout << "  " << std::endl;
+    // TODO: Send router update information.
+}
+
 
 
 /* Scheduler functions */
@@ -52,7 +67,7 @@ void Scheduler::add(Event* event_p){
 void Scheduler::add(event_t in_type, unsigned int in_time, void *in_actOn){
     Event *new_event = new Event(in_type, in_time, in_actOn);
     this->events_p->push(new_event);
-    std::cout << "made/pushed event of type " << new_event->getType() << std::endl;
+    std::cout << "made and pushed event of type " << new_event->getType() << std::endl;
 }
 
 /* Do next event in the event queue. If this event causes another event to be added
@@ -62,6 +77,8 @@ bool Scheduler::doNext(){
     if (this->events_p->size() != 0){
         Event *new_event = this->events_p->top();
         Event *next_event = new_event->execute();
+
+        delete new_event; 
         this->events_p->pop();
 
         if (next_event) {
@@ -90,13 +107,13 @@ void Scheduler::printAndDestroySchedule(){
 Event *Event::execute(){
     if (type == UPDATE_ROUTING){
         std::cout << "Signal for router update sent." << std::endl;
-        // TODO: add functions to call for routing event
+        SYSTEM_CONTROLLER->routerUpdate();
         Event *new_event = new Event(UPDATE_ROUTING, this->time + ROUTING_UPDATE_PERIOD);
         return new_event;
     }
     else if (type == PRINT_STATS){
         std::cout << "Printing system stats to files." << std::endl;
-    // TODO
+        SYSTEM_CONTROLLER->printSystem();
         Event *new_event = new Event(PRINT_STATS, this->time + SNAPSHOT_PERIOD);
         return new_event;
     }

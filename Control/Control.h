@@ -14,11 +14,12 @@
 #include "Router.h"
 
 /* Constants */
-static const unsigned int ROUTING_UPDATE_PERIOD = 6000;
-static const unsigned int SNAPSHOT_PERIOD = 6000;
+static unsigned int ROUTING_UPDATE_PERIOD = 6000;
+static unsigned int SNAPSHOT_PERIOD = 6000;
 static const unsigned int END_PERIOD = 100; // number of events to execute
                                             // after flows done (for data 
                                             // collection)
+
 
 /* Different type of events */
 enum event_t{
@@ -75,7 +76,10 @@ public:
 };
 
 
-/* Master controller for everything */ 
+/* Master controller. Deals with input and output. 
+ * Also includes functions to enact processes that need
+ * to occur system-wide.
+ */ 
 class Controller {
 private:
   std::list<Router*> *routers_p;
@@ -88,8 +92,16 @@ public:
   Controller();
   ~Controller();
 
+  void printSystem();
+  void routerUpdate();
+
   void run();
 };
+
+/* Pointer to the master controller. 
+ * This is ONLY set by the Controller constructor. 
+ */
+static Controller *SYSTEM_CONTROLLER; 
 
 
 #endif
