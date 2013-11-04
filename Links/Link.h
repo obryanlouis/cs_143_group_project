@@ -4,6 +4,7 @@
 #define LINK_H
 
 #include <queue>
+#include <string>
 #include "Node.h"
 
 class Node;
@@ -45,6 +46,7 @@ public:
 	int getOccupancy();
 	int getPacketLoss();
 	int getFlowRate();
+	int getStat(std::string stat);
 	int getLength();
 	
 	Node *getEnd1();

@@ -1,7 +1,5 @@
 // Control.cpp
 
-#include <iostream>
-
 #include "Control.h"
 
 /* Controller functions */
@@ -31,6 +29,36 @@ void Controller::run(){
     std::cout << "Network simulated successfully" << std::endl;
 }
 
+
+void Controller::statsSnapshot() {
+    unsigned int currentTime = this->schedule_p->getCurrentTime();
+    std::map<std::string, std::ofstream*> files;
+    // Links
+    std::ofstream *occupancyFile, *lossFile, *rateFile;
+    occupancyFile->open(LINK_OCCUPANCY_FILE.data(), std::ios::app);
+    lossFile->open(LINK_PACKET_LOSS_FILE.data(), std::ios::app);
+    rateFile->open(LINK_FLOW_RATE_FILE.data(), std::ios::app);
+    files["occupancy"] = occupancyFile;
+    files["loss"] = lossFile;
+    files["rate"] = rateFile;
+    for (std::map<std::string, std::ofstream*>::iterator i = files.begin();
+         i != files.end(); i++)
+    {
+        std::ofstream *file = i->second;
+        std::string stat = i->first;
+        (*file) << currentTime;
+        for (std::list<Link*>::iterator it = this->links_p->begin();
+             it != this->links_p->end(); it++)
+        {
+            Link *link = *it;
+           (*file) << " " + link->getStat(stat);
+        }
+        (*file) << "\n";
+        file->close();
+    }
+    
+    // TODO: Routers, Hosts, Flows
+}
 
 /* Scheduler functions */
 /* Initiate scheduler by creating schedule queue and putting in initial events. */ 
@@ -82,6 +110,10 @@ void Scheduler::printAndDestroySchedule(){
         std::cout << "Time " << curr->getTime() << "| Type = " << curr->getType() << \
             std::endl;
     }
+}
+
+unsigned int Scheduler::getCurrentTime() {
+
 }
 
 /* Event functions */

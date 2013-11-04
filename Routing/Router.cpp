@@ -6,7 +6,11 @@
 #include <iostream>
 
 Router::Router() { 
+    // Make a new routing table
     this->routingTable_p = new RoutingTable();
+    // Add an entry to the routing table saying that the distance to this router
+    // is 0.
+    this->routingTable_p[this] = std::make_pair<int, Link*>(0, NULL);
 }
 
 Router::Router(int in_id, std::list<Link*> l)
@@ -66,8 +70,13 @@ bool Router::updateRoutingTable(RoutingTable *t, Link *l) {
     for (std::map<Node*, std::pair<int, Link*> >::iterator it = t->mapping.begin();
         it != t->mapping.end(); ++it) {
         Node *r = it->first;
-        if ((*routingTable_p)[r].first > t->mapping[r].first) {
-            (*routingTable_p)[r].first = t->mapping[r].first;
+        // If this routing table doesn't have an entry for this node, or its distance
+        // is greater than the calculated distance, then create/update the entry.
+        // Prevent paths that would go back through this router.
+        if (((*routingTable_p).count(r) == 0 ||
+            (*routingTable_p)[r].first + l->getLength() > t->mapping[r].first)
+            && t->mapping[r].second != l) {
+            (*routingTable_p)[r].first = t->mapping[r].first + l->getLength();
             (*routingTable_p)[r].second = l;
             changed = true;
         }

@@ -69,4 +69,16 @@ int Link::getFlowRate() {
     return this->dataSent;
 }
 
-
+int Link::getStat(std::string stat) {
+    if (stat.compare("occupancy") == 0) {
+        return this->getOccupancy();
+    }
+    else if (stat.compare("loss") == 0) {
+        return this->getPacketLoss();
+    }
+    else if (stat.compare("rate") == 0) {
+        return this->getFlowRate();
+    }
+    throw new std::string("You tried to compute the stat " + stat
+        + " but this stat doesn't exist.");
+}

@@ -20,8 +20,6 @@ class Router : public Node {
 
 	RoutingTable *routingTable_p;
         // the router's routing table
-
-	Link* walkBackwards(Node *u, Node *v, std::map<Node *, Node *> *predecessor);
 	
 public:
     // CONSTRUCTORS AND DESTRUCTORS
@@ -37,7 +35,6 @@ public:
         // Returns the next link to route to based on a destination
 	Node *getNextNode(Node *destination);
         // Returns the next router to route to based on destination
-	void bellmanFord(std::list<Node*> nodes, std::list<Link*> edges);
 	bool updateRoutingTable(RoutingTable *t, Link *l);
         // Updates the routing table based on received routing table
         // from link l. Returns true if updated, false otherwise.

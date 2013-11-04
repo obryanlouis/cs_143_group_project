@@ -4,6 +4,8 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
+#include <iostream>
+#include <fstream>
 #include <stdlib.h>
 #include <list>
 #include <queue>
@@ -19,6 +21,9 @@ static const unsigned int SNAPSHOT_PERIOD = 6000;
 static const unsigned int END_PERIOD = 100; // number of events to execute
                                             // after flows done (for data 
                                             // collection)
+static const std::string LINK_OCCUPANCY_FILE = std::string("Output/LinkOccupancy.txt");
+static const std::string LINK_PACKET_LOSS_FILE = std::string("Output/LinkPacketLoss.txt");
+static const std::string LINK_FLOW_RATE_FILE = std::string("Output/LinkFlowRate.txt");
 
 /* Different type of events */
 enum event_t{
@@ -60,35 +65,36 @@ struct timecomp{
 /* Schedules and executes events*/
 class Scheduler{
 private:
-  std::priority_queue<Event*, std::vector<Event*>, timecomp> *events_p;
+    std::priority_queue<Event*, std::vector<Event*>, timecomp> *events_p;
 
 public:
-  Scheduler();
-  ~Scheduler();
+    Scheduler();
+    ~Scheduler();
 
-  void add(event_t in_type,  unsigned int in_time, void *in_actOn = 0);
-  void add(Event* event_p);
-  bool doNext();
+    void add(event_t in_type,  unsigned int in_time, void *in_actOn = 0);
+    void add(Event* event_p);
+    bool doNext();
 
-  void printAndDestroySchedule();
-
+    void printAndDestroySchedule();
+    unsigned int getCurrentTime();
 };
-
 
 /* Master controller for everything */ 
 class Controller {
 private:
-  std::list<Router*> *routers_p;
-  std::list<Link*> *links_p;
-  std::list<Flow*> *flows_p;
-  Scheduler *schedule_p;
-  int flowsLeft;
+    std::list<Router*> *routers_p;
+    std::list<Link*> *links_p;
+    std::list<Flow*> *flows_p;
+    Scheduler *schedule_p;
+    int flowsLeft;
 
 public:
-  Controller();
-  ~Controller();
+    Controller();
+    ~Controller();
 
-  void run();
+    void run();
+    void statsSnapshot();
+        // Writes the relevant stats to files so that they can be graphed
 };
 
 
