@@ -16,14 +16,15 @@
 #include "Router.h"
 
 /* Constants */
-static const unsigned int ROUTING_UPDATE_PERIOD = 6000;
-static const unsigned int SNAPSHOT_PERIOD = 6000;
+static unsigned int ROUTING_UPDATE_PERIOD = 6000;
+static unsigned int SNAPSHOT_PERIOD = 6000;
 static const unsigned int END_PERIOD = 100; // number of events to execute
                                             // after flows done (for data 
                                             // collection)
 static const std::string LINK_OCCUPANCY_FILE = std::string("Output/LinkOccupancy.txt");
 static const std::string LINK_PACKET_LOSS_FILE = std::string("Output/LinkPacketLoss.txt");
 static const std::string LINK_FLOW_RATE_FILE = std::string("Output/LinkFlowRate.txt");
+
 
 /* Different type of events */
 enum event_t{
@@ -39,6 +40,8 @@ private:
     event_t type;
     unsigned int time;
     void *actOn;
+    void *fp;
+        // A function pointer to execute during Event::execute
 
 public:
     Event(event_t in_type, unsigned int in_time, void *in_actOn = 0)
@@ -79,7 +82,10 @@ public:
     unsigned int getCurrentTime();
 };
 
-/* Master controller for everything */ 
+/* Master controller. Deals with input and output. 
+ * Also includes functions to enact processes that need
+ * to occur system-wide.
+ */ 
 class Controller {
 private:
     std::list<Router*> *routers_p;
@@ -92,10 +98,16 @@ public:
     Controller();
     ~Controller();
 
+    void printSystem();
+    void routerUpdate();
+
     void run();
-    void statsSnapshot();
-        // Writes the relevant stats to files so that they can be graphed
 };
+
+/* Pointer to the master controller. 
+ * This is ONLY set by the Controller constructor. 
+ */
+static Controller *SYSTEM_CONTROLLER; 
 
 
 #endif
