@@ -5,7 +5,7 @@ SOURCES=Routing/Router.cpp Routing/RoutingTable.cpp Links/Link.cpp Main/Main.cpp
 PLOTSOURCES=gnuplot/make_plot.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=test
-INCLUDE=-I Control -I Flow -I Links -I Node -I Routing -I Packet
+INCLUDE=-I Control -I Flow -I Links -I Node -I Routing -I Packet -I Main
 
 all: test
 

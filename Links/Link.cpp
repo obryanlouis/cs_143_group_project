@@ -1,7 +1,7 @@
 #include "Link.h"
 
 Link::Link(int in_ID, Node *in_end1, Node *in_end2, int in_capacity,
-    int in_delay)
+    int in_delay, int in_rate)
     : ID(in_ID)
     , end1_p(in_end1)
     , end2_p(in_end2)
@@ -10,6 +10,7 @@ Link::Link(int in_ID, Node *in_end1, Node *in_end2, int in_capacity,
     , dataSent(0)
     , packetLoss(0)
     , capacityUsed(0)
+    , rate(in_rate)
 { }
 
 void Link::resetStats() {
@@ -17,8 +18,8 @@ void Link::resetStats() {
     this->packetLoss = 0;
 }
 
-int Link::getLength() { 
-    return this->length; 
+int Link::getRate() { 
+    return this->rate; 
 }
 
 Node *Link::getEnd1() { 
@@ -65,7 +66,7 @@ int Link::getPacketLoss() {
     return this->packetLoss;
 }
 
-int Link::getFlowRate() {
+int Link::getDataSent() {
     return this->dataSent;
 }
 
@@ -76,9 +77,40 @@ int Link::getStat(std::string stat) {
     else if (stat.compare("loss") == 0) {
         return this->getPacketLoss();
     }
-    else if (stat.compare("rate") == 0) {
-        return this->getFlowRate();
+    else if (stat.compare("data sent") == 0) {
+        return this->getDataSent();
     }
     throw new std::string("You tried to compute the stat " + stat
         + " but this stat doesn't exist.");
 }
+
+void sendPacketCallback(void* args) {
+    void **argArray = (void **)args;
+    Node *n = (Node *)argArray[0];
+    Packet *p = (Packet *)argArray[1];
+    n->handlePacket(p);
+}
+
+void Link::sendAnotherPacket() {
+    // Get the current time and propagation time to schedule the next event
+    unsigned int currentTime = CONTROLLER->getCurrentTime();
+    unsigned int propogationTime = delay;
+    // Get the next node
+    Node *nextNode = this->end2_p;
+    // Pop the next packet
+    Packet *packet = this->popPacket();
+    // Store the node and the packet as an argument for the callback
+    void *args[2];
+    args[0] = nextNode;
+    args[1] = packet;
+    // Make a callback for the event to execute
+    void (*fp)(void*) = &sendPacketCallback;
+    // Make a new event and add it to the controller's schedule
+    Event *e = new Event(currentTime + propogationTime, fp, &args);
+    CONTROLLER->add(e);
+}
+
+int Link::getDelay() {
+    return this->delay;
+}
+

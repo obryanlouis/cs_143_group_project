@@ -11,9 +11,12 @@
 #include <queue>
 
 #include "Flow.h"
-#include "Link.h"
+//#include "Link.h"
 #include "Node.h"
-#include "Router.h"
+//#include "Router.h"
+
+class Link;
+class Router;
 
 /* Constants */
 static unsigned int ROUTING_UPDATE_PERIOD = 6000;
@@ -27,33 +30,36 @@ static const std::string LINK_FLOW_RATE_FILE = std::string("Output/LinkFlowRate.
 
 
 /* Different type of events */
-enum event_t{
+/*enum event_t{
     UPDATE_ROUTING,
     PRINT_STATS,
     UPDATE_FLOWS,
     UPDATE_LINKS
-};
+};*/
 
 /* Events that get put into the scheduler */
 class Event {
 private:
-    event_t type;
     unsigned int time;
     void *actOn;
-    void *fp;
-        // A function pointer to execute during Event::execute
+    void (*fp)(void*);
+        // A function pointer to a function to execute during Event::execute
+    void *arg;
+        // The argument to the function pointer
 
 public:
-    Event(event_t in_type, unsigned int in_time, void *in_actOn = 0)
-        :type(in_type)
-        ,time(in_time)
+    Event(unsigned int in_time, void (*fp)(void*), void *arg, void *in_actOn = 0)
+        :time(in_time)
         ,actOn(in_actOn)
+        ,arg(arg)
+        ,fp(fp)
     {}
 
     ~Event(){}
 
     unsigned int getTime() const { return time; }
-    event_t getType() const { return type;}
+    //event_t getType() const { return type;}
+    //  Can we just have this function signature be void execute()?
     Event *execute();
 };
 
@@ -69,12 +75,13 @@ struct timecomp{
 class Scheduler{
 private:
     std::priority_queue<Event*, std::vector<Event*>, timecomp> *events_p;
+    unsigned int currentTime;
 
 public:
     Scheduler();
     ~Scheduler();
 
-    void add(event_t in_type,  unsigned int in_time, void *in_actOn = 0);
+    //void add(event_t in_type,  unsigned int in_time, void *in_actOn = 0);
     void add(Event* event_p);
     bool doNext();
 
@@ -93,6 +100,7 @@ private:
     std::list<Flow*> *flows_p;
     Scheduler *schedule_p;
     int flowsLeft;
+    unsigned int prevStatCollectTime;
 
 public:
     Controller();
@@ -100,6 +108,8 @@ public:
 
     void printSystem();
     void routerUpdate();
+    void add(Event *event_p);
+    unsigned int getCurrentTime();
 
     void run();
 };

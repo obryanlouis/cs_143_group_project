@@ -3,21 +3,31 @@
 #ifndef LINK_H
 #define LINK_H
 
+#include <utility>
 #include <queue>
 #include <string>
+#include "Main.h"
 #include "Node.h"
+#include "Control.h"
 
 class Node;
 class Packet;
+class Controller;
 
+namespace {
+    extern Controller *CONTROLLER;
+}
 
 /* Link class which controls packet transfer between routers. */
 class Link {
 	
 private:
     int ID;
+        // ID of the link
 	Node *end1_p;
+        // One endpoint of the link
 	Node *end2_p;
+        // The other endpoint of the link
     int capacity; 
         // maximum capacity (in bytes)
     int capacityUsed;
@@ -30,24 +40,27 @@ private:
         // used for stat keeping
     int packetLoss;
         // used for stat keeping 
-	int length;	
-	    // can change this
-    void pushPacket(Packet *in_packet);
+	int rate;	
+	    // the link rate in Mbps
+    int pushPacket(Packet *in_packet);
+        // push the packet onto the buffer. Returns 0 if successfuly and
+        // 1 if the packet is dropped
 
 
 public:
     Link () { }
     Link(int in_ID, Node *in_end1, Node *in_end2, int in_capacity,
-        int in_delay);
+        int in_delay, int in_rate);
 
     ~Link() { }
     
 	void resetStats();
 	int getOccupancy();
 	int getPacketLoss();
-	int getFlowRate();
+	int getDataSent();
 	int getStat(std::string stat);
-	int getLength();
+	int getRate();
+	int getDelay();
 	
 	Node *getEnd1();
 	Node *getEnd2();
@@ -55,6 +68,12 @@ public:
 
     Packet* popPacket();
     void handlePacket(Packet* packet);
+        // Handles an incoming packet by either adding it to the buffer, or 
+        // dropping it. Also schedules an event to execute that will simulate
+        // the router processing THIS packet.
+    void sendAnotherPacket();
+        // Dequeues the top packet and schedules an event in the future for
+        // the router to handle the packet.
 
 };
 

@@ -8,6 +8,7 @@ Controller::Controller(){
     this->schedule_p = new Scheduler();
     // TODO: Update the number of flows. 
     this->flowsLeft = 0;
+    this->prevStatCollectTime = 0;
 }
 
 void Controller::run(){
@@ -46,7 +47,7 @@ void Controller::printSystem() {
     rateFile->open(LINK_FLOW_RATE_FILE.data(), std::ios::app);
     files["occupancy"] = occupancyFile;
     files["loss"] = lossFile;
-    files["rate"] = rateFile;
+    files["data sent"] = rateFile;
     for (std::map<std::string, std::ofstream*>::iterator i = files.begin();
          i != files.end(); i++)
     {
@@ -56,8 +57,17 @@ void Controller::printSystem() {
         for (std::list<Link*>::iterator it = this->links_p->begin();
              it != this->links_p->end(); it++)
         {
-            Link *link = *it;
-           (*file) << " " + link->getStat(stat);
+               Link *link = *it;
+            // Calculate the flow rate during this time interval
+            if (stat.compare("data sent") == 0) {
+               int dataSent = link->getStat(stat);
+               int timeDifference = currentTime - this->prevStatCollectTime;
+               (*file) << " " << (double)dataSent / (double)timeDifference;
+            }
+            // For the values that can be directly saved do so
+            else {
+               (*file) << " " + link->getStat(stat);
+            }
         }
         (*file) << "\n";
         file->close();
@@ -67,14 +77,25 @@ void Controller::printSystem() {
     std::cout << "  Outputting Flow information." << std::endl;
     
     std::cout << "--Done printing system." << std::endl;
+    this->prevStatCollectTime = currentTime;
+}
+
+void Controller::add(Event *event_p) {
+    this->schedule_p->add(event_p);
+}
+
+unsigned int Controller::getCurrentTime() {
+    return this->schedule_p->getCurrentTime();
 }
 
 /* Scheduler functions */
 /* Initiate scheduler by creating schedule queue and putting in initial events. */ 
 Scheduler::Scheduler(){
     this->events_p = new std::priority_queue<Event*, std::vector<Event*>, timecomp>; 
-    add(UPDATE_ROUTING, 0);
-    add(PRINT_STATS,0);
+    // TODO: make callback functions for the routing update and the stat printing
+    //add(UPDATE_ROUTING, 0);
+    //add(PRINT_STATS,0);
+    this->currentTime = 0;
 }
 
 Scheduler::~Scheduler(){
@@ -83,14 +104,14 @@ Scheduler::~Scheduler(){
 
 void Scheduler::add(Event* event_p){
     this->events_p->push(event_p);
-    std::cout << "pushed event of type " << event_p->getType() << std::endl;
+    //std::cout << "pushed event of type " << event_p->getType() << std::endl;
 }
 
-void Scheduler::add(event_t in_type, unsigned int in_time, void *in_actOn){
+/*void Scheduler::add(event_t in_type, unsigned int in_time, void *in_actOn){
     Event *new_event = new Event(in_type, in_time, in_actOn);
     this->events_p->push(new_event);
-    std::cout << "made and pushed event of type " << new_event->getType() << std::endl;
-}
+    //std::cout << "made and pushed event of type " << new_event->getType() << std::endl;
+}*/
 
 /* Do next event in the event queue. If this event causes another event to be added
  * to the event queue, do so here. 
@@ -98,6 +119,8 @@ void Scheduler::add(event_t in_type, unsigned int in_time, void *in_actOn){
 bool Scheduler::doNext(){
     if (this->events_p->size() != 0){
         Event *new_event = this->events_p->top();
+        // Update the current time of the scheduler.
+        this->currentTime = new_event->getTime();
         Event *next_event = new_event->execute();
 
         delete new_event; 
@@ -118,20 +141,22 @@ void Scheduler::printAndDestroySchedule(){
     while (this->events_p->size() != 0){
         Event* curr = this->events_p->top();
         this->events_p->pop();
-        std::cout << "Time " << curr->getTime() << "| Type = " << curr->getType() << \
+        //std::cout << "Time " << curr->getTime() << "| Type = " << curr->getType() << \
             std::endl;
     }
 }
 
 unsigned int Scheduler::getCurrentTime() {
-
+    return this->currentTime;
 }
 
 /* Event functions */
 
 // Execute function should be kept up to date with the event type struct.
 Event *Event::execute(){
-    this->fp();
+    // Execute the pointer to the callback function with the given argument
+    this->fp(this->arg);
+    return NULL;
     /*if (type == UPDATE_ROUTING){
         std::cout << "Signal for router update sent." << std::endl;
         SYSTEM_CONTROLLER->routerUpdate();
