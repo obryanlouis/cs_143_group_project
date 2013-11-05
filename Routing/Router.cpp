@@ -21,7 +21,7 @@ Router::~Router() {
     delete this->routingTable_p;
 }
 
-void Router::handlePacket(Packet *packet){
+void Router::handlePacket(Packet *packet, Link *link){
     std::cout << "Router is handling packet" << std::endl;
 
     bool  updated;   // to be used if the packet is for Routing Table Updates
@@ -31,7 +31,7 @@ void Router::handlePacket(Packet *packet){
     {
     case Packet::ROUTE:
         // handing routing table information
-        updated = updateRoutingTable(packet->getRoutingTable(), 0);
+        updated = updateRoutingTable(packet->getRoutingTable(), link);
         if (updated == 0) {
             // successfully updated routing table
         } else {

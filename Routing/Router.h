@@ -40,7 +40,7 @@ public:
         // from link l. Returns true if updated, false otherwise.
     void addLink(Link *l);
         // Adds a link to the router
-    void handlePacket(Packet* packet); 
+    void handlePacket(Packet* packet, Link *link); 
 };
 
 #endif

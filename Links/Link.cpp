@@ -85,10 +85,14 @@ int Link::getStat(std::string stat) {
 }
 
 void sendPacketCallback(void* args) {
+    // Unpack the arguments
     void **argArray = (void **)args;
     Node *n = (Node *)argArray[0];
     Packet *p = (Packet *)argArray[1];
-    n->handlePacket(p);
+    Link *l = (Link *)argArray[2];
+    n->handlePacket(p, l);
+    // Clean up
+    delete argArray;
 }
 
 void Link::sendAnotherPacket() {
@@ -99,10 +103,13 @@ void Link::sendAnotherPacket() {
     Node *nextNode = this->end2_p;
     // Pop the next packet
     Packet *packet = this->popPacket();
+    // A pointer to this link;
+    Link *link = this;
     // Store the node and the packet as an argument for the callback
-    void *args[2];
+    void **args = (void **)malloc(sizeof(void *) * 3);
     args[0] = nextNode;
     args[1] = packet;
+    args[2] = link;
     // Make a callback for the event to execute
     void (*fp)(void*) = &sendPacketCallback;
     // Make a new event and add it to the controller's schedule
