@@ -66,8 +66,58 @@ int Link::getPacketLoss() {
     return this->packetLoss;
 }
 
-int Link::getFlowRate() {
+int Link::getDataSent() {
     return this->dataSent;
 }
 
+int Link::getStat(std::string stat) {
+    if (stat.compare("occupancy") == 0) {
+        return this->getOccupancy();
+    }
+    else if (stat.compare("loss") == 0) {
+        return this->getPacketLoss();
+    }
+    else if (stat.compare("data sent") == 0) {
+        return this->getDataSent();
+    }
+    throw new std::string("You tried to compute the stat " + stat
+        + " but this stat doesn't exist.");
+}
+
+void sendPacketCallback(void* args) {
+    // Unpack the arguments
+    void **argArray = (void **)args;
+    Node *n = (Node *)argArray[0];
+    Packet *p = (Packet *)argArray[1];
+    Link *l = (Link *)argArray[2];
+    n->handlePacket(p, l);
+    // Clean up
+    delete argArray;
+}
+
+void Link::sendAnotherPacket() {
+    // Get the current time and propagation time to schedule the next event
+    unsigned int currentTime = CONTROLLER->getCurrentTime();
+    unsigned int propogationTime = delay;
+    // Get the next node
+    Node *nextNode = this->end2_p;
+    // Pop the next packet
+    Packet *packet = this->popPacket();
+    // A pointer to this link;
+    Link *link = this;
+    // Store the node and the packet as an argument for the callback
+    void **args = (void **)malloc(sizeof(void *) * 3);
+    args[0] = nextNode;
+    args[1] = packet;
+    args[2] = link;
+    // Make a callback for the event to execute
+    void (*fp)(void*) = &sendPacketCallback;
+    // Make a new event and add it to the controller's schedule
+    Event *e = new Event(currentTime + propogationTime, fp, &args);
+    CONTROLLER->add(e);
+}
+
+int Link::getDelay() {
+    return this->delay;
+}
 

@@ -3,12 +3,20 @@
 #ifndef LINK_H
 #define LINK_H
 
+#include <utility>
 #include <queue>
+#include <string>
+#include "Main.h"
 #include "Node.h"
+#include "Control.h"
 
 class Node;
 class Packet;
+class Controller;
 
+namespace {
+    extern Controller *CONTROLLER;
+}
 
 /* Link class which controls packet transfer between routers. */
 class Link {
@@ -49,8 +57,10 @@ public:
 	void resetStats();
 	int getOccupancy();
 	int getPacketLoss();
-	int getFlowRate();
+	int getDataSent();
+	int getStat(std::string stat);
 	int getRate();
+	int getDelay();
 	
 	Node *getEnd1();
 	Node *getEnd2();
@@ -58,6 +68,12 @@ public:
 
     Packet* popPacket();
     void handlePacket(Packet* packet);
+        // Handles an incoming packet by either adding it to the buffer, or 
+        // dropping it. Also schedules an event to execute that will simulate
+        // the router processing THIS packet.
+    void sendAnotherPacket();
+        // Dequeues the top packet and schedules an event in the future for
+        // the router to handle the packet.
 
 };
 

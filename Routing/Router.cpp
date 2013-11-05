@@ -6,7 +6,11 @@
 #include <iostream>
 
 Router::Router() { 
+    // Make a new routing table
     this->routingTable_p = new RoutingTable();
+    // Add an entry to the routing table saying that the distance to this router
+    // is 0.
+    (*this->routingTable_p)[this] = std::make_pair<int, Link*>(0, NULL);
 }
 
 Router::Router(int in_id, std::list<Link*> l)
@@ -17,7 +21,7 @@ Router::~Router() {
     delete this->routingTable_p;
 }
 
-void Router::handlePacket(Packet *packet){
+void Router::handlePacket(Packet *packet, Link *link){
     std::cout << "Router is handling packet" << std::endl;
 
     bool  updated;   // to be used if the packet is for Routing Table Updates
@@ -27,7 +31,7 @@ void Router::handlePacket(Packet *packet){
     {
     case Packet::ROUTE:
         // handing routing table information
-        updated = updateRoutingTable(packet->getRoutingTable(), 0);
+        updated = updateRoutingTable(packet->getRoutingTable(), link);
         if (updated == 0) {
             // successfully updated routing table
         } else {
@@ -66,8 +70,13 @@ bool Router::updateRoutingTable(RoutingTable *t, Link *l) {
     for (std::map<Node*, std::pair<int, Link*> >::iterator it = t->mapping.begin();
         it != t->mapping.end(); ++it) {
         Node *r = it->first;
-        if ((*routingTable_p)[r].first > t->mapping[r].first) {
-            (*routingTable_p)[r].first = t->mapping[r].first;
+        // If this routing table doesn't have an entry for this node, or its distance
+        // is greater than the calculated distance, then create/update the entry.
+        // Prevent paths that would go back through this router.
+        if ((routingTable_p->mapping.count(r) == 0 ||
+            (*routingTable_p)[r].first + l->getDelay() > t->mapping[r].first)
+            && t->mapping[r].second != l) {
+            (*routingTable_p)[r].first = t->mapping[r].first + l->getDelay();
             (*routingTable_p)[r].second = l;
             changed = true;
         }

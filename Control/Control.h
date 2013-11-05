@@ -4,14 +4,19 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
+#include <iostream>
+#include <fstream>
 #include <stdlib.h>
 #include <list>
 #include <queue>
 
 #include "Flow.h"
-#include "Link.h"
+//#include "Link.h"
 #include "Node.h"
-#include "Router.h"
+//#include "Router.h"
+
+class Link;
+class Router;
 
 /* Constants */
 static unsigned int ROUTING_UPDATE_PERIOD = 6000;
@@ -19,34 +24,42 @@ static unsigned int SNAPSHOT_PERIOD = 6000;
 static const unsigned int END_PERIOD = 100; // number of events to execute
                                             // after flows done (for data 
                                             // collection)
+static const std::string LINK_OCCUPANCY_FILE = std::string("Output/LinkOccupancy.txt");
+static const std::string LINK_PACKET_LOSS_FILE = std::string("Output/LinkPacketLoss.txt");
+static const std::string LINK_FLOW_RATE_FILE = std::string("Output/LinkFlowRate.txt");
 
 
 /* Different type of events */
-enum event_t{
+/*enum event_t{
     UPDATE_ROUTING,
     PRINT_STATS,
     UPDATE_FLOWS,
     UPDATE_LINKS
-};
+};*/
 
 /* Events that get put into the scheduler */
 class Event {
 private:
-    event_t type;
     unsigned int time;
     void *actOn;
+    void (*fp)(void*);
+        // A function pointer to a function to execute during Event::execute
+    void *arg;
+        // The argument to the function pointer
 
 public:
-    Event(event_t in_type, unsigned int in_time, void *in_actOn = 0)
-        :type(in_type)
-        ,time(in_time)
+    Event(unsigned int in_time, void (*fp)(void*), void *arg, void *in_actOn = 0)
+        :time(in_time)
         ,actOn(in_actOn)
+        ,arg(arg)
+        ,fp(fp)
     {}
 
     ~Event(){}
 
     unsigned int getTime() const { return time; }
-    event_t getType() const { return type;}
+    //event_t getType() const { return type;}
+    //  Can we just have this function signature be void execute()?
     Event *execute();
 };
 
@@ -61,20 +74,20 @@ struct timecomp{
 /* Schedules and executes events*/
 class Scheduler{
 private:
-  std::priority_queue<Event*, std::vector<Event*>, timecomp> *events_p;
+    std::priority_queue<Event*, std::vector<Event*>, timecomp> *events_p;
+    unsigned int currentTime;
 
 public:
-  Scheduler();
-  ~Scheduler();
+    Scheduler();
+    ~Scheduler();
 
-  void add(event_t in_type,  unsigned int in_time, void *in_actOn = 0);
-  void add(Event* event_p);
-  bool doNext();
+    //void add(event_t in_type,  unsigned int in_time, void *in_actOn = 0);
+    void add(Event* event_p);
+    bool doNext();
 
-  void printAndDestroySchedule();
-
+    void printAndDestroySchedule();
+    unsigned int getCurrentTime();
 };
-
 
 /* Master controller. Deals with input and output. 
  * Also includes functions to enact processes that need
@@ -82,20 +95,23 @@ public:
  */ 
 class Controller {
 private:
-  std::list<Router*> *routers_p;
-  std::list<Link*> *links_p;
-  std::list<Flow*> *flows_p;
-  Scheduler *schedule_p;
-  int flowsLeft;
+    std::list<Router*> *routers_p;
+    std::list<Link*> *links_p;
+    std::list<Flow*> *flows_p;
+    Scheduler *schedule_p;
+    int flowsLeft;
+    unsigned int prevStatCollectTime;
 
 public:
-  Controller();
-  ~Controller();
+    Controller();
+    ~Controller();
 
-  void printSystem();
-  void routerUpdate();
+    void printSystem();
+    void routerUpdate();
+    void add(Event *event_p);
+    unsigned int getCurrentTime();
 
-  void run();
+    void run();
 };
 
 /* Pointer to the master controller. 
