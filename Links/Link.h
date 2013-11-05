@@ -15,8 +15,11 @@ class Link {
 	
 private:
     int ID;
+        // ID of the link
 	Node *end1_p;
+        // One endpoint of the link
 	Node *end2_p;
+        // The other endpoint of the link
     int capacity; 
         // maximum capacity (in bytes)
     int capacityUsed;
@@ -29,9 +32,11 @@ private:
         // used for stat keeping
     int packetLoss;
         // used for stat keeping 
-	int length;	
-	    // can change this
-    void pushPacket(Packet *in_packet);
+	int rate;	
+	    // the link rate in Mbps
+    int pushPacket(Packet *in_packet);
+        // push the packet onto the buffer. Returns 0 if successfuly and
+        // 1 if the packet is dropped
 
 
 public:
@@ -45,7 +50,7 @@ public:
 	int getOccupancy();
 	int getPacketLoss();
 	int getFlowRate();
-	int getLength();
+	int getRate();
 	
 	Node *getEnd1();
 	Node *getEnd2();

@@ -1,7 +1,7 @@
 #include "Link.h"
 
 Link::Link(int in_ID, Node *in_end1, Node *in_end2, int in_capacity,
-    int in_delay)
+    int in_delay, int in_rate)
     : ID(in_ID)
     , end1_p(in_end1)
     , end2_p(in_end2)
@@ -10,6 +10,7 @@ Link::Link(int in_ID, Node *in_end1, Node *in_end2, int in_capacity,
     , dataSent(0)
     , packetLoss(0)
     , capacityUsed(0)
+    , rate(in_rate)
 { }
 
 void Link::resetStats() {
@@ -17,8 +18,8 @@ void Link::resetStats() {
     this->packetLoss = 0;
 }
 
-int Link::getLength() { 
-    return this->length; 
+int Link::getRate() { 
+    return this->rate; 
 }
 
 Node *Link::getEnd1() { 
