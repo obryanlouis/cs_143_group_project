@@ -78,3 +78,4 @@ bool Router::updateRoutingTable(RoutingTable *t, Link *l) {
 void Router::addLink(Link * l) {
     this->links.push_back(l);
 }
+

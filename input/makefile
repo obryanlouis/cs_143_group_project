@@ -11,4 +11,5 @@ read_input: read_input.cpp pugixml.o
 pugixml.o: pugixml.hpp pugixml.cpp
 	$(CC) $(CFLAGS) pugixml.cpp
 clean:
-	rm -rf *.o *.~
+	rm -rf *.o *.~ run
+

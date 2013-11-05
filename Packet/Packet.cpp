@@ -1,35 +1,42 @@
 #include "Packet.h"
 
-using namespace std;
+
+Packet::Packet(RoutingTable *tabl, Packet::PacketType type, Node *s, Node *de,
+        time_t start, Packet::PacketSize packetSize, Flow *f, std::string id)
+    : table(table)
+    , type(type)
+    , source(s)
+    , destination(de)
+    , startTime(start)
+    , size(packetSize)
+    , flow_p(f)
+    , packetId(id)
+{}
 
 Packet::~Packet() { } 
 
-Packet::Packet(RoutingTable *tab, Packet::PacketType t, Node *s, Node *de, time_t start,
-        int size, Flow *f, string id) {
-    this->table = tab;
-    this->type = t;
-    this->source = s;
-    this->destination = de;
-    this->startTime = start;
-    this->size = size;
-    this->flowId = f;
-    this->id = id;
-}
-
-Packet::PacketType Packet::getType() {
-    return type;
-}
-
-RoutingTable * Packet::getRoutingTable() {
+RoutingTable* Packet::getRoutingTable() {
     assert(this->type == Packet::ROUTE);
     return this->table;
 }
 
-int Packet::getSize() {
+Packet::PacketSize Packet::getSize() {
     return this->size;
+}
+
+Packet::PacketType Packet::getType() {
+    return this->type;
+}
+
+Node* Packet::getSource() {
+    return this->source;
 }
 
 Node* Packet::getDestination() {
     return this->destination;
 }
 
+Flow* Packet::getFlow() {
+    assert(this->type != Packet::ROUTE);
+    return this->flow_p;
+}

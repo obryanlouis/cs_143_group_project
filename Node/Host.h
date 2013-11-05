@@ -1,17 +1,24 @@
-
+// Host.h
 
 #ifndef HOST_H
 #define HOST_H
 
+#include <iostream>
+#include <cassert>
+
+#include "Packet.h"
+#include "Node.h"
 #include "Link.h"
 #include "Flow.h"
 
 class Host : public Node {
 
-    Link *link_p;
-        // the link the host is connected to
     Flow *flow_p;
         // the flow the host is associated with (as a source)
+    int dataSent;
+        // The amount of data sent in the last time interval (bytes)
+    int dataReceived;
+        // The amount of data received in the last time interval (bytes)
 
 public:
     Host(int in_id, Link *in_link, Flow *in_flow);
@@ -23,6 +30,12 @@ public:
         // returns a pointer to the link the host is connected to
     Flow* getFlow();
         // returns a pointer to the flow the host is associated with
+    int getDataSent();
+        // Returns the amount of data sent in the last time interval (bytes)
+    int getDataReceived();
+        // Returns the amount of data received in the last time interval (bytes)
+	void resetStats();
+        // Resets the stats for the next time interval
     void handlePacket(Packet *packet);
         // handle a received packet
 

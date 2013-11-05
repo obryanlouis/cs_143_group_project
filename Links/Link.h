@@ -42,7 +42,7 @@ private:
 public:
     Link () { }
     Link(int in_ID, Node *in_end1, Node *in_end2, int in_capacity,
-        int in_delay);
+        int in_delay, int in_rate);
 
     ~Link() { }
     
