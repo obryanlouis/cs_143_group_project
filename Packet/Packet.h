@@ -57,7 +57,7 @@ public:
 
 
 class RoutingPacket : public Packet {
-private:
+protected:
     RoutingTable *table; 
     Link* link;
 public:
@@ -70,7 +70,7 @@ public:
 };
 
 class DataPacket : public Packet {
-private:
+protected:
     int packetId;
         // The id of the packet
     unsigned int startTime;

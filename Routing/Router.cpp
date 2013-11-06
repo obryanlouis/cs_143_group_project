@@ -35,7 +35,7 @@ void Router::handlePacket(Packet *packet){
     {
     case Packet::ROUTE:
         // handing routing table information
-       updated = updateRoutingTable(R->getRoutingTable(), R->getLink());
+        updated = updateRoutingTable(R->getRoutingTable(), R->getLink());
         if (updated == 0) {
             // successfully updated routing table
         } else {

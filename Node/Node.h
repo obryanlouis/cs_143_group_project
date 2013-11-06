@@ -7,10 +7,6 @@
 #include <cstdarg>
 
 
-#include "Link.h"
-#include "Packet.h"
-#include "RoutingTable.h"
-
 class Link;
 class Packet;
 

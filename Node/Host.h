@@ -6,10 +6,13 @@
 #include <iostream>
 #include <cassert>
 
-#include "Packet.h"
 #include "Node.h"
+#include "Packet.h"
 #include "Link.h"
 #include "Flow.h"
+
+class Flow;
+class Node;
 
 class Host : public Node {
 

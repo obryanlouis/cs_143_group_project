@@ -5,14 +5,21 @@
 
 #include <set>
 #include <vector>
+#include <map>
+#include <queue>
+#include <algorithm>
 
+#include "Control.h"
 #include "Packet.h"
+#include "Host.h"
 
-class Host;
-class Packet;
+class DataPacket;
+class AckPacket;
 
 /* Class that controls packet flow between hosts. */
 class Flow {
+    friend void makeAndSendPacket(int id, Flow *flow);
+    friend void maintainFlowCallback(void *arg);
     int flowId;
         // The id of the flow
     int size;
@@ -21,9 +28,12 @@ class Flow {
         // Number of packets in the flow
     int progress;
         // Number of packets successfully transferred so far
-    std::vector<bool> donePackets;
-        // Vector of booleans of packets and transfer state
-    std::set<Packet*> outstanding;
+    std::map<int, int> packets;
+        // A map that will keep track of whether or not packets have
+        // been successfully sent and received. The key is the 
+        // packet id and the value is 1 if the packet has been
+        // sucessfully received, and 0 otherwise.
+    std::vector<DataPacket *> outstanding;
         // set of outstanding packets 
     Host *source;
         // The source host of this flow
@@ -33,7 +43,12 @@ class Flow {
         // data sent in last time interval
     int dataReceived;
         // data received in last time interval
-
+    unsigned int timeout;
+        // the timeout for packets. if this has expired, then the
+        // flow should resend the packet
+    int windowSize;
+    int getNextPacketId();
+    void maintain();
 
 public:
     Flow(int in_ID, int in_size, Host *in_source, Host *in_destination);
@@ -49,10 +64,10 @@ public:
     void updateDataReceived(int bytes);
         // Update the data received in the last time interval by adding
         // bytes to the dataReceived field.
+    void handlePacket(AckPacket *p);
+        // Handles an incoming packet acknowledgement
     Host *getStart();
     Host *getDestination();
-
-
 };
 
 
