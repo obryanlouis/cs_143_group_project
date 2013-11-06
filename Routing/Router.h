@@ -16,6 +16,7 @@ class Link;
 class RoutingTable;
 class Node;
 
+
 class Router : public Node {
 
 	RoutingTable *routingTable_p;
@@ -40,7 +41,7 @@ public:
         // from link l. Returns true if updated, false otherwise.
     void addLink(Link *l);
         // Adds a link to the router
-    void handlePacket(Packet* packet, Link *link); 
+    void handlePacket(Packet* packet); 
         // Handles a packet at the router. If it is a routing table update,
         // it is used to update the routing table. If it is a data or
         // acknowledgement packet, it is forwarded to the next node.

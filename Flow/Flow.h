@@ -49,6 +49,9 @@ public:
     void updateDataReceived(int bytes);
         // Update the data received in the last time interval by adding
         // bytes to the dataReceived field.
+    Host *getStart();
+    Host *getDestination();
+
 
 };
 

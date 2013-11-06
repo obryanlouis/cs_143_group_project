@@ -21,17 +21,21 @@ Router::~Router() {
     delete this->routingTable_p;
 }
 
-void Router::handlePacket(Packet *packet, Link *link){
+void Router::handlePacket(Packet *packet){
     std::cout << "Router is handling packet" << std::endl;
 
     bool  updated;   // to be used if the packet is for Routing Table Updates
-    Link *nextLink;  // to be used for handling data packets
+
+    // Initialize variables to right type (must be done before switch table.)
+    RoutingPacket *R = (RoutingPacket *) packet;
+    AckPacket *A = (AckPacket *) packet;
+    DataPacket *D = (DataPacket *)packet;
 
     switch (packet->getType())
     {
     case Packet::ROUTE:
         // handing routing table information
-        updated = updateRoutingTable(packet->getRoutingTable(), link);
+       updated = updateRoutingTable(R->getRoutingTable(), R->getLink());
         if (updated == 0) {
             // successfully updated routing table
         } else {
@@ -43,10 +47,10 @@ void Router::handlePacket(Packet *packet, Link *link){
         break;
     case Packet::ACK:
         // handle acknowledgement packets: same as data packets
+        break;
     case Packet::DATA:
         // handle data packets
-        nextLink = getNextLink(packet->getDestination());
-        nextLink->handlePacket(packet);
+        (getNextLink(D->getDestination()))->handlePacket(packet);
         break;
     default:
         std::cout << "INVALID PACKET TYPE" << std::endl;
@@ -87,4 +91,6 @@ bool Router::updateRoutingTable(RoutingTable *t, Link *l) {
 void Router::addLink(Link * l) {
     this->links.push_back(l);
 }
+
+
 

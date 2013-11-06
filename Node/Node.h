@@ -4,6 +4,8 @@
 #define NODE_H
 
 #include <list>
+#include <cstdarg>
+
 
 #include "Link.h"
 #include "Packet.h"
@@ -25,7 +27,7 @@ public:
     Node(int in_id, std::list<Link*> l);
     virtual ~Node();
 
-    virtual void handlePacket(Packet* packet, void * ...) = 0;
+    virtual void handlePacket(Packet* packet) = 0;
 
 };
 

@@ -32,11 +32,12 @@ void Controller::run(){
 }
 
 void Controller::routerUpdate(){
-    std::cout << " Controller::routerUpdate " << std::endl;
+    std::cout << "***Updating Router Info*** " << std::endl;
     // TODO: Send router update information.
 }
 
 void Controller::printSystem() {
+    std::cout << "***Printing System***" <<std::endl;
     unsigned int currentTime = this->schedule_p->getCurrentTime();
     std::map<std::string, std::ofstream*> files;
     // Links

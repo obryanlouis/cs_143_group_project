@@ -17,11 +17,13 @@
 
 class Link;
 class Router;
+class Flow;
+class Node;
 
 /* Constants */
 static unsigned int ROUTING_UPDATE_PERIOD = 6000;
 static unsigned int SNAPSHOT_PERIOD = 6000;
-static const unsigned int END_PERIOD = 100; // number of events to execute
+static const unsigned int END_PERIOD = 3; // number of events to execute
                                             // after flows done (for data 
                                             // collection)
 static const std::string LINK_OCCUPANCY_FILE = std::string("Output/LinkOccupancy.txt");

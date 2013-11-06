@@ -35,3 +35,10 @@ void Flow::updateDataReceived(int bytes) {
     dataReceived += bytes;
 }
 
+Host *Flow::getStart(){
+    return source;
+}
+
+Host *Flow::getDestination(){
+    return destination;
+}

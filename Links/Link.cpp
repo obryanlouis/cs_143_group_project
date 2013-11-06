@@ -90,14 +90,14 @@ void sendPacketCallback(void* args) {
     Node *n = (Node *)argArray[0];
     Packet *p = (Packet *)argArray[1];
     Link *l = (Link *)argArray[2];
-    n->handlePacket(p, l);
+    n->handlePacket(p);
     // Clean up
     delete argArray;
 }
 
 void Link::sendAnotherPacket() {
     // Get the current time and propagation time to schedule the next event
-    unsigned int currentTime = CONTROLLER->getCurrentTime();
+    unsigned int currentTime = SYSTEM_CONTROLLER->getCurrentTime();
     unsigned int propogationTime = delay;
     // Get the next node
     Node *nextNode = this->end2_p;
@@ -114,7 +114,7 @@ void Link::sendAnotherPacket() {
     void (*fp)(void*) = &sendPacketCallback;
     // Make a new event and add it to the controller's schedule
     Event *e = new Event(currentTime + propogationTime, fp, &args);
-    CONTROLLER->add(e);
+    SYSTEM_CONTROLLER->add(e);
 }
 
 int Link::getDelay() {

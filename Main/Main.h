@@ -4,11 +4,11 @@
 #include <iostream>
 
 #include "Control.h"
+#include "Flow.h"
+#include "Link.h"
+#include "Node.h"
+#include "Packet.h"
+#include "Router.h"
 
-class Controller;
-
-namespace {
-    Controller *CONTROLLER;
-}
 
 #endif

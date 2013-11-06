@@ -6,61 +6,46 @@
 #include <cassert>
 #include <string>
 
+#include "RoutingTable.h"
+
 class RoutingTable;
 class Node;
 class Flow;
+class Link;
 
+/* Abstract class that holds basics of a packet */
 class Packet{
 
 public:
+    /* Enum for packet type */
     enum PacketType {
         ROUTE,
         DATA,
         ACK
     };
-        // enum holding the different packet types to handle
 
-    enum PacketSize {
-        ROUTESIZE = 1024,   // not sure yet
-        DATASIZE  = 1024,
-        ACKSIZE   = 64
-    };
-        // enum holding the different packet sizes in bytes
+    /* Constants for data size */
+    const static int DATASIZE  = 1024;
+    const static int ACKSIZE   = 64;
 
-private:
-    RoutingTable *table;
-        // If the packet is a Routing Table Update packet, this will be
-        // a pointer to the routing table. If the packet is a data or
-        // acknowledgement packet, this should be made NULL.
+
+protected:
     PacketType type;
         // Specifies the type of packet this is
-    std::string packetId;
-        // The id of the packet
+    int size;
+        // The size of this packet
     Node *source;
         // The source of this packet
     Node *destination;
         // The destination of this packet
-    time_t startTime;
-        // The time this packet was sent from its destination
-    PacketSize size;
-        // The size of this packet
-    Flow *flow_p;
-        // The flow this packet is associated with. If it is a Routing
-        // Table Update packt, this should be NULL.
 
 public:
-    Packet(RoutingTable *table, PacketType type, Node *s, Node *de, time_t start, 
-            PacketSize packetSize, Flow *f, std::string id);
+    Packet(PacketType in_type, int in_size, Node *s, Node *de);
         // Create an object of class Packet with the given specifications
     ~Packet();
         // Destroy this instance of Packet
-    std::string getId();
-        // Returns the packet id
-    RoutingTable* getRoutingTable();
-        // Return the routing table field of this packet. If it is not
-        // a Routing Table Update packet, it will just be NULL.
 
-    PacketSize getSize();
+    int getSize();
         // Return the size of the packet
     PacketType getType();
         // Return the type of the packet
@@ -68,9 +53,50 @@ public:
         // Return the source node of the packet
     Node* getDestination();
         // Return the destination node of the packet
+};
+
+
+class RoutingPacket : public Packet {
+private:
+    RoutingTable *table; 
+    Link* link;
+public:
+    RoutingPacket(Node *source, Node *destination, \
+                  RoutingTable *in_table, Link* in_link, int size = 1024);
+    ~RoutingPacket();
+
+    RoutingTable* getRoutingTable();
+    Link* getLink();
+};
+
+class DataPacket : public Packet {
+private:
+    int packetId;
+        // The id of the packet
+    unsigned int startTime;
+        // The time this packet was sent from its destination
+    Flow *flow_p;
+        // The flow this packet is associated with. If it is a Routing
+        // Table Update packt, this should be NULL.
+
+public:
+    DataPacket(int id, Flow *flow, unsigned int in_startTime);
+    DataPacket(DataPacket *old);
+    ~DataPacket();
+
+    int getId();
+        // Returns the packet id
+    unsigned int getStartTime();
+        // Returns time packet originally sent. 
     Flow* getFlow();
         // Return the flow this packet is associated to. If the packet is
         // a Routing Table Update packet, this will be NULL.
+};
+
+class AckPacket : public DataPacket {
+public:
+    AckPacket(DataPacket* packet);
+    ~AckPacket();
 
 };
 

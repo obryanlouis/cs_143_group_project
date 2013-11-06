@@ -15,7 +15,10 @@ class Node;
 class RoutingTable
 {
 public:
-	friend class Router;
+    friend class Router;
+    RoutingTable();
+    RoutingTable(RoutingTable *old);
+    ~RoutingTable();
 
 	std::pair<int, Link*> & operator[] (Node *r) { return mapping[r]; }
 

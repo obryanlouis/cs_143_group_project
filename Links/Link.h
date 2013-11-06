@@ -6,7 +6,6 @@
 #include <utility>
 #include <queue>
 #include <string>
-#include "Main.h"
 #include "Node.h"
 #include "Control.h"
 
@@ -14,9 +13,6 @@ class Node;
 class Packet;
 class Controller;
 
-namespace {
-    extern Controller *CONTROLLER;
-}
 
 /* Link class which controls packet transfer between routers. */
 class Link {

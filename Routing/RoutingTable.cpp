@@ -1,6 +1,20 @@
 
 #include "RoutingTable.h"
 
+RoutingTable::RoutingTable()
+    :mapping()
+{
+}
+
+// Copy-constructor
+RoutingTable::RoutingTable(RoutingTable *old)
+    :mapping(old->mapping)
+{   
+}
+
+RoutingTable::~RoutingTable(){
+    delete &mapping;
+}
 
 Link* RoutingTable::nextLink(Node *r)
 {
