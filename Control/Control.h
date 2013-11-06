@@ -29,28 +29,19 @@ static const std::string LINK_PACKET_LOSS_FILE = std::string("Output/LinkPacketL
 static const std::string LINK_FLOW_RATE_FILE = std::string("Output/LinkFlowRate.txt");
 
 
-/* Different type of events */
-/*enum event_t{
-    UPDATE_ROUTING,
-    PRINT_STATS,
-    UPDATE_FLOWS,
-    UPDATE_LINKS
-};*/
 
 /* Events that get put into the scheduler */
 class Event {
 private:
     unsigned int time;
-    void *actOn;
     void (*fp)(void*);
         // A function pointer to a function to execute during Event::execute
     void *arg;
         // The argument to the function pointer
 
 public:
-    Event(unsigned int in_time, void (*fp)(void*), void *arg, void *in_actOn = 0)
+    Event(unsigned int in_time, void (*fp)(void*), void *arg)
         :time(in_time)
-        ,actOn(in_actOn)
         ,arg(arg)
         ,fp(fp)
     {}
@@ -58,9 +49,7 @@ public:
     ~Event(){}
 
     unsigned int getTime() const { return time; }
-    //event_t getType() const { return type;}
-    //  Can we just have this function signature be void execute()?
-    Event *execute();
+    void execute();
 };
 
 /* Used in the scheduler to order elements in list by time.
@@ -75,10 +64,10 @@ struct timecomp{
 class Scheduler{
 private:
     std::priority_queue<Event*, std::vector<Event*>, timecomp> *events_p;
-    unsigned int currentTime;
 
 public:
     Scheduler();
+    void initScheduler();
     ~Scheduler();
 
     //void add(event_t in_type,  unsigned int in_time, void *in_actOn = 0);
@@ -100,8 +89,7 @@ private:
     std::list<Flow*> *flows_p;
     Scheduler *schedule_p;
     int flowsLeft;
-    unsigned int prevStatCollectTime;
-
+    
 public:
     Controller();
     ~Controller();
@@ -109,8 +97,8 @@ public:
     void printSystem();
     void routerUpdate();
     void add(Event *event_p);
-    unsigned int getCurrentTime();
 
+    unsigned int getCurrentTime();
     void run();
 };
 
@@ -118,6 +106,7 @@ public:
  * This is ONLY set by the Controller constructor. 
  */
 static Controller *SYSTEM_CONTROLLER; 
-
+/* Only Scheduler should update the following */
+static unsigned int SYSTEM_TIME;
 
 #endif

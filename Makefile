@@ -10,7 +10,7 @@ INCLUDE=-I Control -I Flow -I Links -I Node -I Routing -I Packet -I Main
 all: test
 
 test: $(SOURCES)
-	$(CC) $(SOURCES) -o bin/$@ $(INCLUDE)
+	$(CC) $(SOURCES) -o bin/$@ $(INCLUDE) -g
 
 plot_test: $(PLOTSOURCES)
 	$(CC) $(PLOTSOURCES) -o bin/$@
