@@ -20,7 +20,7 @@ private:
 
 public:
     Node();
-    Node(int in_id, std::list<Link*> l);
+    Node(int in_id);
     virtual ~Node();
 
     virtual void handlePacket(Packet* packet) = 0;

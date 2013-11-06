@@ -3,9 +3,8 @@
 
 Node::Node() {}
 
-Node::Node(int in_id, std::list<Link*> l)
+Node::Node(int in_id)
     : nodeId(in_id)
-    , links(l)
 {}
 
 Node::~Node()

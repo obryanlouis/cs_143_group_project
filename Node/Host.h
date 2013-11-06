@@ -24,7 +24,7 @@ class Host : public Node {
         // The amount of data received in the last time interval (bytes)
 
 public:
-    Host(int in_id, Link *in_link, Flow *in_flow);
+    Host(int in_id, Flow *in_flow);
         // create an instance of class Host with the give specifications
     ~Host();
         // destroy this instance of Host
@@ -41,6 +41,7 @@ public:
         // Resets the stats for the next time interval
     void handlePacket(Packet *packet);
         // handle a received packet
+    void setLink(Link *link);
 
 };
 

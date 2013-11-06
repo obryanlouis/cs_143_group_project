@@ -15,6 +15,7 @@
 
 class DataPacket;
 class AckPacket;
+class Host;
 
 /* Class that controls packet flow between hosts. */
 class Flow {

@@ -14,8 +14,10 @@ Router::Router() {
 }
 
 Router::Router(int in_id, std::list<Link*> l)
-    : Node(in_id, l)
-{}
+    : Node(in_id)
+{
+    this->links = l;
+}
 
 Router::~Router() {
     delete this->routingTable_p;
