@@ -49,6 +49,12 @@ public:
     void broadcastRoutingTable();
         // Broadcasts this router's current routing table
         // to all neighbors.
+
+
+
+
+    void debugRoutingTable();
+        // Prints the routing table to the terminal
 };
 
 #endif

@@ -17,3 +17,7 @@ void Node::handlePacket(Packet *packet) {
 void Node::addLink(Link *link) {
     this->links.push_back(link);
 }
+
+int Node::getId() {
+    return this->nodeId;
+}

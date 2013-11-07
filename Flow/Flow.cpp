@@ -85,7 +85,7 @@ void Flow::maintain() {
 }
 
 int Flow::getNextPacketId() {
-    int id = -1;
+    int id = FLOW_END;
     DataPacket *last = this->outstanding.back();
     if (last != NULL) {
          id = last->getId() + 1;

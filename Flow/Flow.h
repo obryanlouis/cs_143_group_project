@@ -18,6 +18,8 @@ class DataPacket;
 class AckPacket;
 class Host;
 
+int FLOW_END = -1;
+
 /* Class that controls packet flow between hosts. */
 class Flow {
     friend void makeAndSendPacket(int id, Flow *flow);
@@ -35,7 +37,7 @@ class Flow {
         // been successfully sent and received. The key is the 
         // packet id and the value is 1 if the packet has been
         // sucessfully received, and 0 otherwise.
-    std::vector<DataPacket *> outstanding;
+    std::vector<int> outstanding;
         // set of outstanding packets 
     Host *source;
         // The source host of this flow

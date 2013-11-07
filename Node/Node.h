@@ -26,6 +26,7 @@ public:
 
     virtual void handlePacket(Packet* packet) = 0;
     void addLink(Link *link);
+    int getId();
 };
 
 #endif
