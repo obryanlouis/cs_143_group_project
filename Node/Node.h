@@ -5,6 +5,7 @@
 
 #include <list>
 #include <cstdarg>
+#include <iostream>
 
 
 class Link;

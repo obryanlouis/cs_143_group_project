@@ -19,13 +19,13 @@ Controller::Controller(std::list<Router *> *in_routers,
     SYSTEM_CONTROLLER = this; 
     this->schedule_p = new Scheduler();
     this->schedule_p->initScheduler();
-    // TODO: Update the number of flows. 
-    this->flowsLeft = 0;
+    this->flowsLeft = in_flows->size();
+    std::cout << "Number of input flows: " << flowsLeft << "\n";
 }
 
 void Controller::run(){
     bool noError = true;
-    while (!noError && this->flowsLeft != 0) {
+    while (noError && this->flowsLeft != 0) {
         noError = this->schedule_p->doNext();
     }
 
