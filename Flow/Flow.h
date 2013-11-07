@@ -37,7 +37,7 @@ class Flow {
         // been successfully sent and received. The key is the 
         // packet id and the value is 1 if the packet has been
         // sucessfully received, and 0 otherwise.
-    std::vector<int> outstanding;
+    std::vector<DataPacket *> outstanding;
         // set of outstanding packets 
     Host *source;
         // The source host of this flow
