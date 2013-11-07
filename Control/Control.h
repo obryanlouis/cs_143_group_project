@@ -70,10 +70,8 @@ private:
 
 public:
     Scheduler();
-    void initScheduler();
     ~Scheduler();
 
-    //void add(event_t in_type,  unsigned int in_time, void *in_actOn = 0);
     void add(Event* event_p);
     bool doNext();
 
@@ -99,14 +97,18 @@ public:
 
     void addRouter(Router *router);
     void addLink(Link *link);
-    void addFlow(Flow *flow);
-
-    void printSystem();
-    void routerUpdate();
+    void addFlow(Flow *flow, unsigned int startTime);
+    unsigned int getCurrentTime();
+ 
+    void printMySystem();
+    void updateMyRouters();
     void add(Event *event_p);
 
-    unsigned int getCurrentTime();
     void run();
+
+private:
+    void initSystem();
+
 };
 
 /* Only Scheduler should update the following */

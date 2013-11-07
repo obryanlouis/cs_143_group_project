@@ -17,7 +17,6 @@ Controller::Controller(){
     this->flows_p = new std::list<Flow*>();
 
     this->schedule_p = new Scheduler();
-    this->schedule_p->initScheduler();
 }
 
 Controller::~Controller(){
@@ -35,14 +34,26 @@ void Controller::addLink(Link *link){
     this->links_p->push_back(link);
 }
 
-void Controller::addFlow(Flow *flow){
+
+extern void maintainFlowCallback(void *arg);
+
+void Controller::addFlow(Flow *flow, unsigned int startTime){
     this->flows_p->push_back(flow);
+
+    // Create first flow event for this flow 
+    Event *e = new Event(startTime, &maintainFlowCallback, flow);
+    this->add(e);
+
+
+}
+
+unsigned int Controller::getCurrentTime() {
+    return SYSTEM_TIME;
 }
 
 void Controller::run(){
-    this->flowsLeft = flows_p->size();
-    std::cout << "Number of input flows: " << flowsLeft << "\n";
- 
+    this->initSystem();
+
     bool noError = true;
     while (noError && this->flowsLeft != 0) {
         noError = this->schedule_p->doNext();
@@ -62,7 +73,7 @@ void Controller::run(){
     std::cout << "Network simulated successfully. YAY!" << std::endl;
 }
 
-void Controller::routerUpdate(){
+void Controller::updateMyRouters(){
     std::cout << "***Updating Router Info*** " << std::endl;
 
     for (std::list<Router *>::iterator it = this->routers_p->begin();
@@ -72,7 +83,7 @@ void Controller::routerUpdate(){
     }
 }
 
-void Controller::printSystem() {
+void Controller::printMySystem() {
     std::cout << "***Printing System***" <<std::endl;
     unsigned int currentTime = this->schedule_p->getCurrentTime();
     std::map<std::string, std::ofstream*> files;
@@ -121,39 +132,37 @@ void Controller::add(Event *event_p) {
     schedule_p->add(event_p);
 }
 
-unsigned int Controller::getCurrentTime() {
-    return SYSTEM_TIME;
-}
-
 void routerUpdate(void* args){
-    SYSTEM_CONTROLLER->routerUpdate();
+    SYSTEM_CONTROLLER->updateMyRouters();
     void (*fp)(void*) = &routerUpdate;
     SYSTEM_CONTROLLER->add  \
         (new Event(SYSTEM_TIME + ROUTING_UPDATE_PERIOD, fp, 0));
 }
 
 void printSystem(void* args){
-    SYSTEM_CONTROLLER->printSystem();
+    SYSTEM_CONTROLLER->printMySystem();
     void (*fp)(void*) = &printSystem;
     SYSTEM_CONTROLLER->add \
         (new Event(SYSTEM_TIME + SNAPSHOT_PERIOD, fp, 0));
 }
+
+void Controller::initSystem(){
+    // Init flows
+    this->flowsLeft = flows_p->size();
+    std::cout << "Number of input flows: " << flowsLeft << "\n";
+
+    // Do first router update/system print
+    void *args;
+    routerUpdate(args);
+    printSystem(args);
+}
+
 
 /* Scheduler functions */
 /* Initiate scheduler by creating schedule queue and putting in initial events. */ 
 Scheduler::Scheduler(){
     events_p = new std::priority_queue<Event*, std::vector<Event*>, timecomp>; 
     SYSTEM_TIME = 0;
-}
-
-void Scheduler::initScheduler(){
-/*    void (*fp)(void*) = &routerUpdate;
-    Event *event = new Event(0, fp, 0);
-    SYSTEM_CONTROLLER->add(event);
-    fp = &printSystem;
-    event = new Event(0, fp, 0);
-    SYSTEM_CONTROLLER->add(event);
-*/ 
 }
 
 Scheduler::~Scheduler(){
