@@ -28,25 +28,48 @@ Node* Packet::getDestination() {
 
 
 /**************** RoutingPacket ********************/
-RoutingPacket::RoutingPacket(Node *source, Node *destination, \
-                        RoutingTable *in_table, Link* in_link, int in_size)
-    :Packet(Packet::ROUTE, in_size, source, destination)
+RoutingPacket::RoutingPacket(Node *source, Node *destination,\
+    Link* in_link, PacketType in_type, int in_size)
+    :Packet(in_type, in_size, source, destination)
     ,link(in_link) 
-{   
-    this->table = new RoutingTable(in_table);
-}
+{ }   
 
-RoutingPacket::~RoutingPacket(){
-    delete &table;
-}
-
-RoutingTable* RoutingPacket::getRoutingTable(){
-    return this->table;
-}
+RoutingPacket::~RoutingPacket() { }
 
 Link* RoutingPacket::getLink(){
     return this->link;
 }
+
+
+/************** RouterRoutingPacket ******************/
+
+RouterRoutingPacket::RouterRoutingPacket(Node *source, Node *destination,
+    Link *in_link, RoutingTable *in_table, int size)
+    :RoutingPacket(source, destination, in_link, 
+            Packet::ROUTERROUTE, size)
+{
+    // Copy the routing table to this packet
+    this->table = new RoutingTable(in_table);
+}
+
+RoutingTable* RouterRoutingPacket::getRoutingTable() {
+    return this->table;
+}
+
+/************** HostRoutingPacket ********************/
+
+HostRoutingPacket::HostRoutingPacket(Node *source, Node *destination,
+        Link *in_link, Host *in_host, int size)
+    :RoutingPacket(source, destination, in_link, 
+            Packet::HOSTROUTE, size)
+{
+    this->host = in_host;
+}
+
+Host * HostRoutingPacket::getHost() {
+    return this->host;
+}
+
 
 
 /************* DataPacket ***********************/

@@ -29,23 +29,26 @@ void Router::handlePacket(Packet *packet){
     bool  updated;   // to be used if the packet is for Routing Table Updates
 
     // Initialize variables to right type (must be done before switch table.)
-    RoutingPacket *R = (RoutingPacket *) packet;
+    RouterRoutingPacket *R = (RouterRoutingPacket *) packet;
     AckPacket *A = (AckPacket *) packet;
     DataPacket *D = (DataPacket *)packet;
+    HostRoutingPacket *H = (HostRoutingPacket *) packet;
 
     switch (packet->getType())
     {
-    case Packet::ROUTE:
+    case Packet::HOSTROUTE:
+        // the host is telling this router that it exists 
+        this->updateSingleNode(H->getHost(), H->getLink());
+        break;
+    case Packet::ROUTERROUTE:
         // handing routing table information
         updated = updateRoutingTable(R->getRoutingTable(), R->getLink());
-        if (updated == 0) {
-            // successfully updated routing table
-        } else {
-            // failed to update...throw some exception?
+        // If the routing table was updated, broadcast this to all
+        // neighbors.
+        if (updated) {
+            this->broadcastRoutingTable();
         }
 
-            // the 0 should be the Link * we received this packet from
-            // will depend on implementation
         break;
     case Packet::ACK:
         // handle acknowledgement packets: same as data packets
@@ -60,6 +63,16 @@ void Router::handlePacket(Packet *packet){
         break;
     }
 }
+
+void Router::broadcastRoutingTable() {
+    for (std::list<Link* >::iterator it = this->links.begin();
+            it != this->links.end(); it++)
+    {
+        RouterRoutingPacket *newRoutingPacket 
+            = new RouterRoutingPacket(NULL, NULL, *it, this->routingTable_p);
+        (*it)->handlePacket(newRoutingPacket);
+    }
+}    
 
 Link* Router::getNextLink(Node *destination) {
 	return this->routingTable_p->nextLink(destination);
@@ -96,3 +109,11 @@ void Router::addLink(Link * l) {
 
 
 
+void Router::updateSingleNode(Host *host, Link *link) {
+    // The router is directly connected to this host through the
+    // link. Just set the distance to this host to be the link's
+    // delay.
+    std::pair<int, Link*> pair = std::make_pair<int, Link*>(
+            link->getDelay(), link);
+    (*this->routingTable_p)[host] = pair;
+}

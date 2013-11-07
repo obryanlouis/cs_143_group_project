@@ -45,11 +45,16 @@ void Host::handlePacket(Packet *packet){
     time_t time;     // to be used for handling data packets
     AckPacket *ack;     // to be used for handling data packets
     Flow *flow = this->flow_p;      // to be used for handling data packets
+    HostRoutingPacket *routingPacket;
 
     switch (packet->getType())
     {
-    case Packet::ROUTE:
-        // Hosts don't need to do anything with routing table update packets
+    case Packet::ROUTERROUTE:
+        // Hosts need to send back information to the router telling
+        // it that they are there.
+        routingPacket = new HostRoutingPacket(NULL, NULL, 
+                this->links.front(), this);
+        this->links.front()->handlePacket(routingPacket);
         break;
     case Packet::ACK:
         // handle acknowledgement packets: adjust the receive rate of the
@@ -58,16 +63,27 @@ void Host::handlePacket(Packet *packet){
         flow->handlePacket((AckPacket *)packet);
         break;
     case Packet::DATA:
-        // handle data packets: adjust its own receive rate, but also look
-        // at the packet's flow and adjust that flow's receive rate
-        dataReceived += packet->getSize();
+        // If the source of this packet is this host, then the packet
+        // is coming from this host's flow, so it should be sent.
+        // Otherwise, the host is receiving this data.
+        if (packet->getSource() == this) {
+            // Update the data sent
+            this->dataSent += packet->getSize();
+            // Send this packet
+            this->links.front()->handlePacket(packet);
+        }
+        else {
+            // handle data packets: adjust its own receive rate, but also look
+            // at the packet's flow and adjust that flow's receive rate
+            dataReceived += packet->getSize();
 
-        // also needs to send back an acknowledgement packet
-        // TODO: Get time from scheduler
-        time = 0;
-        *ack = new AckPacket((DataPacket *)packet);
-        // Send the packet back to the host
-        this->links.front()->handlePacket(ack);
+            // also needs to send back an acknowledgement packet
+            // TODO: Get time from scheduler
+            time = 0;
+            *ack = new AckPacket((DataPacket *)packet);
+            // Send the packet back to the host
+            this->links.front()->handlePacket(ack);
+        }
         break;
     default:
         std::cout << "INVALID PACKET TYPE" << std::endl;

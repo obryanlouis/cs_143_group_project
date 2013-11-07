@@ -31,3 +31,8 @@ Node* RoutingTable::nextNode(Node *r)
 	}
 	return l->getEnd1();
 }
+
+bool RoutingTable::containsEntry(Node *node) {
+    return this->mapping.count(node);
+}
+

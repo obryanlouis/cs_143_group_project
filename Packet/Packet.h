@@ -12,6 +12,7 @@ class RoutingTable;
 class Node;
 class Flow;
 class Link;
+class Host;
 
 /* Abstract class that holds basics of a packet */
 class Packet{
@@ -19,7 +20,8 @@ class Packet{
 public:
     /* Enum for packet type */
     enum PacketType {
-        ROUTE,
+        ROUTERROUTE,
+        HOSTROUTE,
         DATA,
         ACK
     };
@@ -58,15 +60,34 @@ public:
 
 class RoutingPacket : public Packet {
 protected:
-    RoutingTable *table; 
     Link* link;
 public:
-    RoutingPacket(Node *source, Node *destination, \
-                  RoutingTable *in_table, Link* in_link, int size = 1024);
+    RoutingPacket(Node *source, Node *destination, 
+        Link* in_link, PacketType in_type, int in_size = 1024);
     ~RoutingPacket();
 
-    RoutingTable* getRoutingTable();
     Link* getLink();
+};
+
+// The packet type that routers will send out
+class RouterRoutingPacket : public RoutingPacket {
+protected:
+    RoutingTable *table; 
+public:
+    RouterRoutingPacket(Node *source, Node *destination,
+        Link *in_link, RoutingTable *in_table, int size = 1024);
+    RoutingTable* getRoutingTable();
+};
+
+// The packet type that hosts will send to routers to show them
+// that they exist.
+class HostRoutingPacket : public RoutingPacket {
+protected:
+    Host *host;
+public:
+    HostRoutingPacket(Node *source, Node *destination, Link *in_link,
+            Host *in_host, int size = 1024);
+    Host *getHost();
 };
 
 class DataPacket : public Packet {

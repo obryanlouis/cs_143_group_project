@@ -24,6 +24,9 @@ public:
 
 	Link* nextLink(Node *r);
 	Node* nextNode(Node *r);
+    bool containsEntry(Node *node);
+        // Determines whether or not the routing table has an entry
+        // for this node.
 	
 private:
 	std::map<Node*, std::pair<int, Link*> > mapping;
