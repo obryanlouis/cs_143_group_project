@@ -2,6 +2,8 @@
 
 #include "Flow.h"
 
+extern Controller *SYSTEM_CONTROLLER; 
+
 Flow::Flow(int in_ID, int in_size, Host *in_source, Host *in_destination)
     : flowId(in_ID)
     , size(in_size)

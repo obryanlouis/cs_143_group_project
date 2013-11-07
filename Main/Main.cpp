@@ -1,9 +1,10 @@
 #include "Main.h"
 
 using namespace std;
-int main( int argc, const char* argv[] ) {
 
-    SYSTEM_CONTROLLER = new Controller();    
+extern Controller *SYSTEM_CONTROLLER; 
+
+int main( int argc, const char* argv[] ) {
 
     Flow *flow1, *flow2;
     Host *host1, *host2;
@@ -20,6 +21,22 @@ int main( int argc, const char* argv[] ) {
     router1 = new Router();
     router1->addLink(link2);
     router1->addLink(link4);
+
+    std::list<Link*> links;
+    std::list<Router*> routers;
+    std::list<Flow*> flows;
+
+    links.push_back(link1);
+    links.push_back(link2);
+    links.push_back(link3);
+    links.push_back(link4);
+
+    routers.push_back(router1);
+
+    flows.push_back(flow1);
+    flows.push_back(flow2);
+
+    SYSTEM_CONTROLLER = new Controller(&routers, &links, &flows);
 
     SYSTEM_CONTROLLER->run();
     

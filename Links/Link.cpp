@@ -1,5 +1,8 @@
 #include "Link.h"
 
+extern Controller *SYSTEM_CONTROLLER; 
+void sendAnotherPacket(void *arg);
+
 Link::Link(int in_ID, Node *in_end1, Node *in_end2, int in_capacity,
     int in_delay, int in_rate)
     : ID(in_ID)
@@ -11,7 +14,9 @@ Link::Link(int in_ID, Node *in_end1, Node *in_end2, int in_capacity,
     , packetLoss(0)
     , capacityUsed(0)
     , rate(in_rate)
-{ }
+{ 
+   nextFree = SYSTEM_CONTROLLER->getCurrentTime();
+}
 
 void Link::resetStats() {
     this->dataSent = 0;
@@ -42,6 +47,17 @@ void Link::handlePacket(Packet* packet) {
         // Add the packet
         this->buffer.push(packet);
         this->capacityUsed += size;
+        unsigned int time;
+        unsigned int currentTime = SYSTEM_CONTROLLER->getCurrentTime();
+        if (this->nextFree > currentTime) {
+            time = nextFree + packet->getSize() / rate;
+        }
+        else {
+            time = currentTime;
+        }
+        Event *e = new Event(time, &sendAnotherPacket, this);
+        SYSTEM_CONTROLLER->add(e);
+        nextFree = time;
     }
     else {
         // Otherwise, delete the packet
@@ -95,16 +111,15 @@ void sendPacketCallback(void* args) {
     delete argArray;
 }
 
-void Link::sendAnotherPacket() {
+void sendAnotherPacket(void *arg) {
     // Get the current time and propagation time to schedule the next event
+    Link * link = (Link *)arg;
     unsigned int currentTime = SYSTEM_CONTROLLER->getCurrentTime();
-    unsigned int propogationTime = delay;
+    unsigned int propogationTime = link->getDelay();
     // Get the next node
-    Node *nextNode = this->end2_p;
+    Node *nextNode = link->getEnd2();
     // Pop the next packet
-    Packet *packet = this->popPacket();
-    // A pointer to this link;
-    Link *link = this;
+    Packet *packet = link->popPacket();
     // Store the node and the packet as an argument for the callback
     void **args = (void **)malloc(sizeof(void *) * 3);
     args[0] = nextNode;

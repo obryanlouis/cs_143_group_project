@@ -15,7 +15,7 @@
 class Link;
 class RoutingTable;
 class Node;
-
+class Host;
 
 class Router : public Node {
 

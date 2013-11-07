@@ -13,7 +13,8 @@
 #include "Flow.h"
 //#include "Link.h"
 #include "Node.h"
-//#include "Router.h"
+#include "Router.h"
+#include "Header.h"
 
 class Link;
 class Router;
@@ -93,7 +94,8 @@ private:
     int flowsLeft;
     
 public:
-    Controller();
+    Controller(std::list<Router *> *in_routers, std::list<Link*> *in_links,
+            std::list<Flow*> *in_flows);
     ~Controller();
 
     void printSystem();
@@ -104,10 +106,6 @@ public:
     void run();
 };
 
-/* Pointer to the master controller. 
- * This is ONLY set by the Controller constructor. 
- */
-static Controller *SYSTEM_CONTROLLER; 
 /* Only Scheduler should update the following */
 static unsigned int SYSTEM_TIME;
 

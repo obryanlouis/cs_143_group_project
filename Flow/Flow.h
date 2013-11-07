@@ -10,6 +10,7 @@
 #include <algorithm>
 
 #include "Control.h"
+#include "Header.h"
 #include "Packet.h"
 #include "Host.h"
 

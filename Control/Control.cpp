@@ -2,8 +2,20 @@
 
 #include "Control.h"
 
+/* Pointer to the master controller. 
+ * This is ONLY set by the Controller constructor. 
+ */
+// This can't be static...
+Controller *SYSTEM_CONTROLLER;
+
 /* Controller functions */
-Controller::Controller(){
+Controller::Controller(std::list<Router *> *in_routers, 
+        std::list<Link*> *in_links, std::list<Flow*> *in_flows)
+    : routers_p(in_routers)
+    , links_p(in_links)
+    , flows_p(in_flows)
+
+{
     SYSTEM_CONTROLLER = this; 
     this->schedule_p = new Scheduler();
     this->schedule_p->initScheduler();
@@ -33,7 +45,12 @@ void Controller::run(){
 
 void Controller::routerUpdate(){
     std::cout << "***Updating Router Info*** " << std::endl;
-    // TODO: Send router update information.
+
+    for (std::list<Router *>::iterator it = this->routers_p->begin();
+         it != this->routers_p->end(); it++)
+    {
+        (*it)->broadcastRoutingTable();
+    }
 }
 
 void Controller::printSystem() {

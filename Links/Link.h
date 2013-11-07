@@ -11,8 +11,6 @@
 
 class Node;
 class Packet;
-class Controller;
-
 
 /* Link class which controls packet transfer between routers. */
 class Link {
@@ -41,6 +39,8 @@ private:
     int pushPacket(Packet *in_packet);
         // push the packet onto the buffer. Returns 0 if successfuly and
         // 1 if the packet is dropped
+    unsigned int nextFree;
+        // The next time that the queue will be free
 
 
 public:
@@ -67,9 +67,6 @@ public:
         // Handles an incoming packet by either adding it to the buffer, or 
         // dropping it. Also schedules an event to execute that will simulate
         // the router processing THIS packet.
-    void sendAnotherPacket();
-        // Dequeues the top packet and schedules an event in the future for
-        // the router to handle the packet.
 
 };
 
