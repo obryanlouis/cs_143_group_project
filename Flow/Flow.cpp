@@ -68,7 +68,7 @@ void makeAndSendPacket(int id, Flow *flow) {
 void Flow::maintain() {
     if (this->outstanding.size() < this->windowSize) {
         int id = this->getNextPacketId();
-        if (id != -1) {
+        if (id != FLOW_END) {
             makeAndSendPacket(id, this);
         }
     }
@@ -80,8 +80,8 @@ void Flow::maintain() {
     }
 
     // Schedule the next maintenance for this flow to be frequent
-    Event *e = new Event(SYSTEM_CONTROLLER->getCurrentTime(),
-        &maintainFlowCallback, this);
+    Event *e = new Event(SYSTEM_CONTROLLER->getCurrentTime() +
+        FLOW_MAINTENANCE_PERIOD, &maintainFlowCallback, this);
 }
 
 int Flow::getNextPacketId() {
@@ -98,8 +98,8 @@ int Flow::getNextPacketId() {
             }
         }
     }
-    if (id == -1 || id >= this->totalPackets) {
-        return -1;
+    if (id == FLOW_END || id >= this->totalPackets) {
+        return FLOW_END;
     }
     return id;
 }

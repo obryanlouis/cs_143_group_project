@@ -9,21 +9,40 @@
 Controller *SYSTEM_CONTROLLER;
 
 /* Controller functions */
-Controller::Controller(std::list<Router *> *in_routers, 
-        std::list<Link*> *in_links, std::list<Flow*> *in_flows)
-    : routers_p(in_routers)
-    , links_p(in_links)
-    , flows_p(in_flows)
+Controller::Controller(){
+    SYSTEM_CONTROLLER = this;
 
-{
-    SYSTEM_CONTROLLER = this; 
+    this->routers_p = new std::list<Router*>();
+    this->links_p = new std::list<Link*>();
+    this->flows_p = new std::list<Flow*>();
+
     this->schedule_p = new Scheduler();
     this->schedule_p->initScheduler();
-    this->flowsLeft = in_flows->size();
-    std::cout << "Number of input flows: " << flowsLeft << "\n";
+}
+
+Controller::~Controller(){
+    delete this->routers_p;
+    delete this->links_p;
+    delete this->flows_p;
+    delete this->schedule_p;
+}
+
+void Controller::addRouter(Router *router){
+    this->routers_p->push_back(router);
+}
+
+void Controller::addLink(Link *link){
+    this->links_p->push_back(link);
+}
+
+void Controller::addFlow(Flow *flow){
+    this->flows_p->push_back(flow);
 }
 
 void Controller::run(){
+    this->flowsLeft = flows_p->size();
+    std::cout << "Number of input flows: " << flowsLeft << "\n";
+ 
     bool noError = true;
     while (noError && this->flowsLeft != 0) {
         noError = this->schedule_p->doNext();
@@ -128,13 +147,13 @@ Scheduler::Scheduler(){
 }
 
 void Scheduler::initScheduler(){
-    // TODO: make callback functions for the routing update and the stat printing
-    void (*fp)(void*) = &routerUpdate;
+/*    void (*fp)(void*) = &routerUpdate;
     Event *event = new Event(0, fp, 0);
     SYSTEM_CONTROLLER->add(event);
     fp = &printSystem;
     event = new Event(0, fp, 0);
     SYSTEM_CONTROLLER->add(event);
+*/ 
 }
 
 Scheduler::~Scheduler(){

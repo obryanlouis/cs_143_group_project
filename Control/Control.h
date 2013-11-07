@@ -94,9 +94,12 @@ private:
     int flowsLeft;
     
 public:
-    Controller(std::list<Router *> *in_routers, std::list<Link*> *in_links,
-            std::list<Flow*> *in_flows);
+    Controller();
     ~Controller();
+
+    void addRouter(Router *router);
+    void addLink(Link *link);
+    void addFlow(Flow *flow);
 
     void printSystem();
     void routerUpdate();

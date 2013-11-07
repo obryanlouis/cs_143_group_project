@@ -18,7 +18,8 @@ class DataPacket;
 class AckPacket;
 class Host;
 
-int FLOW_END = -1;
+static int FLOW_END = -1;
+static int FLOW_MAINTENANCE_PERIOD = 5;
 
 /* Class that controls packet flow between hosts. */
 class Flow {

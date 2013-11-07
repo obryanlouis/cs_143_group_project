@@ -37,14 +37,14 @@ int main( int argc, const char* argv[] ) {
     flows.push_back(flow1);
     flows.push_back(flow2);
 
-    SYSTEM_CONTROLLER = new Controller(&routers, &links, &flows);
+    //SYSTEM_CONTROLLER = new Controller(&routers, &links, &flows);
 
     /*RoutingTable routingTable;
     RouterRoutingPacket packet(host1, host2, link1, &routingTable, 1024);
     link1->handlePacket(&packet);
     host1->handlePacket(&packet);*/
 
-    SYSTEM_CONTROLLER->run();
+    //SYSTEM_CONTROLLER->run();
     
 	return 0;
 }

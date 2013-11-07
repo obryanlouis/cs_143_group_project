@@ -115,16 +115,15 @@ void Router::updateSingleNode(Host *host, Link *link) {
 
 // Prints the routing table of this router to the terminal
 void Router::debugRoutingTable() {
-    for (std::map<Node*, std::pair<int, Link* > >::iterator it
-                = this->routingTable_p->mapping.begin();
-            it != this->routingTable_p->mapping.end();
-            it++)
-        {
-            Node *node = it->first;
-            int id = node->getId();
-            int distance = it->second.first;
-            std::cout << "The distance to Node " << id << " is " << distance
-                << "\n";
-        }
+for (std::map<Node*, std::pair<int, Link* > >::iterator it
+            = this->routingTable_p->mapping.begin();
+        it != this->routingTable_p->mapping.end();
+        it++)
+    {
+        Node *node = it->first;
+        int id = node->getId();
+        int distance = it->second.first;
+        std::cout << "The distance to Node " << id << " is " << distance
+            << "\n";
     }
 }
