@@ -15,7 +15,8 @@ Link::Link(int in_ID, Node *in_end1, Node *in_end2, int in_capacity,
     , capacityUsed(0)
     , rate(in_rate)
 { 
-   nextFree = SYSTEM_CONTROLLER->getCurrentTime();
+    nextFree = SYSTEM_CONTROLLER->getCurrentTime();
+    in_end1->addLink(this);
 }
 
 void Link::resetStats() {
@@ -108,7 +109,7 @@ void sendPacketCallback(void* args) {
     Link *l = (Link *)argArray[2];
     n->handlePacket(p);
     // Clean up
-    delete argArray;
+    delete[] argArray;
 }
 
 void sendAnotherPacket(void *arg) {
@@ -128,7 +129,7 @@ void sendAnotherPacket(void *arg) {
     // Make a callback for the event to execute
     void (*fp)(void*) = &sendPacketCallback;
     // Make a new event and add it to the controller's schedule
-    Event *e = new Event(currentTime + propogationTime, fp, &args);
+    Event *e = new Event(currentTime + propogationTime, fp, (void *)args);
     SYSTEM_CONTROLLER->add(e);
 }
 

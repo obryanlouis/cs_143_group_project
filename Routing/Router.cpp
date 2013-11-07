@@ -103,11 +103,6 @@ bool Router::updateRoutingTable(RoutingTable *t, Link *l) {
     return changed;
 }
 
-void Router::addLink(Link * l) {
-    this->links.push_back(l);
-}
-
-
 
 void Router::updateSingleNode(Host *host, Link *link) {
     // The router is directly connected to this host through the

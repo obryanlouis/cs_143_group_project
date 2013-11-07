@@ -25,7 +25,7 @@ public:
     virtual ~Node();
 
     virtual void handlePacket(Packet* packet) = 0;
-
+    void addLink(Link *link);
 };
 
 #endif

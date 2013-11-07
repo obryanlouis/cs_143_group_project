@@ -13,3 +13,7 @@ Node::~Node()
 void Node::handlePacket(Packet *packet) {
     std::cout << "Node packet handler.\n";
 }
+
+void Node::addLink(Link *link) {
+    this->links.push_back(link);
+}

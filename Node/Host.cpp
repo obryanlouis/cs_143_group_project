@@ -2,9 +2,8 @@
 
 #include "Host.h"
 
-Host::Host(int in_id, Flow *in_flow)
-    : flow_p(in_flow)
-    , dataSent(0)
+Host::Host(int in_id)
+    : dataSent(0)
     , dataReceived(0)
     , Node(in_id)
 { }
@@ -20,6 +19,10 @@ Link* Host::getLink() {
     }
 
     return *this->links.begin();
+}
+
+void Host::setFlow(Flow *flow) {
+    this->flow_p = flow;
 }
 
 Flow* Host::getFlow() {
