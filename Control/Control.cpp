@@ -135,8 +135,9 @@ void Controller::add(Event *event_p) {
 void routerUpdate(void* args){
     SYSTEM_CONTROLLER->updateMyRouters();
     void (*fp)(void*) = &routerUpdate;
-    SYSTEM_CONTROLLER->add  \
-        (new Event(SYSTEM_TIME + ROUTING_UPDATE_PERIOD, fp, 0));
+    // DEBUG
+    /*SYSTEM_CONTROLLER->add  \
+        (new Event(SYSTEM_TIME + ROUTING_UPDATE_PERIOD, fp, 0));*/
 }
 
 void printSystem(void* args){
@@ -156,7 +157,6 @@ void Controller::initSystem(){
     routerUpdate(args);
     printSystem(args);
 }
-
 
 /* Scheduler functions */
 /* Initiate scheduler by creating schedule queue and putting in initial events. */ 

@@ -42,6 +42,8 @@ void Link::setEnds(Node *n1, Node *n2) {
 }
 
 void Link::handlePacket(Packet* packet) {
+    std::cout << "Link " << this->ID << " is handling packet " <<
+        "of type " << packet->getType() << "\n";
     int size = packet->getSize();
     // If there is space remaining in the buffer
     if (!(size + this->capacityUsed > this->capacity)) {
@@ -109,7 +111,7 @@ void sendPacketCallback(void* args) {
     Link *l = (Link *)argArray[2];
     n->handlePacket(p);
     // Clean up
-    delete[] argArray;
+    free(argArray);
 }
 
 void sendAnotherPacket(void *arg) {
@@ -122,6 +124,8 @@ void sendAnotherPacket(void *arg) {
     // Pop the next packet
     Packet *packet = link->popPacket();
     // Store the node and the packet as an argument for the callback
+    // The array `args` WILL BE FREED in the callback, so can't be
+    // used afterward.
     void **args = (void **)malloc(sizeof(void *) * 3);
     args[0] = nextNode;
     args[1] = packet;

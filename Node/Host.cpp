@@ -43,7 +43,7 @@ void Host::resetStats() {
 }
 
 void Host::handlePacket(Packet *packet){
-    std::cout << "Host is handling packet" << std::endl;
+    std::cout << "Host " << this->nodeId << " is handling packet\n";
 
     time_t time;     // to be used for handling data packets
     AckPacket *ack;     // to be used for handling data packets
@@ -63,7 +63,9 @@ void Host::handlePacket(Packet *packet){
         // handle acknowledgement packets: adjust the receive rate of the
         // host, do work for congestion control (not needed just yet)
         dataReceived += packet->getSize();
-        flow->handlePacket((AckPacket *)packet);
+        // Create a new acknowledgement packet and send it
+        ack = new AckPacket((DataPacket *)packet);
+        flow->handlePacket(ack);
         break;
     case Packet::DATA:
         // If the source of this packet is this host, then the packet

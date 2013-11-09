@@ -73,6 +73,7 @@ public:
         // Handles an incoming packet acknowledgement
     Host *getStart();
     Host *getDestination();
+    int getId();
 };
 
 

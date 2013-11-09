@@ -12,7 +12,7 @@ int main( int argc, const char* argv[] ) {
     Router *router1;
     host1 = new Host(1);
     host2 = new Host(2);
-    flow1 = new Flow(1, 0, host1, host2);
+    flow1 = new Flow(1, 10240, host1, host2);
     router1 = new Router();
     link1 = new Link(1, host1, router1, 10000, 10, 100);
     link2 = new Link(2, router1, host2, 10000, 10, 100);
@@ -27,7 +27,8 @@ int main( int argc, const char* argv[] ) {
     SYSTEM_CONTROLLER->addLink(link3);
     SYSTEM_CONTROLLER->addLink(link4);
 
-    SYSTEM_CONTROLLER->addFlow(flow1, 0);
+    // Give some time for the routing table to stabilize.
+    SYSTEM_CONTROLLER->addFlow(flow1, 3000);
 
     SYSTEM_CONTROLLER->addRouter(router1);
 
