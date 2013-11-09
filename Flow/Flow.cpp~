@@ -101,12 +101,10 @@ void Flow::maintain() {
         makeAndSendPacket(this->outstanding.front()->getId(), this);
     }
 
-    if (this->progress < this->totalPackets) {
-        // Schedule the next maintenance for this flow to be frequent
-        Event *e = new Event(SYSTEM_CONTROLLER->getCurrentTime() +
-            FLOW_MAINTENANCE_PERIOD, &maintainFlowCallback, this);
-        SYSTEM_CONTROLLER->add(e);
-    }
+    // Schedule the next maintenance for this flow to be frequent
+    Event *e = new Event(SYSTEM_CONTROLLER->getCurrentTime() +
+        FLOW_MAINTENANCE_PERIOD, &maintainFlowCallback, this);
+    SYSTEM_CONTROLLER->add(e);
 }
 
 int Flow::getNextPacketId() {

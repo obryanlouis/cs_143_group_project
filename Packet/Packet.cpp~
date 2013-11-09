@@ -121,7 +121,6 @@ AckPacket::AckPacket(DataPacket *old)
     size = Packet::ACKSIZE;
     source = old->getDestination();
     destination = old->getSource();
-    delete old;
 }
 
 AckPacket::~AckPacket(){}
