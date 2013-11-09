@@ -44,6 +44,7 @@ void Host::resetStats() {
 
 void Host::handlePacket(Packet *packet){
     std::cout << "Host " << this->nodeId << " is handling packet\n";
+    Node::handlePacket(packet);
 
     time_t time;     // to be used for handling data packets
     AckPacket *ack;     // to be used for handling data packets
@@ -57,14 +58,13 @@ void Host::handlePacket(Packet *packet){
         // it that they are there.
         routingPacket = new HostRoutingPacket(NULL, NULL, 
                 this->links.front(), this);
+        routingPacket->setPreviousNode(this);
         this->links.front()->handlePacket(routingPacket);
         break;
     case Packet::ACK:
         // handle acknowledgement packets: adjust the receive rate of the
         // host, do work for congestion control (not needed just yet)
         dataReceived += packet->getSize();
-        // Create a new acknowledgement packet and send it
-        ack = new AckPacket((DataPacket *)packet);
         flow->handlePacket(ack);
         break;
     case Packet::DATA:
@@ -74,6 +74,7 @@ void Host::handlePacket(Packet *packet){
         if (packet->getSource() == this) {
             // Update the data sent
             this->dataSent += packet->getSize();
+            packet->setPreviousNode(this);
             // Send this packet
             this->links.front()->handlePacket(packet);
         }
@@ -83,9 +84,8 @@ void Host::handlePacket(Packet *packet){
             dataReceived += packet->getSize();
 
             // also needs to send back an acknowledgement packet
-            // TODO: Get time from scheduler
-            time = 0;
-            *ack = new AckPacket((DataPacket *)packet);
+            ack = new AckPacket((DataPacket *)packet);
+            ack->setPreviousNode(this);
             // Send the packet back to the host
             this->links.front()->handlePacket(ack);
         }

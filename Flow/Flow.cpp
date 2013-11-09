@@ -20,6 +20,7 @@ Flow::Flow(int in_ID, int in_size, Host *in_source, Host *in_destination)
     }
     this->windowSize = 10;
     this->timeout = 400;
+    in_source->setFlow(this);
 }
 
 Flow::~Flow()
@@ -39,6 +40,7 @@ void Flow::updateDataReceived(int bytes) {
 }
 
 void Flow::handlePacket(AckPacket *p) {
+    std::cout << "Flow " << flowId << " has received an acknowledgement packet\n";
     // remove the packet from outstanding if it exists
     std::vector<DataPacket *>::iterator it = std::find(this->outstanding.begin(), this->outstanding.end(), p);
     if (it != this->outstanding.end())
@@ -50,6 +52,8 @@ void Flow::handlePacket(AckPacket *p) {
     // TODO: update window size
     // update other stats: progress, dataSent, dataReceived
     this->progress++;
+    std::cout << "Flow " << flowId << " progress: " << progress <<
+        " out of " << totalPackets << " received\n";
     this->dataReceived += p->getSize();
 
     // DEBUG
@@ -98,6 +102,7 @@ void Flow::maintain() {
     // Schedule the next maintenance for this flow to be frequent
     Event *e = new Event(SYSTEM_CONTROLLER->getCurrentTime() +
         FLOW_MAINTENANCE_PERIOD, &maintainFlowCallback, this);
+    SYSTEM_CONTROLLER->add(e);
 }
 
 int Flow::getNextPacketId() {

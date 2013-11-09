@@ -40,6 +40,9 @@ protected:
         // The source of this packet
     Node *destination;
         // The destination of this packet
+    Node *previousNode;
+        // The previous node that this packet came from on this
+        // packet's route
 
 public:
     Packet(PacketType in_type, int in_size, Node *s, Node *de);
@@ -55,6 +58,10 @@ public:
         // Return the source node of the packet
     Node* getDestination();
         // Return the destination node of the packet
+    void setPreviousNode(Node *node);
+        // Set the previous node that this packet came from
+    Node* getPreviousNode();
+        // Return the previous node that this packet came from
 };
 
 

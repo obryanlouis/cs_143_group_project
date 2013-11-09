@@ -17,6 +17,7 @@ Link::Link(int in_ID, Node *in_end1, Node *in_end2, int in_capacity,
 { 
     nextFree = SYSTEM_CONTROLLER->getCurrentTime();
     in_end1->addLink(this);
+    in_end2->addLink(this);
 }
 
 void Link::resetStats() {
@@ -119,10 +120,17 @@ void sendAnotherPacket(void *arg) {
     Link * link = (Link *)arg;
     unsigned int currentTime = SYSTEM_CONTROLLER->getCurrentTime();
     unsigned int propogationTime = link->getDelay();
-    // Get the next node
-    Node *nextNode = link->getEnd2();
     // Pop the next packet
     Packet *packet = link->popPacket();
+    // Get the next node, which is the opposite end from which the
+    // packet came from.
+    Node *nextNode;
+    if (link->getEnd2() == packet->getPreviousNode()) {
+        nextNode = link->getEnd1();
+    }
+    else {
+        nextNode = link->getEnd2();
+    }
     // Store the node and the packet as an argument for the callback
     // The array `args` WILL BE FREED in the callback, so can't be
     // used afterward.

@@ -1,5 +1,6 @@
 
 #include "Node.h"
+#include "Packet.h"
 
 Node::Node() {}
 
@@ -11,7 +12,11 @@ Node::~Node()
 {}
 
 void Node::handlePacket(Packet *packet) {
-    std::cout << "Node packet handler.\n";
+    // DEBUG
+    if (packet == NULL) {
+        std::cout << "Node::handlePacket : Packet is null\n";
+    }
+    packet->setPreviousNode(this);
 }
 
 void Node::addLink(Link *link) {

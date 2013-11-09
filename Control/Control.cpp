@@ -84,9 +84,9 @@ void Controller::updateMyRouters(){
 }
 
 void Controller::printMySystem() {
-    std::cout << "***Printing System***" <<std::endl;
+    /*std::cout << "***Printing System***" <<std::endl;
     unsigned int currentTime = this->schedule_p->getCurrentTime();
-    std::map<std::string, std::ofstream*> files;
+    std::map<std::string, std::ofstream*> files;*/
     // Links
 /*    std::cout << "  Outputting Link information." << std::endl;
     std::ofstream *occupancyFile, *lossFile, *rateFile;
@@ -123,9 +123,9 @@ void Controller::printMySystem() {
     }
 */    
     // TODO: Routers, Hosts, Flows
-    std::cout << "  Outputting Flow information." << std::endl;
+    /*std::cout << "  Outputting Flow information." << std::endl;
     
-    std::cout << "--Done printing system." << std::endl;
+    std::cout << "--Done printing system." << std::endl;*/
 }
 
 void Controller::add(Event *event_p) {

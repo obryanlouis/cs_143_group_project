@@ -24,7 +24,7 @@ public:
     Node(int in_id);
     virtual ~Node();
 
-    virtual void handlePacket(Packet* packet) = 0;
+    virtual void handlePacket(Packet* packet);
     void addLink(Link *link);
     int getId();
 };

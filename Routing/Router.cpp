@@ -25,6 +25,7 @@ Router::~Router() {
 
 void Router::handlePacket(Packet *packet){
     std::cout << "Router is handling packet" << std::endl;
+    Node::handlePacket(packet);
 
     bool  updated;   // to be used if the packet is for Routing Table Updates
 
@@ -52,7 +53,6 @@ void Router::handlePacket(Packet *packet){
         break;
     case Packet::ACK:
         // handle acknowledgement packets: same as data packets
-        break;
     case Packet::DATA:
         // handle data packets
         (getNextLink(D->getDestination()))->handlePacket(packet);
@@ -70,6 +70,7 @@ void Router::broadcastRoutingTable() {
     {
         RouterRoutingPacket *newRoutingPacket 
             = new RouterRoutingPacket(NULL, NULL, *it, this->routingTable_p);
+        newRoutingPacket->setPreviousNode(this);
         (*it)->handlePacket(newRoutingPacket);
     }
 }    

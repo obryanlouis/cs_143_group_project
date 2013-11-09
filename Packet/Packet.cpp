@@ -26,6 +26,13 @@ Node* Packet::getDestination() {
     return this->destination;
 }
 
+void Packet::setPreviousNode(Node *node) {
+    this->previousNode = node;
+}
+
+Node * Packet::getPreviousNode() {
+    return this->previousNode;
+}
 
 /**************** RoutingPacket ********************/
 RoutingPacket::RoutingPacket(Node *source, Node *destination,\
@@ -112,6 +119,8 @@ AckPacket::AckPacket(DataPacket *old)
 {
     type = Packet::ACK;
     size = Packet::ACKSIZE;
+    source = old->getDestination();
+    destination = old->getSource();
 }
 
 AckPacket::~AckPacket(){}
