@@ -57,6 +57,8 @@ void Flow::handlePacket(AckPacket *p) {
         std::cout << "Flow " << this->flowId << " has finished " <<
             "sending and receiving all packets.\n";
     }
+
+    delete p;
 }
 
 void maintainFlowCallback(void *arg) {

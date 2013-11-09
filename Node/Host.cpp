@@ -55,7 +55,7 @@ void Host::handlePacket(Packet *packet){
     case Packet::ROUTERROUTE:
         // Hosts need to send back information to the router telling
         // it that they are there.
-        routingPacket = new HostRoutingPacket(NULL, NULL, 
+        routingPacket = new HostRoutingPacket(0, 0, 
                 this->links.front(), this);
         this->links.front()->handlePacket(routingPacket);
         break;
@@ -63,8 +63,7 @@ void Host::handlePacket(Packet *packet){
         // handle acknowledgement packets: adjust the receive rate of the
         // host, do work for congestion control (not needed just yet)
         dataReceived += packet->getSize();
-        // Create a new acknowledgement packet and send it
-        ack = new AckPacket((DataPacket *)packet);
+        // let the flow handle the packet, including freeing the memory
         flow->handlePacket(ack);
         break;
     case Packet::DATA:
@@ -83,8 +82,6 @@ void Host::handlePacket(Packet *packet){
             dataReceived += packet->getSize();
 
             // also needs to send back an acknowledgement packet
-            // TODO: Get time from scheduler
-            time = 0;
             *ack = new AckPacket((DataPacket *)packet);
             // Send the packet back to the host
             this->links.front()->handlePacket(ack);

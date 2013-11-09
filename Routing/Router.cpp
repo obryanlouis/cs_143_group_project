@@ -24,7 +24,9 @@ Router::~Router() {
 }
 
 void Router::handlePacket(Packet *packet){
-    std::cout << "Router is handling packet" << std::endl;
+    std::cout << "Router id: "
+              << this->nodeId
+              << " is handling packet" << std::endl;
 
     bool  updated;   // to be used if the packet is for Routing Table Updates
 
