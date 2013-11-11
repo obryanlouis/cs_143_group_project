@@ -97,6 +97,8 @@ private:
     std::list<Host*> *hosts_p;
     Scheduler *schedule_p;
     int flowsLeft;
+
+    friend int makePlots();
     
 public:
     Controller();
@@ -107,6 +109,7 @@ public:
     void addFlow(Flow *flow, unsigned int startTime);
     void addHost(Host *host);
     unsigned int getCurrentTime();
+    void decrementFlowsLeft();
  
     void printMySystem();
     void updateMyRouters();

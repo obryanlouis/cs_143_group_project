@@ -3,7 +3,10 @@
 #include "Router.h"
 #include "Node.h"
 #include "Packet.h"
+#include "Control.h"
 #include <iostream>
+
+extern Controller *SYSTEM_CONTROLLER;
 
 Router::Router() { 
     // Make a new routing table
@@ -27,7 +30,10 @@ void Router::handlePacket(Packet *packet){
     Node::handlePacket(packet);
     std::cout << "Router id: "
               << this->nodeId
-              << " is handling packet" << std::endl;
+              << " is handling packet"
+              << " at time "
+              << SYSTEM_CONTROLLER->getCurrentTime()
+              << "\n";
 
     bool  updated;   // to be used if the packet is for Routing Table Updates
 

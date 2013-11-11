@@ -28,7 +28,7 @@ int main( int argc, const char* argv[] ) {
     //SYSTEM_CONTROLLER->addLink(link4);
 
     // Give some time for the routing table to stabilize.
-    SYSTEM_CONTROLLER->addFlow(flow1, 3000);
+    SYSTEM_CONTROLLER->addFlow(flow1, 10);
 
     SYSTEM_CONTROLLER->addRouter(router1);
 

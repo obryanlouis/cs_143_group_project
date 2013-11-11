@@ -10,9 +10,13 @@
 #include "Packet.h"
 #include "Link.h"
 #include "Flow.h"
+#include "Control.h"
 
 class Flow;
 class Node;
+class Controller;
+
+extern Controller *SYSTEM_CONTROLLER;
 
 class Host : public Node {
 

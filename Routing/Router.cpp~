@@ -27,7 +27,10 @@ void Router::handlePacket(Packet *packet){
     Node::handlePacket(packet);
     std::cout << "Router id: "
               << this->nodeId
-              << " is handling packet" << std::endl;
+              << " is handling packet"
+              << " at time "
+              << SYSTEM_CONTROLLER->getCurrentTime()
+              << "\n";
 
     bool  updated;   // to be used if the packet is for Routing Table Updates
 
@@ -42,6 +45,7 @@ void Router::handlePacket(Packet *packet){
     case Packet::HOSTROUTE:
         // the host is telling this router that it exists 
         this->updateSingleNode(H->getHost(), H->getLink());
+        delete packet;
         break;
     case Packet::ROUTERROUTE:
         // handing routing table information
@@ -52,6 +56,7 @@ void Router::handlePacket(Packet *packet){
             this->broadcastRoutingTable();
         }
 
+        delete packet;
         break;
     case Packet::ACK:
         // handle acknowledgement packets: same as data packets

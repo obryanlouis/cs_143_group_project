@@ -43,7 +43,8 @@ void Host::resetStats() {
 }
 
 void Host::handlePacket(Packet *packet){
-    std::cout << "Host " << this->nodeId << " is handling packet\n";
+    std::cout << "Host " << this->nodeId << " is handling packet "
+        << "at time " << SYSTEM_CONTROLLER->getCurrentTime() << "\n";
     Node::handlePacket(packet);
 
     time_t time;     // to be used for handling data packets

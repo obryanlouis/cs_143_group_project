@@ -74,6 +74,8 @@ void Controller::run(){
         }
     }
 
+    makePlots();
+
     std::cout << "Network simulated successfully. YAY!" << std::endl;
 }
 
@@ -85,6 +87,10 @@ void Controller::updateMyRouters(){
     {
         (*it)->broadcastRoutingTable();
     }
+}
+
+void Controller::decrementFlowsLeft() {
+    this->flowsLeft--;
 }
 
 void Controller::printMySystem() {

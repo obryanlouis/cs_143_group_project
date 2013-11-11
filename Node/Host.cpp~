@@ -103,3 +103,13 @@ void Host::setLink(Link *link) {
     this->links.clear();
     this->links.push_back(link);
 }
+
+
+double Host::getStats(std::string stat, int period) {
+    if (stat.compare("send rate") == 0) {
+        return (double) this->dataSent / (double) period;
+    }
+    else if (stat.compare("receive rate") == 0) {
+        return (double) this->dataReceived / (double) period;
+    }
+}

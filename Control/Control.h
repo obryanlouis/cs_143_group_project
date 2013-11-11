@@ -97,6 +97,8 @@ private:
     std::list<Host*> *hosts_p;
     Scheduler *schedule_p;
     int flowsLeft;
+
+    friend void makePlots();
     
 public:
     Controller();

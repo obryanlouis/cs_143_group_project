@@ -8,6 +8,8 @@
 // This can't be static...
 Controller *SYSTEM_CONTROLLER;
 
+extern void makePlots(); 
+
 /* Controller functions */
 Controller::Controller(){
     SYSTEM_CONTROLLER = this;
@@ -73,6 +75,8 @@ void Controller::run(){
             this->schedule_p->doNext();
         }
     }
+
+    makePlots();
 
     std::cout << "Network simulated successfully. YAY!" << std::endl;
 }
