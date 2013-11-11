@@ -44,6 +44,8 @@ public:
         // handle a received packet
     void setLink(Link *link);
 
+    double getStats(std::string stat, int period);
+
 };
 
 #endif

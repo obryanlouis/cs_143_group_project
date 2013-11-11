@@ -66,6 +66,7 @@ void Host::handlePacket(Packet *packet){
         // host, do work for congestion control (not needed just yet)
         dataReceived += packet->getSize();
         // let the flow handle the packet, including freeing the memory
+        ack = (AckPacket *)packet;
         flow->handlePacket(ack);
         break;
     case Packet::DATA:

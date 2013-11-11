@@ -17,6 +17,7 @@ Link::Link(int in_ID, Node *in_end1, Node *in_end2, int in_capacity,
 { 
     nextFree = SYSTEM_CONTROLLER->getCurrentTime();
     in_end1->addLink(this);
+    in_end2->addLink(this);
 }
 
 void Link::resetStats() {
@@ -89,7 +90,7 @@ int Link::getDataSent() {
     return this->dataSent;
 }
 
-int Link::getStat(std::string stat) {
+int Link::getStat(std::string stat, int period) {
     if (stat.compare("occupancy") == 0) {
         return this->getOccupancy();
     }

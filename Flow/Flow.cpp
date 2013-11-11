@@ -82,6 +82,13 @@ void makeAndSendPacket(int id, Flow *flow) {
 }
 
 void Flow::maintain() {
+    // If this flow is done sending packets, inform the system controller and
+    // stop making calls to this function
+    if (this->progress == this->totalPackets) {
+        SYSTEM_CONTROLLER->decrementFlowsLeft();
+        return;
+    }
+
     // If the flow/host hasn't surpassed the window size
     if (this->outstanding.size() < this->windowSize) {
         int id = this->getNextPacketId();
@@ -139,4 +146,18 @@ Host *Flow::getDestination(){
 
 int Flow::getId() {
     return this->flowId;
+}
+
+double Flow::getStats(std::string stat, int period) {
+    // TODO: Make sure all the units are correct.
+    if (stat.compare("send rate") == 0) {
+        return (double)this->dataSent / (double)period;
+    }
+    else if (stat.compare("receive rate") == 0) {
+        return (double)this->dataReceived / (double)period;
+    }
+    else if (stat.compare("rtt") == 0) {
+        return (double)this->outstanding.size() * (double)period /
+            (double)this->dataReceived;
+    }
 }

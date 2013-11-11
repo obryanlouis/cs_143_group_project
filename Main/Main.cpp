@@ -32,6 +32,9 @@ int main( int argc, const char* argv[] ) {
 
     SYSTEM_CONTROLLER->addRouter(router1);
 
+    SYSTEM_CONTROLLER->addHost(host1);
+    SYSTEM_CONTROLLER->addHost(host2);
+
     /*RoutingTable routingTable;
     RouterRoutingPacket packet(host1, host2, link1, &routingTable, 1024);
     link1->handlePacket(&packet);

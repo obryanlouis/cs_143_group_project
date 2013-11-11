@@ -24,13 +24,14 @@ class Host : public Node {
         // The amount of data received in the last time interval (bytes)
 
 public:
-    Host(int in_id, Flow *in_flow);
+    Host(int in_id);
         // create an instance of class Host with the give specifications
     ~Host();
         // destroy this instance of Host
 
     Link* getLink();
         // returns a pointer to the link the host is connected to
+    void setFlow(Flow *flow);
     Flow* getFlow();
         // returns a pointer to the flow the host is associated with
     int getDataSent();
