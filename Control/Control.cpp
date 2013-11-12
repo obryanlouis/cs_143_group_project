@@ -8,6 +8,8 @@
 // This can't be static...
 Controller *SYSTEM_CONTROLLER;
 
+extern void makePlots(); 
+
 /* Controller functions */
 Controller::Controller(){
     SYSTEM_CONTROLLER = this;
@@ -15,6 +17,7 @@ Controller::Controller(){
     this->routers_p = new std::list<Router*>();
     this->links_p = new std::list<Link*>();
     this->flows_p = new std::list<Flow*>();
+    this->hosts_p = new std::list<Host*>();
 
     this->schedule_p = new Scheduler();
 }
@@ -34,6 +37,9 @@ void Controller::addLink(Link *link){
     this->links_p->push_back(link);
 }
 
+void Controller::addHost(Host *host) {
+    this->hosts_p->push_back(host);
+}
 
 extern void maintainFlowCallback(void *arg);
 
@@ -70,6 +76,8 @@ void Controller::run(){
         }
     }
 
+    makePlots();
+
     std::cout << "Network simulated successfully. YAY!" << std::endl;
 }
 
@@ -83,19 +91,23 @@ void Controller::updateMyRouters(){
     }
 }
 
+void Controller::decrementFlowsLeft() {
+    this->flowsLeft--;
+}
+
 void Controller::printMySystem() {
-    /*std::cout << "***Printing System***" <<std::endl;
+    std::cout << "***Printing System***" <<std::endl;
     unsigned int currentTime = this->schedule_p->getCurrentTime();
-    std::map<std::string, std::ofstream*> files;*/
+    std::map<std::string, std::ofstream*> files;
     // Links
-/*    std::cout << "  Outputting Link information." << std::endl;
-    std::ofstream *occupancyFile, *lossFile, *rateFile;
-    occupancyFile->open(LINK_OCCUPANCY_FILE.data(), std::ios::app);
-    lossFile->open(LINK_PACKET_LOSS_FILE.data(), std::ios::app);
-    rateFile->open(LINK_FLOW_RATE_FILE.data(), std::ios::app);
-    files["occupancy"] = occupancyFile;
-    files["loss"] = lossFile;
-    files["data sent"] = rateFile;
+    std::cout << "  Outputting Link information." << std::endl;
+    std::ofstream occupancyFile, lossFile, rateFile;
+    occupancyFile.open(LINK_OCCUPANCY_FILE.data(), std::ios::app);
+    lossFile.open(LINK_PACKET_LOSS_FILE.data(), std::ios::app);
+    rateFile.open(LINK_FLOW_RATE_FILE.data(), std::ios::app);
+    files["occupancy"] = &occupancyFile;
+    files["loss"] = &lossFile;
+    files["data sent"] = &rateFile;
     for (std::map<std::string, std::ofstream*>::iterator i = files.begin();
          i != files.end(); i++)
     {
@@ -106,26 +118,80 @@ void Controller::printMySystem() {
              it != this->links_p->end(); it++)
         {
                Link *link = *it;
-            // Calculate the flow rate during this time interval
-            if (stat.compare("data sent") == 0) {
-               int dataSent = link->getStat(stat);
-               // TODO: Make sure that the snapshot period thing matches units
-               int timeDifference = SNAPSHOT_PERIOD;
-               (*file) << " " << (double)dataSent / (double)timeDifference;
-            }
-            // For the values that can be directly saved do so
-            else {
-               (*file) << " " + link->getStat(stat);
-            }
+               (*file) << " " << link->getStat(stat, SNAPSHOT_PERIOD);
         }
         (*file) << "\n";
         file->close();
     }
-*/    
-    // TODO: Routers, Hosts, Flows
-    /*std::cout << "  Outputting Flow information." << std::endl;
-    
-    std::cout << "--Done printing system." << std::endl;*/
+    //  Reset the stats
+    for (std::list<Link*>::iterator it = this->links_p->begin();
+         it != this->links_p->end(); it++)
+    {
+           (*it)->resetStats();
+    }
+
+    std::cout << "  Outputting Flow information." << std::endl;
+    std::ofstream flowSendFile, flowReceiveFile, flowRTTFile;
+    flowSendFile.open(FLOW_SEND_FILE.data(), std::ios::app);
+    flowReceiveFile.open(FLOW_RECEIVE_FILE.data(), std::ios::app);
+    flowRTTFile.open(FLOW_RTT_FILE.data(), std::ios::app);
+    files.clear();
+    files["send rate"] = &flowSendFile;
+    files["receive rate"] = &flowReceiveFile;
+    files["rtt"] = &flowRTTFile;
+    for (std::map<std::string, std::ofstream*>::iterator i = files.begin();
+         i != files.end(); i++)
+    {
+        std::ofstream *file = i->second;
+        std::string stat = i->first;
+        (*file) << currentTime;
+        for (std::list<Flow*>::iterator it = this->flows_p->begin();
+             it != this->flows_p->end(); it++)
+        {
+               Flow *flow = *it;
+               (*file) << " " << flow->getStats(stat, SNAPSHOT_PERIOD);
+        }
+        (*file) << "\n";
+        file->close();
+    }
+
+    //  Reset the stats
+    for (std::list<Flow*>::iterator it = this->flows_p->begin();
+         it != this->flows_p->end(); it++)
+    {
+           (*it)->resetStats();
+    }
+
+    std::cout << "Outputting Host information." << "\n";
+    files.clear();
+    std::ofstream hostSendFile, hostReceiveFile;
+    hostSendFile.open(HOST_SEND_FILE.data(), std::ios::app);
+    hostReceiveFile.open(HOST_RECEIVE_FILE.data(), std::ios::app);
+    files["send rate"] = &hostSendFile;
+    files["receive rate"] = &hostReceiveFile;
+    for (std::map<std::string, std::ofstream*>::iterator i = files.begin();
+         i != files.end(); i++)
+    {
+        std::ofstream *file = i->second;
+        std::string stat = i->first;
+        (*file) << currentTime;
+        for (std::list<Host*>::iterator it = this->hosts_p->begin();
+             it != this->hosts_p->end(); it++)
+        {
+               Host *host = *it;
+               (*file) << " " << host->getStats(stat, SNAPSHOT_PERIOD);
+        }
+        (*file) << "\n";
+        file->close();
+    }
+    //  Reset the stats
+    for (std::list<Host*>::iterator it = this->hosts_p->begin();
+         it != this->hosts_p->end(); it++)
+    {
+           (*it)->resetStats();
+    }
+
+    std::cout << "--Done printing system." << std::endl;
 }
 
 void Controller::add(Event *event_p) {
@@ -135,9 +201,8 @@ void Controller::add(Event *event_p) {
 void routerUpdate(void* args){
     SYSTEM_CONTROLLER->updateMyRouters();
     void (*fp)(void*) = &routerUpdate;
-    // DEBUG
-    /*SYSTEM_CONTROLLER->add  \
-        (new Event(SYSTEM_TIME + ROUTING_UPDATE_PERIOD, fp, 0));*/
+    SYSTEM_CONTROLLER->add  \
+        (new Event(SYSTEM_TIME + ROUTING_UPDATE_PERIOD, fp, 0));
 }
 
 void printSystem(void* args){
@@ -147,10 +212,39 @@ void printSystem(void* args){
         (new Event(SYSTEM_TIME + SNAPSHOT_PERIOD, fp, 0));
 }
 
+void removeOldStatsFiles() {
+    std::list<std::string> filenames;
+    filenames.push_back(LINK_OCCUPANCY_FILE);
+    filenames.push_back(LINK_PACKET_LOSS_FILE);
+    filenames.push_back(LINK_FLOW_RATE_FILE);
+    filenames.push_back(FLOW_SEND_FILE);
+    filenames.push_back(FLOW_RECEIVE_FILE);
+    filenames.push_back(FLOW_RTT_FILE);
+    filenames.push_back(HOST_SEND_FILE);
+    filenames.push_back(HOST_RECEIVE_FILE);
+
+    for (std::list<std::string>::iterator it = filenames.begin();
+        it != filenames.end(); it++)
+    {
+        std::ifstream ifile(it->data());
+        // If the file exists, delete it
+        if (ifile) {
+            if (remove(it->data()) != 0) {
+                std::cout << "Could not delete file " + *it;
+                exit(1);
+            }
+        }
+    }
+    std::cout << "Successfully removed old stats files.\n";
+}
+
 void Controller::initSystem(){
     // Init flows
     this->flowsLeft = flows_p->size();
     std::cout << "Number of input flows: " << flowsLeft << "\n";
+
+    // Delete old stats files
+    removeOldStatsFiles();
 
     // Do first router update/system print
     void *args;
@@ -209,3 +303,4 @@ unsigned int Scheduler::getCurrentTime() {
 void Event::execute(){
     this->fp(this->arg);
 }
+

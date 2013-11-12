@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <list>
 #include <queue>
+#include <stdio.h>
 
 #include "Flow.h"
 //#include "Link.h"
@@ -23,7 +24,7 @@ class Node;
 
 /* Constants */
 static unsigned int ROUTING_UPDATE_PERIOD = 6000;
-static unsigned int SNAPSHOT_PERIOD = 6000;
+static unsigned int SNAPSHOT_PERIOD = 5;
 static const unsigned int END_PERIOD = 3; // number of events to execute
                                             // after flows done (for data 
                                             // collection)
@@ -31,7 +32,12 @@ static const std::string LINK_OCCUPANCY_FILE = std::string("Output/LinkOccupancy
 static const std::string LINK_PACKET_LOSS_FILE = std::string("Output/LinkPacketLoss.txt");
 static const std::string LINK_FLOW_RATE_FILE = std::string("Output/LinkFlowRate.txt");
 
+static const std::string FLOW_SEND_FILE = std::string("Output/FlowSend.txt");
+static const std::string FLOW_RECEIVE_FILE = std::string("Output/FlowReceive.txt");
+static const std::string FLOW_RTT_FILE = std::string("Output/FlowRTT.txt");
 
+static const std::string HOST_SEND_FILE = std::string("Output/HostSend.txt");
+static const std::string HOST_RECEIVE_FILE = std::string("Output/HostReceive.txt");
 
 /* Events that get put into the scheduler */
 class Event {
@@ -70,10 +76,8 @@ private:
 
 public:
     Scheduler();
-    void initScheduler();
     ~Scheduler();
 
-    //void add(event_t in_type,  unsigned int in_time, void *in_actOn = 0);
     void add(Event* event_p);
     bool doNext();
 
@@ -90,23 +94,33 @@ private:
     std::list<Router*> *routers_p;
     std::list<Link*> *links_p;
     std::list<Flow*> *flows_p;
+    std::list<Host*> *hosts_p;
     Scheduler *schedule_p;
     int flowsLeft;
+
+    friend int makePlots();
     
 public:
-    Controller(std::list<Router *> *in_routers, std::list<Link*> *in_links,
-            std::list<Flow*> *in_flows);
+    Controller();
     ~Controller();
 
-    void printSystem();
-    void routerUpdate();
+    void addRouter(Router *router);
+    void addLink(Link *link);
+    void addFlow(Flow *flow, unsigned int startTime);
+    void addHost(Host *host);
+    unsigned int getCurrentTime();
+    void decrementFlowsLeft();
+ 
+    void printMySystem();
+    void updateMyRouters();
     void add(Event *event_p);
 
-    unsigned int getCurrentTime();
     void run();
-};
 
-Controller *SYSTEM_CONTROLLER;
+private:
+    void initSystem();
+
+};
 
 /* Only Scheduler should update the following */
 static unsigned int SYSTEM_TIME;

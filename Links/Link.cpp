@@ -44,7 +44,8 @@ void Link::setEnds(Node *n1, Node *n2) {
 
 void Link::handlePacket(Packet* packet) {
     std::cout << "Link " << this->ID << " is handling packet " <<
-        "of type " << packet->getType() << "\n";
+        "of type " << packet->getType() << " at time " <<
+        SYSTEM_CONTROLLER->getCurrentTime() << "\n";
     int size = packet->getSize();
     // If there is space remaining in the buffer
     if (!(size + this->capacityUsed > this->capacity)) {
@@ -90,15 +91,15 @@ int Link::getDataSent() {
     return this->dataSent;
 }
 
-int Link::getStat(std::string stat) {
+double Link::getStat(std::string stat, int period) {
     if (stat.compare("occupancy") == 0) {
-        return this->getOccupancy();
+        return (double) this->getOccupancy();
     }
     else if (stat.compare("loss") == 0) {
-        return this->getPacketLoss();
+        return (double) this->getPacketLoss() / period;
     }
     else if (stat.compare("data sent") == 0) {
-        return this->getDataSent();
+        return (double) this->getDataSent() / period;
     }
     throw new std::string("You tried to compute the stat " + stat
         + " but this stat doesn't exist.");

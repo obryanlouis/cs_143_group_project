@@ -40,7 +40,8 @@ void Flow::updateDataReceived(int bytes) {
 }
 
 void Flow::handlePacket(AckPacket *p) {
-    std::cout << "Flow " << flowId << " has received an acknowledgement packet\n";
+    std::cout << "Flow " << flowId << " has received an acknowledgement packet "
+        "at time " << SYSTEM_CONTROLLER->getCurrentTime() << "\n";
     // remove the packet from outstanding if it exists
     std::vector<DataPacket *>::iterator it = std::find(this->outstanding.begin(), this->outstanding.end(), p);
     if (it != this->outstanding.end())
@@ -78,27 +79,36 @@ void makeAndSendPacket(int id, Flow *flow) {
     flow->source->handlePacket(p);
     // Add the packet to the list of outstanding packets
     flow->outstanding.push_back(p);
-
+    flow->updateDataSent(p->getSize());
 }
 
 void Flow::maintain() {
-    // If the flow/host hasn't surpassed the window size
-    if (this->outstanding.size() < this->windowSize) {
-        int id = this->getNextPacketId();
-        // And there is still a packet to send
-        if (id != FLOW_END) {
-            // Then send the packet
-            makeAndSendPacket(id, this);
-        }
+    // If this flow is done sending packets, inform the system controller and
+    // stop making calls to this function
+    if (this->progress == this->totalPackets) {
+        SYSTEM_CONTROLLER->decrementFlowsLeft();
+        return;
     }
 
     if (this->outstanding.size() > 0 &&
             SYSTEM_CONTROLLER->getCurrentTime() - 
             this->outstanding.front()->getStartTime() > this->timeout)
     {
+        // Reset the outstanding packets because we assume they've been lost
+        this->outstanding.clear();
         // The packet waiting has timed out...assume that the first
         // outstanding packet has been lost and resend it.
         makeAndSendPacket(this->outstanding.front()->getId(), this);
+    }
+
+    // If the flow/host hasn't surpassed the window size
+    else if (this->outstanding.size() < this->windowSize) {
+        int id = this->getNextPacketId();
+        // And there is still a packet to send
+        if (id != FLOW_END) {
+            // Then send the packet
+            makeAndSendPacket(id, this);
+        }
     }
 
     if (this->progress < this->totalPackets) {
@@ -139,4 +149,18 @@ Host *Flow::getDestination(){
 
 int Flow::getId() {
     return this->flowId;
+}
+
+double Flow::getStats(std::string stat, int period) {
+    // TODO: Make sure all the units are correct.
+    if (stat.compare("send rate") == 0) {
+        return (double)this->dataSent / (double)period;
+    }
+    else if (stat.compare("receive rate") == 0) {
+        return (double)this->dataReceived / (double)period;
+    }
+    else if (stat.compare("rtt") == 0) {
+        return (double)this->outstanding.size() * (double)period /
+            (double)this->dataReceived;
+    }
 }

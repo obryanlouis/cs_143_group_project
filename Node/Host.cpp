@@ -43,7 +43,8 @@ void Host::resetStats() {
 }
 
 void Host::handlePacket(Packet *packet){
-    std::cout << "Host " << this->nodeId << " is handling packet\n";
+    std::cout << "Host " << this->nodeId << " is handling packet "
+        << "at time " << SYSTEM_CONTROLLER->getCurrentTime() << "\n";
     Node::handlePacket(packet);
 
     time_t time;     // to be used for handling data packets
@@ -102,4 +103,14 @@ void Host::handlePacket(Packet *packet){
 void Host::setLink(Link *link) {
     this->links.clear();
     this->links.push_back(link);
+}
+
+
+double Host::getStats(std::string stat, int period) {
+    if (stat.compare("send rate") == 0) {
+        return (double) this->dataSent / (double) period;
+    }
+    else if (stat.compare("receive rate") == 0) {
+        return (double) this->dataReceived / (double) period;
+    }
 }

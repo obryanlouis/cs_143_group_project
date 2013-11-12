@@ -66,6 +66,7 @@ void Host::handlePacket(Packet *packet){
         // host, do work for congestion control (not needed just yet)
         dataReceived += packet->getSize();
         // let the flow handle the packet, including freeing the memory
+        ack = (AckPacket *)packet;
         flow->handlePacket(ack);
         break;
     case Packet::DATA:
@@ -101,4 +102,14 @@ void Host::handlePacket(Packet *packet){
 void Host::setLink(Link *link) {
     this->links.clear();
     this->links.push_back(link);
+}
+
+
+double Host::getStats(std::string stat, int period) {
+    if (stat.compare("send rate") == 0) {
+        return (double) this->dataSent / (double) period;
+    }
+    else if (stat.compare("receive rate") == 0) {
+        return (double) this->dataReceived / (double) period;
+    }
 }

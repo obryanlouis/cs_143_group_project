@@ -74,6 +74,7 @@ public:
     Host *getStart();
     Host *getDestination();
     int getId();
+    double getStats(std::string stat, int period);
 };
 
 
