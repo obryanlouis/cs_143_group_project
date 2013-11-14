@@ -26,7 +26,7 @@ class Router : public Node {
 	
 public:
     // CONSTRUCTORS AND DESTRUCTORS
-    Router();
+    Router(int id);
         // Create an instance of class Router
     Router(int in_id, std::list<Link*> l);
         // Create an instance of class Router with the given id

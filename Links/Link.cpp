@@ -72,6 +72,7 @@ void Link::handlePacket(Packet* packet) {
 }
 
 Packet* Link::popPacket() {
+    assert (this->buffer.size() != 0);
     Packet *packet = this->buffer.back();
     this->buffer.pop();
     this->dataSent += packet->getSize();
@@ -123,6 +124,10 @@ void sendAnotherPacket(void *arg) {
     unsigned int propogationTime = link->getDelay();
     // Pop the next packet
     Packet *packet = link->popPacket();
+    assert(packet != NULL);
+    if (packet->getType() == Packet::ROUTERROUTE && SYSTEM_CONTROLLER->getCurrentTime() == 10) {
+        int x = 1;
+    }
     // Get the next node, which is the opposite end from which the
     // packet came from.
     Node *nextNode;

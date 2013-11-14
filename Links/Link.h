@@ -28,8 +28,10 @@ private:
         // the current amount of the buffer's capacity that has been used
     int delay; 
         // time delay for travel through link (ignoring in/out time)
+        // units: ms
     std::queue<Packet*> buffer; 
         // FIFO queue of packets
+        // units: KB
     int dataSent;
         // used for stat keeping
     int packetLoss;

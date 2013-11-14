@@ -12,6 +12,7 @@ Node::~Node()
 {}
 
 void Node::handlePacket(Packet *packet) {
+    // DEBUG
     if (packet == NULL) {
         std::cout << "Node::handlePacket : Packet is null\n";
     }
@@ -24,4 +25,8 @@ void Node::addLink(Link *link) {
 
 int Node::getId() {
     return this->nodeId;
+}
+
+void Node::setId(int id) {
+    this->nodeId = id;
 }

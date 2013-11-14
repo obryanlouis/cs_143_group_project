@@ -79,7 +79,7 @@ void makeAndSendPacket(int id, Flow *flow) {
     flow->source->handlePacket(p);
     // Add the packet to the list of outstanding packets
     flow->outstanding.push_back(p);
-    flow->updateDataSend(p->getSize());
+    flow->updateDataSent(p->getSize());
 }
 
 void Flow::maintain() {

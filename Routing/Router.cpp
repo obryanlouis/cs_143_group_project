@@ -8,12 +8,14 @@
 
 extern Controller *SYSTEM_CONTROLLER;
 
-Router::Router() { 
+Router::Router(int id) { 
     // Make a new routing table
     this->routingTable_p = new RoutingTable();
     // Add an entry to the routing table saying that the distance to this router
     // is 0.
     (*this->routingTable_p)[this] = std::make_pair<int, Link*>(0, NULL);
+    // Set the id of this router
+    this->nodeId = id;
 }
 
 Router::Router(int in_id, std::list<Link*> l)
@@ -34,6 +36,7 @@ void Router::handlePacket(Packet *packet){
               << " at time "
               << SYSTEM_CONTROLLER->getCurrentTime()
               << "\n";
+    assert(packet != NULL);
 
     bool  updated;   // to be used if the packet is for Routing Table Updates
 
@@ -75,6 +78,8 @@ void Router::handlePacket(Packet *packet){
 }
 
 void Router::broadcastRoutingTable() {
+    std::cout << "Router " << nodeId << " starting broadcasting routing table"
+        << " at time " << SYSTEM_CONTROLLER->getCurrentTime() << "\n";
     for (std::list<Link* >::iterator it = this->links.begin();
             it != this->links.end(); it++)
     {
@@ -83,6 +88,8 @@ void Router::broadcastRoutingTable() {
         newRoutingPacket->setPreviousNode(this);
         (*it)->handlePacket(newRoutingPacket);
     }
+    std::cout << "Router " << nodeId << " finished broadcasting routing table"
+        << " at time " << SYSTEM_CONTROLLER->getCurrentTime() << "\n";
 }    
 
 Link* Router::getNextLink(Node *destination) {
@@ -96,6 +103,11 @@ Node* Router::getNextNode(Node *destination) {
 
 /*  Updates the routing table of this router based on a neighbor's table   */
 bool Router::updateRoutingTable(RoutingTable *t, Link *l) {
+    assert(t != NULL);
+    assert(l != NULL);
+    if (this->nodeId == 1 && SYSTEM_CONTROLLER->getCurrentTime() == 10) {
+        int x = 1;
+    }
     bool changed = false;
     for (std::map<Node*, std::pair<int, Link*> >::iterator it = t->mapping.begin();
         it != t->mapping.end(); ++it) {

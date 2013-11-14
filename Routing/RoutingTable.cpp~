@@ -10,6 +10,7 @@ RoutingTable::RoutingTable()
 RoutingTable::RoutingTable(RoutingTable *old)
     :mapping(old->mapping)
 {   
+    assert(&mapping != NULL);
 }
 
 RoutingTable::~RoutingTable(){
@@ -33,6 +34,6 @@ Node* RoutingTable::nextNode(Node *r)
 }
 
 bool RoutingTable::containsEntry(Node *node) {
-    return this.mapping.count(node);
+    return this->mapping.count(node);
 }
 

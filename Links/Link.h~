@@ -54,7 +54,7 @@ public:
 	int getOccupancy();
 	int getPacketLoss();
 	int getDataSent();
-	int getStat(std::string stat, int period);
+	double getStat(std::string stat, int period);
 	int getRate();
 	int getDelay();
 	

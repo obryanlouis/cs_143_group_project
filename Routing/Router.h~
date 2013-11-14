@@ -28,6 +28,8 @@ public:
     // CONSTRUCTORS AND DESTRUCTORS
     Router();
         // Create an instance of class Router
+    Router(int id);
+        // Create an instance of class Router
     Router(int in_id, std::list<Link*> l);
         // Create an instance of class Router with the given id
 
@@ -49,6 +51,12 @@ public:
     void broadcastRoutingTable();
         // Broadcasts this router's current routing table
         // to all neighbors.
+
+
+
+
+    void debugRoutingTable();
+        // Prints the routing table to the terminal
 };
 
 #endif
