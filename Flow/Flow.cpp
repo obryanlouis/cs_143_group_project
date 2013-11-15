@@ -1,6 +1,8 @@
 // Flow.cpp
 
 #include "Flow.h"
+#include <sstream>
+
 
 extern Controller *SYSTEM_CONTROLLER; 
 
@@ -37,6 +39,12 @@ void Flow::updateDataSent(int bytes) {
 
 void Flow::updateDataReceived(int bytes) {
     dataReceived += bytes;
+}
+
+std::string Flow::infoString(){
+    std::stringstream ss;
+    ss << "(Flow " << this->getId() << ")";
+    return ss.str();
 }
 
 void Flow::handlePacket(AckPacket *p) {

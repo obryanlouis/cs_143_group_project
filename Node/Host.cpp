@@ -57,7 +57,7 @@ void Host::handlePacket(Packet *packet){
     case Packet::ROUTERROUTE:
         // Hosts need to send back information to the router telling
         // it that they are there.
-        routingPacket = new HostRoutingPacket(0, 0, 
+        routingPacket = new HostRoutingPacket(this, 0, 
                 this->links.front(), this);
         routingPacket->setPreviousNode(this);
         this->links.front()->handlePacket(routingPacket);
@@ -113,4 +113,10 @@ double Host::getStats(std::string stat, int period) {
     else if (stat.compare("receive rate") == 0) {
         return (double) this->dataReceived / (double) period;
     }
+}
+
+std::string Host::infoString(){
+    std::stringstream sstm;
+    sstm << "(Host " << this->getId() << ")";
+    return sstm.str();
 }

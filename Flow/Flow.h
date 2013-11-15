@@ -8,6 +8,7 @@
 #include <map>
 #include <queue>
 #include <algorithm>
+#include <string>
 
 #include "Control.h"
 #include "Header.h"
@@ -74,6 +75,7 @@ public:
     Host *getStart();
     Host *getDestination();
     int getId();
+    std::string infoString();
     double getStats(std::string stat, int period);
 };
 

@@ -6,6 +6,7 @@
 #include <utility>
 #include <queue>
 #include <string>
+#include <sstream>
 #include "Node.h"
 #include "Control.h"
 
@@ -60,9 +61,11 @@ public:
 	int getRate();
 	int getDelay();
 	
+    int getId();
 	Node *getEnd1();
 	Node *getEnd2();
     void setEnds(Node *n1, Node *n2);
+    std::string infoString();
 
     Packet* popPacket();
     void handlePacket(Packet* packet);

@@ -42,10 +42,16 @@ void Link::setEnds(Node *n1, Node *n2) {
     this->end2_p = n2;
 }
 
+std::string Link::infoString(){
+    std::stringstream ss;
+    ss << "(Link " << this->getId() << ")";
+    return ss.str();
+}
+
 void Link::handlePacket(Packet* packet) {
-    std::cout << "Link " << this->ID << " is handling packet " <<
-        "of type " << packet->getType() << " at time " <<
-        SYSTEM_CONTROLLER->getCurrentTime() << "\n";
+    std::cout << "T" << SYSTEM_CONTROLLER->getCurrentTime() << \
+        ":" << this->infoString() << " is handling "<< \
+        packet->infoString() << std::endl;
     int size = packet->getSize();
     // If there is space remaining in the buffer
     if (!(size + this->capacityUsed > this->capacity)) {
@@ -155,3 +161,6 @@ int Link::getDelay() {
     return this->delay;
 }
 
+int Link::getId(){
+    return this->ID;
+}

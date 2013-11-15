@@ -34,7 +34,7 @@ int main( int argc, const char* argv[] ) {
     SYSTEM_CONTROLLER->addLink(link6);
 
     // Give some time for the routing table to stabilize.
-    SYSTEM_CONTROLLER->addFlow(flow1, 100);
+   // SYSTEM_CONTROLLER->addFlow(flow1, 100);
 
     SYSTEM_CONTROLLER->addRouter(router1);
     SYSTEM_CONTROLLER->addRouter(router2);
@@ -45,6 +45,9 @@ int main( int argc, const char* argv[] ) {
     SYSTEM_CONTROLLER->addHost(host2);
 
     SYSTEM_CONTROLLER->run();
+
+
+    std::cout << "Need to uncomment routerUpdate(args) line in Controller::initSystems.";
     
 	return 0;
 }

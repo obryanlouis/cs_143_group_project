@@ -50,6 +50,8 @@ public:
 
     double getStats(std::string stat, int period);
 
+    virtual std::string infoString();
+
 };
 
 #endif

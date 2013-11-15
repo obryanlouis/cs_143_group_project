@@ -6,7 +6,8 @@
 #include <list>
 #include <cstdarg>
 #include <iostream>
-
+#include <sstream>
+#include <string>
 
 class Link;
 class Packet;
@@ -27,6 +28,8 @@ public:
     virtual void handlePacket(Packet* packet);
     void addLink(Link *link);
     int getId();
+
+    virtual std::string infoString() = 0;
 };
 
 #endif

@@ -25,17 +25,24 @@ Router::Router(int in_id, std::list<Link*> l)
 }
 
 Router::~Router() {
-    delete this->routingTable_p;
+    // delete this->routingTable_p;
+}
+
+std::string Router::infoString(){
+    std::stringstream ss;
+    ss << "(Router " << this->getId() << ")";
+    return ss.str();
 }
 
 void Router::handlePacket(Packet *packet){
-    Node::handlePacket(packet);
-    std::cout << "Router id: "
-              << this->nodeId
-              << " is handling packet"
-              << " at time "
+    // Node::handlePacket(packet);
+    std::cout << "T"
               << SYSTEM_CONTROLLER->getCurrentTime()
-              << "\n";
+              << ":"
+              << this->infoString()
+              << " is handling "
+              << packet->infoString()
+              << std::endl;
     assert(packet != NULL);
 
     bool  updated;   // to be used if the packet is for Routing Table Updates
@@ -51,7 +58,7 @@ void Router::handlePacket(Packet *packet){
     case Packet::HOSTROUTE:
         // the host is telling this router that it exists 
         this->updateSingleNode(H->getHost(), H->getLink());
-        delete packet;
+        delete H;
         break;
     case Packet::ROUTERROUTE:
         // handing routing table information
@@ -61,8 +68,8 @@ void Router::handlePacket(Packet *packet){
         if (updated) {
             this->broadcastRoutingTable();
         }
-
-        delete packet;
+   // TODO: Figure out why leaving "delete R" uncommented breaks things. 
+        //delete R;
         break;
     case Packet::ACK:
         // handle acknowledgement packets: same as data packets
@@ -73,30 +80,33 @@ void Router::handlePacket(Packet *packet){
     default:
         std::cout << "INVALID PACKET TYPE" << std::endl;
         assert(0);
+        exit(0);
         break;
     }
 }
 
 void Router::broadcastRoutingTable() {
-    std::cout << "Router " << nodeId << " starting broadcasting routing table"
+    std::cout << this->infoString() << " starting broadcasting routing table"
         << " at time " << SYSTEM_CONTROLLER->getCurrentTime() << "\n";
     for (std::list<Link* >::iterator it = this->links.begin();
             it != this->links.end(); it++)
     {
         RouterRoutingPacket *newRoutingPacket 
-            = new RouterRoutingPacket(NULL, NULL, *it, this->routingTable_p);
+            = new RouterRoutingPacket(this, NULL, *it, this->routingTable_p);
         newRoutingPacket->setPreviousNode(this);
         (*it)->handlePacket(newRoutingPacket);
     }
-    std::cout << "Router " << nodeId << " finished broadcasting routing table"
+    std::cout << this->infoString() << " finished broadcasting routing table"
         << " at time " << SYSTEM_CONTROLLER->getCurrentTime() << "\n";
 }    
 
 Link* Router::getNextLink(Node *destination) {
+    std::cout << "getting next link" <<std::endl;
 	return this->routingTable_p->nextLink(destination);
 }
 
 Node* Router::getNextNode(Node *destination) {
+    std::cout << "getting next node" << std::endl;
 	return this->routingTable_p->nextNode(destination);
 }
 
@@ -123,6 +133,9 @@ bool Router::updateRoutingTable(RoutingTable *t, Link *l) {
             changed = true;
         }
     }
+
+    std::cout << infoString() << std::endl;
+    debugRoutingTable();
     return changed;
 }
 
@@ -146,7 +159,7 @@ for (std::map<Node*, std::pair<int, Link* > >::iterator it
         Node *node = it->first;
         int id = node->getId();
         int distance = it->second.first;
-        std::cout << "The distance to Node " << id << " is " << distance
+        std::cout << "The distance to " << node->infoString() << " is " << distance
             << "\n";
     }
 }

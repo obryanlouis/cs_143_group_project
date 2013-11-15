@@ -1,5 +1,6 @@
 #include "Packet.h"
-
+#include <iostream>
+#include <sstream>
 /***************** Packet Functions ***************************/
 Packet::Packet(PacketType in_type, int in_size, Node *s, Node *de)
     : type(in_type)
@@ -8,7 +9,7 @@ Packet::Packet(PacketType in_type, int in_size, Node *s, Node *de)
     , size(in_size)
 {}
 
-Packet::~Packet() { } 
+Packet::~Packet() { std::cout << "~Packet()" << std::endl; } 
 
 int Packet::getSize() {
     return this->size;
@@ -41,12 +42,17 @@ RoutingPacket::RoutingPacket(Node *source, Node *destination,\
     ,link(in_link) 
 { }   
 
-RoutingPacket::~RoutingPacket() { }
+RoutingPacket::~RoutingPacket() { std::cout << "    ~RoutingPacket"; }
 
 Link* RoutingPacket::getLink(){
     return this->link;
 }
 
+std::string RoutingPacket::infoString(){
+    std::stringstream ss;
+    std::cout << "(route pkt from" << getSource()->infoString()  << ")";
+    return ss.str(); 
+}
 
 /************** RouterRoutingPacket ******************/
 
@@ -59,8 +65,19 @@ RouterRoutingPacket::RouterRoutingPacket(Node *source, Node *destination,
     this->table = new RoutingTable(in_table);
 }
 
+RouterRoutingPacket::~RouterRoutingPacket(){
+    delete this->table;
+    std::cout << "    ~RouterRoutingPacket";
+}
+
 RoutingTable* RouterRoutingPacket::getRoutingTable() {
     return this->table;
+}
+
+std::string RouterRoutingPacket::infoString(){
+    std::stringstream ss;
+    ss << "(route pkt from " << getSource()->infoString() << ")";
+    return ss.str();
 }
 
 /************** HostRoutingPacket ********************/
@@ -73,10 +90,19 @@ HostRoutingPacket::HostRoutingPacket(Node *source, Node *destination,
     this->host = in_host;
 }
 
+HostRoutingPacket::~HostRoutingPacket(){
+    std::cout << "  ~HostRoutingPacket()";
+}
+
 Host * HostRoutingPacket::getHost() {
     return this->host;
 }
 
+std::string HostRoutingPacket::infoString(){
+    std::stringstream ss;
+    ss << "(route pkt from "<< getSource()->infoString() << ")" ;
+    return ss.str();
+}
 
 
 /************* DataPacket ***********************/
@@ -99,7 +125,7 @@ DataPacket::DataPacket(DataPacket *old)
 }
 
 
-DataPacket::~DataPacket() {}
+DataPacket::~DataPacket() {std::cout << "   ~DataPacket";}
 
 int DataPacket::getId(){
     return this->packetId;
@@ -113,6 +139,14 @@ Flow* DataPacket::getFlow() {
     return this->flow_p;
 }
 
+std::string DataPacket::infoString(){
+    std::stringstream ss;
+    ss <<"(DataPacket " << getId() << " from flow " \
+            << getFlow()->getId() << ")" ;
+    return ss.str();
+}
+
+
 /**** AckPacket *****/
 AckPacket::AckPacket(DataPacket *old)
     :DataPacket(old)
@@ -124,4 +158,11 @@ AckPacket::AckPacket(DataPacket *old)
     delete old;
 }
 
-AckPacket::~AckPacket(){}
+AckPacket::~AckPacket(){std::cout << "    ~AckPacket";}
+
+std::string AckPacket::infoString(){
+    std::stringstream ss;
+    ss << "(AckPacket " << getId() << "from flow " << \
+        getFlow()->getId() << ")";
+    return ss.str();
+}

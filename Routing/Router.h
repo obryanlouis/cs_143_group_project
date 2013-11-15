@@ -55,6 +55,9 @@ public:
 
     void debugRoutingTable();
         // Prints the routing table to the terminal
+
+    virtual std::string infoString();
+
 };
 
 #endif

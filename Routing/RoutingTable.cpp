@@ -4,12 +4,15 @@
 RoutingTable::RoutingTable()
     :mapping()
 {
+    std::cout << &(this->mapping) << std::endl;
 }
 
 // Copy-constructor
 RoutingTable::RoutingTable(RoutingTable *old)
     :mapping(old->mapping)
 {   
+    std::cout << "old: " << &(old->mapping) << "size=" << old->mapping.size()<< \
+     "| new: " << &mapping<<std::endl << "size=" << mapping.size() << std::endl;
 }
 
 RoutingTable::~RoutingTable(){
