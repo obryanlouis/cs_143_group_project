@@ -6,7 +6,9 @@
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
+#include <string>
 #include <list>
+#include <map>
 #include <queue>
 #include <stdio.h>
 
@@ -15,6 +17,7 @@
 #include "Node.h"
 #include "Router.h"
 #include "Header.h"
+#include "InputParser.h"
 
 class Link;
 class Router;
@@ -90,12 +93,20 @@ public:
  */ 
 class Controller {
 private:
-    std::list<Router*> *routers_p;
-    std::list<Link*> *links_p;
-    std::list<Flow*> *flows_p;
-    std::list<Host*> *hosts_p;
-    Scheduler *schedule_p;
-    int flowsLeft;
+    int                     snapshotTime;
+    int                     routingUpdateTime;
+    std::list<HostInfo>     hostInfos;
+    std::list<RouterInfo>   routerInfos;
+    std::list<LinkInfo>     linkInfos;
+    std::list<FlowInfo>     flowInfos;
+    std::list<Router*>      routers;
+    std::list<Link*>        links;
+    std::list<Flow*>        flows;
+    std::list<Host*>        hosts;
+    Scheduler              *schedule_p;
+    int                     flowsLeft;
+    std::map<int, Host* >   hostsById;
+    std::map<int, Router* > routersById;
 
     friend void makePlots();
 
@@ -116,8 +127,8 @@ public:
     void printMySystem();
     void updateMyRouters();
     void add(Event *event_p);
-    void setSnapshotTime();
-    void setRouterUpdateTime();
+    void setSnapshotTime(int t);
+    void setRoutingUpdateTime(int t);
 
     // DEBUG: Allow other classes to add packets to the list of
     // all packets, and to remove them
@@ -131,10 +142,13 @@ public:
     // DEBUG: Other functions
     void printRoutingTables();
 
-    void run();
+    void run(std::string inputFile);
 
 private:
-    void initSystem();
+    void initSystem(std::string inputFile);
+    Node* getNode(int type, int id, std::map<int, Host* > hostsById,
+            std::map<int, Router* > routersById);
+
 
 };
 

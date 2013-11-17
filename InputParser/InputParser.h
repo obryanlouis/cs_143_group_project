@@ -6,7 +6,7 @@
 // Class and helpers to parse the given network description xml file and store
 // the input in some objects.
 
-#include "pugixml.cpp"
+#include "pugixml.hpp"
 #include <iostream>
 #include <string>
 #include <cstdlib>

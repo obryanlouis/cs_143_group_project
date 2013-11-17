@@ -14,37 +14,28 @@ extern void makePlots();
 Controller::Controller(){
     SYSTEM_CONTROLLER = this;
 
-    this->routers_p = new std::list<Router*>();
-    this->links_p = new std::list<Link*>();
-    this->flows_p = new std::list<Flow*>();
-    this->hosts_p = new std::list<Host*>();
-
     this->schedule_p = new Scheduler();
 }
 
-Controller::~Controller(){
-    delete this->routers_p;
-    delete this->links_p;
-    delete this->flows_p;
-    delete this->schedule_p;
-}
+Controller::~Controller()
+{}
 
 void Controller::addRouter(Router *router){
-    this->routers_p->push_back(router);
+    this->routers.push_back(router);
 }
 
 void Controller::addLink(Link *link){
-    this->links_p->push_back(link);
+    this->links.push_back(link);
 }
 
 void Controller::addHost(Host *host) {
-    this->hosts_p->push_back(host);
+    this->hosts.push_back(host);
 }
 
 extern void maintainFlowCallback(void *arg);
 
 void Controller::addFlow(Flow *flow, unsigned int startTime){
-    this->flows_p->push_back(flow);
+    this->flows.push_back(flow);
 
     // Create first flow event for this flow 
     Event *e = new Event(startTime, &maintainFlowCallback, flow);
@@ -57,8 +48,8 @@ unsigned int Controller::getCurrentTime() {
     return SYSTEM_TIME;
 }
 
-void Controller::run(){
-    this->initSystem();
+void Controller::run(std::string inputFile){
+    this->initSystem(inputFile);
 
     bool noError = true;
     while (noError && this->flowsLeft != 0) {
@@ -85,8 +76,8 @@ void Controller::run(){
 void Controller::updateMyRouters(){
     std::cout << "***Updating Router Info*** " << std::endl;
 
-    for (std::list<Router *>::iterator it = this->routers_p->begin();
-         it != this->routers_p->end(); it++)
+    for (std::list<Router *>::iterator it = this->routers.begin();
+         it != this->routers.end(); it++)
     {
         (*it)->broadcastRoutingTable();
     }
@@ -118,8 +109,8 @@ void Controller::printMySystem() {
         std::ofstream *file = i->second;
         std::string stat = i->first;
         (*file) << currentTime;
-        for (std::list<Link*>::iterator it = this->links_p->begin();
-             it != this->links_p->end(); it++)
+        for (std::list<Link*>::iterator it = this->links.begin();
+             it != this->links.end(); it++)
         {
                Link *link = *it;
                (*file) << " " << link->getStat(stat, SNAPSHOT_PERIOD);
@@ -128,8 +119,8 @@ void Controller::printMySystem() {
         file->close();
     }
     //  Reset the stats
-    for (std::list<Link*>::iterator it = this->links_p->begin();
-         it != this->links_p->end(); it++)
+    for (std::list<Link*>::iterator it = this->links.begin();
+         it != this->links.end(); it++)
     {
            (*it)->resetStats();
     }
@@ -149,8 +140,8 @@ void Controller::printMySystem() {
         std::ofstream *file = i->second;
         std::string stat = i->first;
         (*file) << currentTime;
-        for (std::list<Flow*>::iterator it = this->flows_p->begin();
-             it != this->flows_p->end(); it++)
+        for (std::list<Flow*>::iterator it = this->flows.begin();
+             it != this->flows.end(); it++)
         {
                Flow *flow = *it;
                (*file) << " " << flow->getStats(stat, SNAPSHOT_PERIOD);
@@ -160,8 +151,8 @@ void Controller::printMySystem() {
     }
 
     //  Reset the stats
-    for (std::list<Flow*>::iterator it = this->flows_p->begin();
-         it != this->flows_p->end(); it++)
+    for (std::list<Flow*>::iterator it = this->flows.begin();
+         it != this->flows.end(); it++)
     {
            (*it)->resetStats();
     }
@@ -179,8 +170,8 @@ void Controller::printMySystem() {
         std::ofstream *file = i->second;
         std::string stat = i->first;
         (*file) << currentTime;
-        for (std::list<Host*>::iterator it = this->hosts_p->begin();
-             it != this->hosts_p->end(); it++)
+        for (std::list<Host*>::iterator it = this->hosts.begin();
+             it != this->hosts.end(); it++)
         {
                Host *host = *it;
                (*file) << " " << host->getStats(stat, SNAPSHOT_PERIOD);
@@ -189,8 +180,8 @@ void Controller::printMySystem() {
         file->close();
     }
     //  Reset the stats
-    for (std::list<Host*>::iterator it = this->hosts_p->begin();
-         it != this->hosts_p->end(); it++)
+    for (std::list<Host*>::iterator it = this->hosts.begin();
+         it != this->hosts.end(); it++)
     {
            (*it)->resetStats();
     }
@@ -200,6 +191,14 @@ void Controller::printMySystem() {
 
 void Controller::add(Event *event_p) {
     schedule_p->add(event_p);
+}
+
+void Controller::setSnapshotTime(int t) {
+    this->snapshotTime = t;
+}
+
+void Controller::setRoutingUpdateTime(int t) {
+    this->routingUpdateTime = t;
 }
 
 void routerUpdate(void* args){
@@ -241,9 +240,69 @@ void removeOldStatsFiles() {
     }
 }
 
-void Controller::initSystem(){
+Node* Controller::getNode(int type, int id, std::map<int, Host* > hostsById,
+        std::map<int, Router* > routersById)
+{
+    if (type == 0) {
+        return hostsById[id];
+    }
+    else if (type == 1) {
+        return routersById[id];
+    }
+    std::cout << "Invalid node type: " << type << "\n";
+    exit(1);
+}
+
+void Controller::initSystem(std::string inputFile){
+    // Run the parser
+    InputParser parser(inputFile);
+    parser.run(
+            this->snapshotTime,
+            this->routingUpdateTime,
+            this->hostInfos,
+            this->routerInfos,
+            this->linkInfos,
+            this->flowInfos);
+
+    // Create the objects
+    for (std::list<HostInfo>::iterator it = hostInfos.begin(); it != hostInfos.end(); it++)
+    {
+        Host *h = new Host(it->hostId);
+        hostsById[it->hostId] = h;
+        SYSTEM_CONTROLLER->addHost(h);
+    }
+ 
+    for (std::list<FlowInfo>::iterator it = flowInfos.begin();
+         it != flowInfos.end(); it++)
+    {
+        Flow *f = new Flow(it->flowId, it->flowSize,
+                hostsById[it->sourceId], hostsById[it->destinationId]);
+        SYSTEM_CONTROLLER->addFlow(f, it->startTime);
+    }
+
+    for (std::list<RouterInfo>::iterator it = routerInfos.begin();
+         it != routerInfos.end(); it++)
+    {
+        Router *r = new Router(it->routerId);
+        routersById[it->routerId] = r;
+        SYSTEM_CONTROLLER->addRouter(r);
+    }
+
+    for (std::list<LinkInfo>::iterator it = linkInfos.begin();
+         it != linkInfos.end(); it++)
+    {
+        Node *n1 = getNode(it->node1Type, it->node1Id,
+                hostsById, routersById);
+        Node *n2 = getNode(it->node2Type, it->node2Id,
+                hostsById, routersById);
+        Link *l = new Link(it->linkId, n1, n2, it->bufferSize, it->linkRate,
+                it->linkDelay);
+        SYSTEM_CONTROLLER->addLink(l);
+    }
+
+
     // Init flows
-    this->flowsLeft = flows_p->size();
+    this->flowsLeft = flows.size();
 
     // Delete old stats files
     removeOldStatsFiles();
@@ -314,8 +373,8 @@ void Controller::assertPacketExists(Packet *p) {
 }
 
 void Controller::assertNodeExists(Node *n) {
-    if (std::find(hosts_p->begin(), hosts_p->end(), n) == hosts_p->end() &&
-        std::find(routers_p->begin(), routers_p->end(), n) == routers_p->end())
+    if (std::find(hosts.begin(), hosts.end(), n) == hosts.end() &&
+        std::find(routers.begin(), routers.end(), n) == routers.end())
     {
         std::cout << "Node does not exist.\n";
         exit(1);
@@ -323,8 +382,8 @@ void Controller::assertNodeExists(Node *n) {
 }
 
 void Controller::printRoutingTables() {
-    for (std::list<Router* >::iterator it = routers_p->begin();
-            it != routers_p->end(); it++)
+    for (std::list<Router* >::iterator it = routers.begin();
+            it != routers.end(); it++)
     {
         (*it)->print(); 
     }

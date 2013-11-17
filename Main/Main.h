@@ -9,6 +9,7 @@
 #include "Node.h"
 #include "Packet.h"
 #include "Router.h"
+#include "InputParser.h"
 
 
 #endif

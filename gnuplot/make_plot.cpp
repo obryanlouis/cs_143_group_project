@@ -38,7 +38,7 @@ void makePlots() {
         flowCommands.push_back("set output \"" + saveAs + "\"");
         std::stringstream multiplotCommand;
         multiplotCommand << "set multiplot layout ";
-        multiplotCommand << SYSTEM_CONTROLLER->flows_p->size() << ",1";
+        multiplotCommand << SYSTEM_CONTROLLER->flows.size() << ",1";
         flowCommands.push_back(multiplotCommand.str());
         flowCommands.push_back("set xlabel \"Time\"");
         flowCommands.push_back("set ylabel \"Rate\"");
@@ -50,8 +50,8 @@ void makePlots() {
         }
 
         int k = 2;
-        for (std::list<Flow* >::iterator it = SYSTEM_CONTROLLER->flows_p->begin();
-            it != SYSTEM_CONTROLLER->flows_p->end(); it++)
+        for (std::list<Flow* >::iterator it = SYSTEM_CONTROLLER->flows.begin();
+            it != SYSTEM_CONTROLLER->flows.end(); it++)
         {
             std::stringstream command;
             command << "plot \""
