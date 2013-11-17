@@ -27,5 +27,87 @@
 </defs>
 <g style="fill:none; color:white; stroke:currentColor; stroke-width:1.00; stroke-linecap:butt; stroke-linejoin:miter">
 </g>
+<g style="fill:none; color:black; stroke:currentColor; stroke-width:1.00; stroke-linecap:butt; stroke-linejoin:miter">
+	<g style = 'stroke:none; shape-rendering:crispEdges'>
+		<polygon fill = 'rgb(255, 255, 255)' points = '0.0,480.0 599.9,480.0 599.9,0.1 0.0,0.1 '/>
+	</g>
+	<path stroke='black'  d='M0.0,480.0 L0.0,0.1 L599.9,0.1 L599.9,480.0 L0.0,480.0 M63.6,422.4 L72.6,422.4 M575.0,422.4 
+		L566.0,422.4 '></path>
+	<g transform="translate(55.3,426.9)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
+		<text> 0</text>
+	</g>
+	<path  d='M63.6,354.8 L72.6,354.8 M575.0,354.8 L566.0,354.8 '></path>
+	<g transform="translate(55.3,359.3)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
+		<text> 10</text>
+	</g>
+	<path  d='M63.6,287.2 L72.6,287.2 M575.0,287.2 L566.0,287.2 '></path>
+	<g transform="translate(55.3,291.7)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
+		<text> 20</text>
+	</g>
+	<path  d='M63.6,219.5 L72.6,219.5 M575.0,219.5 L566.0,219.5 '></path>
+	<g transform="translate(55.3,224.0)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
+		<text> 30</text>
+	</g>
+	<path  d='M63.6,151.9 L72.6,151.9 M575.0,151.9 L566.0,151.9 '></path>
+	<g transform="translate(55.3,156.4)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
+		<text> 40</text>
+	</g>
+	<path  d='M63.6,84.3 L72.6,84.3 M575.0,84.3 L566.0,84.3 '></path>
+	<g transform="translate(55.3,88.8)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
+		<text> 50</text>
+	</g>
+	<path  d='M63.6,16.7 L72.6,16.7 M575.0,16.7 L566.0,16.7 '></path>
+	<g transform="translate(55.3,21.2)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
+		<text> 60</text>
+	</g>
+	<path  d='M63.6,422.4 L63.6,413.4 M63.6,16.7 L63.6,25.7 '></path>
+	<g transform="translate(63.6,444.9)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:middle">
+		<text> 0</text>
+	</g>
+	<path  d='M165.9,422.4 L165.9,413.4 M165.9,16.7 L165.9,25.7 '></path>
+	<g transform="translate(165.9,444.9)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:middle">
+		<text> 50</text>
+	</g>
+	<path  d='M268.2,422.4 L268.2,413.4 M268.2,16.7 L268.2,25.7 '></path>
+	<g transform="translate(268.2,444.9)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:middle">
+		<text> 100</text>
+	</g>
+	<path  d='M370.4,422.4 L370.4,413.4 M370.4,16.7 L370.4,25.7 '></path>
+	<g transform="translate(370.4,444.9)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:middle">
+		<text> 150</text>
+	</g>
+	<path  d='M472.7,422.4 L472.7,413.4 M472.7,16.7 L472.7,25.7 '></path>
+	<g transform="translate(472.7,444.9)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:middle">
+		<text> 200</text>
+	</g>
+	<path  d='M575.0,422.4 L575.0,413.4 M575.0,16.7 L575.0,25.7 '></path>
+	<g transform="translate(575.0,444.9)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:middle">
+		<text> 250</text>
+	</g>
+	<path  d='M63.6,16.7 L63.6,422.4 L575.0,422.4 L575.0,16.7 L63.6,16.7 Z '></path>
+	<g transform="translate(17.6,219.6) rotate(270)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:middle">
+		<text>Rate</text>
+	</g>
+	<g transform="translate(319.3,471.9)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:middle">
+		<text>Time</text>
+	</g>
+</g>
+	<a xlink:title="Plot #1">
+<g style="fill:none; color:red; stroke:currentColor; stroke-width:1.00; stroke-linecap:butt; stroke-linejoin:miter">
+	<g transform="translate(507.9,39.2)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
+		<text>1</text>
+	</g>
+	<path  d='M516.2,34.7 L558.4,34.7 M63.6,422.4 L73.8,422.4 L84.1,422.4 L94.3,422.4 L104.5,422.4 L114.7,422.4 
+		L125.0,422.4 L135.2,422.4 L145.4,422.4 L155.7,422.4 L165.9,422.4 L176.1,422.4 L186.3,422.4 L196.6,422.4 
+		L206.8,422.4 L217.0,422.4 L227.2,422.4 L237.5,422.4 L247.7,422.4 L257.9,422.4 L268.2,422.4 L278.4,422.4 
+		L288.6,422.4 L298.8,422.4 L309.1,422.4 L319.3,422.4 L329.5,422.4 L339.8,422.4 L350.0,422.4 L360.2,422.4 
+		L370.4,422.4 L380.7,422.4 L390.9,422.4 L390.9,335.9 L401.1,335.9 L401.1,76.2 L411.4,76.2 L411.4,422.4 
+		L421.6,422.4 L431.8,422.4 L442.0,422.4 L452.3,422.4 L462.5,422.4 L472.7,422.4 L482.9,422.4 L493.2,422.4 
+		L503.4,422.4 L513.6,422.4 L523.9,422.4 L534.1,422.4 L544.3,422.4 '></path>
+</g>
+	</a>
+<g style="fill:none; color:black; stroke:currentColor; stroke-width:1.00; stroke-linecap:butt; stroke-linejoin:miter">
+	<path  d='M63.6,16.7 L63.6,422.4 L575.0,422.4 L575.0,16.7 L63.6,16.7 Z '></path>
+</g>
 </svg>
 
