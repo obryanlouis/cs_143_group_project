@@ -83,7 +83,7 @@ void makeAndSendPacket(int id, Flow *flow) {
     std::cout << "Flow " << flow->getId() << " is sending packet " 
         << id << " to Host " << flow->source->getId() << "\n";
     flow->source->handlePacket(p);
-    flow->updateDataSent(Packet::DATASIZE);
+    flow->updateDataSent(p->getSize());
 }
 
 void Flow::maintain() {
@@ -103,10 +103,6 @@ void Flow::maintain() {
     if (dropped) this->windowSize /= 2;
     if (this->windowSize == 0) this->windowSize = 1;
 
-for (int i = 0; i < totalPackets; i++){
-    std::cout << i << "has timeout of " << packets[i] << std::endl;}
-
-
     // make and send packet 
     int packetsSent = 0;
     for (int i = 0; i < totalPackets; i++){
@@ -122,7 +118,7 @@ for (int i = 0; i < totalPackets; i++){
 
 
 
-    std::cout << "sent out more packets" << std::endl;
+    //std::cout << "sent out more packets" << std::endl;
     // update number of outstanding packets
     packetsSent = 0;
     for (int i = 0; i < totalPackets; i++){

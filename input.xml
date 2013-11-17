@@ -15,21 +15,21 @@
         <link id="1">
             <linkRate>10</linkRate>
             <linkDelay>1</linkDelay>
-            <bufferSize>100</bufferSize>
+            <bufferSize>10000</bufferSize>
             <node1 type="0">1</node1>
             <node2 type="1">1</node2>
         </link>
         <link id="2">
             <linkRate>10</linkRate>
             <linkDelay>1</linkDelay>
-            <bufferSize>100</bufferSize>
+            <bufferSize>10000</bufferSize>
             <node1 type="1">1</node1>
             <node2 type="1">2</node2>
         </link>
         <link id="3">
             <linkRate>10</linkRate>
             <linkDelay>1</linkDelay>
-            <bufferSize>100</bufferSize>
+            <bufferSize>10000</bufferSize>
             <node1 type="1">2</node1>
             <node2 type="0">2</node2>
         </link>
@@ -38,8 +38,8 @@
         <flow id="1">
             <source>1</source>
             <destination>2</destination>
-            <flowSize>25</flowSize>
-            <flowStartTime>0</flowStartTime>
+            <flowSize>102400</flowSize>
+            <flowStartTime>1000000</flowStartTime>
         </flow>
     </networkFlows>
 </Network>

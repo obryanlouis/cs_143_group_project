@@ -63,6 +63,7 @@ void Controller::run(){
     bool noError = true;
     while (noError && this->flowsLeft != 0) {
         noError = this->schedule_p->doNext();
+        printRoutingTables();
     }
 
     if (!noError){
