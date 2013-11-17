@@ -78,7 +78,6 @@ void Link::handlePacket(Packet* packet) {
     }
     else {
         // Otherwise, delete the packet
-        SYSTEM_CONTROLLER->removePacket(packet);
         delete packet;
         this->packetLoss += size;
     }
@@ -120,15 +119,20 @@ double Link::getStat(std::string stat, int period) {
 }
 
 void sendPacketCallback(void* args) {
+    // DEBUG
+    if (SYSTEM_CONTROLLER->numTotalPackets() == 19) {
+        std::cout << "break here\n";
+    }
+
     // Unpack the arguments
     void **argArray = (void **)args;
     Node *n = (Node *)argArray[0];
     SYSTEM_CONTROLLER->assertNodeExists(n);
     Packet *p = (Packet *)argArray[1];
-    SYSTEM_CONTROLLER->assertPacketExists(p);
     n->handlePacket(p);
     // Clean up
     free(argArray);
+    SYSTEM_CONTROLLER->checkPackets();
 }
 
 void sendAnotherPacket(void *arg) {

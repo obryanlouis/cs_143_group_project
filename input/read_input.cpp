@@ -96,6 +96,19 @@ FlowInfo::FlowInfo(int id, int src, int dst, int size, int start)
     , startTime(start)
 {}
 
+Node * getNode(int type, int id, map<int, Host* > hostsById,
+        map<int, Router* > routersById)
+{
+    if (type == 0) {
+        return hostsById[id];
+    }
+    else if (type == 1) {
+        return routersById[id];
+    }
+    std::cout << "Invalid node type: " << type << "\n";
+    exit(1);
+}
+
 int main(int argc, char **argv) {
     // input should just have one argument, and it should be the xml file
     // containing the specification
@@ -281,6 +294,47 @@ int main(int argc, char **argv) {
          << "**************************************************"
          << endl << endl;
               
+    // Create the objects to be used in the system
+    int              snapshotTime;
+    int              routingUpdateTime;
+    list<HostInfo>   hosts;
+    list<RouterInfo> routers;
+    list<LinkInfo>   links;
+    list<FlowInfo>   flows;
+
+    std::map<int, Host* > hostsById;
+    std::map<int, Router* > routersById;
+
+    for (list<HostInfo>::iterator it = hosts.begin(); it != hosts.end(); it++)
+    {
+        Host *h = new Host(it->hostId);
+        hostsById[it->hostId] = h;
+        SYSTEM_CONTROLLER->addHost(h);
+    }
+ 
+    for (list<FlowInfo>::iterator it = hosts.begin(); it != hosts.end(); it++)
+    {
+        Flow *f = new Flow(it->flowId, it->flowSize, it->sourceId,
+                it->destinationId);
+        SYSTEM_CONTROLLER->addFlow(f);
+    }
+
+    for (list<RouterInfo>::iterator it = routers.begin(); it != routers.end();
+            it++)
+    {
+        Router *r = new Router(it->routerId);
+        routersById[it->routerId] = it->routerId;
+        SYSTEM_CONTROLLER->addRouter(r);
+    }
+
+    for (list<LinkInfo>::iterator it = links.begin(); it != links.end(); it++)
+    {
+        Node *n1 = getNode(it->nodeType1, it->nodeId1, hostsById, routersById);
+        Node *n2 = getNode(it->nodeType2, it->nodeId2, hostsById, routersById);
+        Link *l = new Link(it->linkId, n1, n2, it->bufferSize, it->linkRate,
+                it->linkDelay);
+        SYSTEM_CONTROLLER->addLink(l);
+    }
 
     // print some stuff
     cout << "snapshot time:     " << snapshotTime      << endl;

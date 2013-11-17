@@ -257,6 +257,9 @@ void checkPacketSource(Packet *p) {
     }
 }
 
+int Controller::numTotalPackets() {
+    return packets.size();
+}
 
 void Controller::addPacket(Packet *p) {
     checkPacketSource(p);
@@ -282,6 +285,20 @@ void Controller::checkPackets() {
             exit(1);
         }
         checkPacketSource(packet);
+        DataPacket *dp = (DataPacket *)packet;
+        if (type == Packet::DATA || type == Packet::ACK) {
+            if (dp->getId() < 0) {
+                std::cout << "Negative packet id (" <<
+                    dp->getId() << ")\n";
+                exit(1);
+            }
+            if (dp->getId() > 10000) {
+                std::cout << "Packet id ("
+                          << dp->getId() 
+                          << ") pretty large. It's probably wrong\n";
+                exit(1);
+            }
+        }
     }
 }
 

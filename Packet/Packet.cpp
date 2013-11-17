@@ -7,9 +7,14 @@ Packet::Packet(PacketType in_type, int in_size, Node *s, Node *de)
     , source(s)
     , destination(de)
     , size(in_size)
-{}
+{
+    SYSTEM_CONTROLLER->addPacket(this);
+}
 
-Packet::~Packet() { std::cout << "~Packet()" << std::endl; } 
+Packet::~Packet() { 
+    std::cout << "~Packet()" << std::endl;
+    SYSTEM_CONTROLLER->removePacket(this);
+} 
 
 int Packet::getSize() {
     return this->size;

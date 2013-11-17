@@ -21,7 +21,7 @@ Flow::Flow(int in_ID, int in_size, Host *in_source, Host *in_destination)
         packets[i] = 0;
     }
     this->windowSize = 10;
-    this->timeout = 400;
+    this->timeout = 40000000;
     in_source->setFlow(this);
 }
 
@@ -48,10 +48,12 @@ std::string Flow::infoString(){
 }
 
 void Flow::handlePacket(AckPacket *p) {
+    SYSTEM_CONTROLLER->checkPackets();
     std::cout << "Flow " << flowId << " has received an acknowledgement packet "
         "at time " << SYSTEM_CONTROLLER->getCurrentTime() << "\n";
     // remove the packet from outstanding if it exists
-    std::vector<DataPacket *>::iterator it = std::find(this->outstanding.begin(), this->outstanding.end(), p);
+    std::vector<DataPacket *>::iterator it = 
+        std::find(this->outstanding.begin(), this->outstanding.end(), p);
     if (it != this->outstanding.end())
     {
         this->outstanding.erase(it);
@@ -71,7 +73,6 @@ void Flow::handlePacket(AckPacket *p) {
             "sending and receiving all packets.\n";
     }
 
-    SYSTEM_CONTROLLER->removePacket(p);
     delete p;
 }
 
@@ -82,7 +83,6 @@ void maintainFlowCallback(void *arg) {
 
 void makeAndSendPacket(int id, Flow *flow) {
     DataPacket *p = new DataPacket(id, flow, SYSTEM_CONTROLLER->getCurrentTime());
-    SYSTEM_CONTROLLER->addPacket(p);
     // Send the packet
     std::cout << "Flow " << flow->getId() << " is sending packet " 
         << id << " to Host " << flow->source->getId() << "\n";
@@ -93,6 +93,13 @@ void makeAndSendPacket(int id, Flow *flow) {
 }
 
 void Flow::maintain() {
+    // DEBUG: Check that all outstanding flow packets actually exist
+    for (std::vector<DataPacket *>::iterator it = outstanding.begin();
+            it != outstanding.end(); it++) {
+        DataPacket *p = *it;
+        SYSTEM_CONTROLLER->assertPacketExists(p);
+    }
+
     // If this flow is done sending packets, inform the system controller and
     // stop making calls to this function
     if (this->progress == this->totalPackets) {
@@ -104,11 +111,11 @@ void Flow::maintain() {
             SYSTEM_CONTROLLER->getCurrentTime() - 
             this->outstanding.front()->getStartTime() > this->timeout)
     {
-        // Reset the outstanding packets because we assume they've been lost
-        this->outstanding.clear();
         // The packet waiting has timed out...assume that the first
         // outstanding packet has been lost and resend it.
         makeAndSendPacket(this->outstanding.front()->getId(), this);
+        // Reset the outstanding packets because we assume they've been lost
+        //this->outstanding.clear();
     }
 
     // If the flow/host hasn't surpassed the window size

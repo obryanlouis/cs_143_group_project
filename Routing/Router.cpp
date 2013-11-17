@@ -47,6 +47,11 @@ void Router::handlePacket(Packet *packet){
 
     bool  updated;   // to be used if the packet is for Routing Table Updates
 
+    // DEBUG
+    if (SYSTEM_CONTROLLER->numTotalPackets() == 19) {
+        std::cout << "break here\n";
+    }
+
     // Initialize variables to right type (must be done before switch table.)
     RouterRoutingPacket *R = (RouterRoutingPacket *) packet;
     AckPacket *A = (AckPacket *) packet;
@@ -58,7 +63,6 @@ void Router::handlePacket(Packet *packet){
     case Packet::HOSTROUTE:
         // the host is telling this router that it exists 
         this->updateSingleNode(H->getHost(), H->getLink());
-        SYSTEM_CONTROLLER->removePacket(H);
         delete H;
         break;
     case Packet::ROUTERROUTE:
@@ -69,8 +73,6 @@ void Router::handlePacket(Packet *packet){
         if (updated) {
             this->broadcastRoutingTable();
         }
-        // TODO: Figure out why leaving "delete R" uncommented breaks things. 
-        SYSTEM_CONTROLLER->removePacket(R);
         delete R;
         break;
     case Packet::ACK:
@@ -95,7 +97,6 @@ void Router::broadcastRoutingTable() {
     {
         RouterRoutingPacket *newRoutingPacket 
             = new RouterRoutingPacket(this, NULL, *it, this->routingTable_p);
-        SYSTEM_CONTROLLER->addPacket(newRoutingPacket);
         newRoutingPacket->setPreviousNode(this);
         (*it)->handlePacket(newRoutingPacket);
     }

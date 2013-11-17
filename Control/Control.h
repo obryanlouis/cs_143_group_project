@@ -117,6 +117,8 @@ public:
     void printMySystem();
     void updateMyRouters();
     void add(Event *event_p);
+    void setSnapshotTime();
+    void setRouterUpdateTime();
 
     // DEBUG: Allow other classes to add packets to the list of
     // all packets, and to remove them
@@ -125,6 +127,7 @@ public:
     void checkPackets();
     void assertPacketExists(Packet *p);
     void assertNodeExists(Node *n);
+    int numTotalPackets();
 
     void run();
 
