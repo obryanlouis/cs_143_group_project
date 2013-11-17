@@ -34,13 +34,14 @@ class Flow {
         // Number of packets in the flow
     int progress;
         // Number of packets successfully transferred so far
-    std::map<int, int> packets;
+    std::map<int, unsigned int> packets;
         // A map that will keep track of whether or not packets have
-        // been successfully sent and received. The key is the 
-        // packet id and the value is 1 if the packet has been
-        // sucessfully received, and 0 otherwise.
-    std::vector<DataPacket *> outstanding;
-        // set of outstanding packets 
+        // been successfully sent and received.
+        // The key is the packet Id.
+        // The value is 0 if the packet has not been sent and the 
+        // time of timeout otherwise.  
+    int outstanding;
+        // number of outstanding packets
     Host *source;
         // The source host of this flow
     Host *destination;
@@ -53,7 +54,6 @@ class Flow {
         // the timeout for packets. if this has expired, then the
         // flow should resend the packet
     int windowSize;
-    int getNextPacketId();
     void maintain();
 
 public:

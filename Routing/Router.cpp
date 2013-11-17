@@ -35,7 +35,7 @@ std::string Router::infoString(){
 }
 
 void Router::handlePacket(Packet *packet){
-    // Node::handlePacket(packet);
+    Node::handlePacket(packet);
     std::cout << "T"
               << SYSTEM_CONTROLLER->getCurrentTime()
               << ":"
@@ -58,7 +58,6 @@ void Router::handlePacket(Packet *packet){
     case Packet::HOSTROUTE:
         // the host is telling this router that it exists 
         this->updateSingleNode(H->getHost(), H->getLink());
-        SYSTEM_CONTROLLER->removePacket(H);
         delete H;
         break;
     case Packet::ROUTERROUTE:
@@ -70,7 +69,6 @@ void Router::handlePacket(Packet *packet){
             this->broadcastRoutingTable();
         }
         // TODO: Figure out why leaving "delete R" uncommented breaks things. 
-        SYSTEM_CONTROLLER->removePacket(R);
         delete R;
         break;
     case Packet::ACK:
@@ -95,7 +93,6 @@ void Router::broadcastRoutingTable() {
     {
         RouterRoutingPacket *newRoutingPacket 
             = new RouterRoutingPacket(this, NULL, *it, this->routingTable_p);
-        SYSTEM_CONTROLLER->addPacket(newRoutingPacket);
         newRoutingPacket->setPreviousNode(this);
         (*it)->handlePacket(newRoutingPacket);
     }
@@ -162,7 +159,12 @@ for (std::map<Node*, std::pair<int, Link* > >::iterator it
         Node *node = it->first;
         int id = node->getId();
         int distance = it->second.first;
+        Link *link = it->second.second;
         std::cout << "The distance to " << node->infoString() << " is " << distance
-            << "\n";
+            << "via ";
+        if (link == 0){
+            std::cout << "no idea" << std::endl;
+        }
+        else std::cout << link->infoString() << std::endl;
     }
 }

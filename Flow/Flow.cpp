@@ -20,8 +20,8 @@ Flow::Flow(int in_ID, int in_size, Host *in_source, Host *in_destination)
     for (int i = 0; i < totalPackets; i++){
         packets[i] = 0;
     }
-    this->windowSize = 10;
-    this->timeout = 400;
+    this->windowSize = 5;
+    this->timeout = 4000;
     in_source->setFlow(this);
 }
 
@@ -50,28 +50,24 @@ std::string Flow::infoString(){
 void Flow::handlePacket(AckPacket *p) {
     std::cout << "Flow " << flowId << " has received an acknowledgement packet "
         "at time " << SYSTEM_CONTROLLER->getCurrentTime() << "\n";
-    // remove the packet from outstanding if it exists
-    std::vector<DataPacket *>::iterator it = std::find(this->outstanding.begin(), this->outstanding.end(), p);
-    if (it != this->outstanding.end())
-    {
-        this->outstanding.erase(it);
-    }
-    // add it to done packets
-    this->packets[p->getId()] = 1;
+
+    // update progress
+    if (this->packets.count(p->getId()) > 0){
+        this->progress++;
+    }  
+    // done with that packet ID, so remove from map to mark done
+    this->packets.erase(p->getId());
+    
+    std::cout << "Package acknowledge" << packets.size() << std::endl;
+
     // TODO: update window size
-    // update other stats: progress, dataSent, dataReceived
-    this->progress++;
+    this->windowSize += 1;
+
+    // update other stats: dataSent, dataReceived
     std::cout << "Flow " << flowId << " progress: " << progress <<
         " out of " << totalPackets << " received\n";
     this->dataReceived += p->getSize();
 
-    // DEBUG
-    if (this->progress == this->totalPackets) {
-        std::cout << "Flow " << this->flowId << " has finished " <<
-            "sending and receiving all packets.\n";
-    }
-
-    SYSTEM_CONTROLLER->removePacket(p);
     delete p;
 }
 
@@ -82,44 +78,56 @@ void maintainFlowCallback(void *arg) {
 
 void makeAndSendPacket(int id, Flow *flow) {
     DataPacket *p = new DataPacket(id, flow, SYSTEM_CONTROLLER->getCurrentTime());
-    SYSTEM_CONTROLLER->addPacket(p);
     // Send the packet
     std::cout << "Flow " << flow->getId() << " is sending packet " 
         << id << " to Host " << flow->source->getId() << "\n";
     flow->source->handlePacket(p);
-    // Add the packet to the list of outstanding packets
-    flow->outstanding.push_back(p);
-    flow->updateDataSent(p->getSize());
 }
 
 void Flow::maintain() {
     // If this flow is done sending packets, inform the system controller and
-    // stop making calls to this function
+    // stop making calls to this function by not making new maintain event
     if (this->progress == this->totalPackets) {
         SYSTEM_CONTROLLER->decrementFlowsLeft();
         return;
     }
 
-    if (this->outstanding.size() > 0 &&
-            SYSTEM_CONTROLLER->getCurrentTime() - 
-            this->outstanding.front()->getStartTime() > this->timeout)
-    {
-        // Reset the outstanding packets because we assume they've been lost
-        this->outstanding.clear();
-        // The packet waiting has timed out...assume that the first
-        // outstanding packet has been lost and resend it.
-        makeAndSendPacket(this->outstanding.front()->getId(), this);
+    // check if there are any dropped packets. If so, update window size.
+    bool dropped = false;
+    for (int i = 0; i < totalPackets; i++){
+        if (packets[i] < SYSTEM_CONTROLLER->getCurrentTime() && packets[i] != 0) dropped = true;
     }
+    if (dropped) this->windowSize /= 2;
+    if (this->windowSize == 0) this->windowSize = 1;
 
-    // If the flow/host hasn't surpassed the window size
-    else if (this->outstanding.size() < this->windowSize) {
-        int id = this->getNextPacketId();
-        // And there is still a packet to send
-        if (id != FLOW_END) {
-            // Then send the packet
-            makeAndSendPacket(id, this);
+    std::cout << "window size " << windowSize << std::endl;
+    std::cout << "remaining " << totalPackets - progress << std::endl;
+
+    // make and send packet 
+    int packetsSent = 0;
+    for (int i = 0; i < totalPackets; i++){
+        if (this->packets.count(i) > 0
+            && packets[i] <= SYSTEM_CONTROLLER->getCurrentTime()
+            && packetsSent < windowSize) {
+           
+            std::cout << "Packet" << i << "timeout of " << packets[i] << std::endl;
+            
+            makeAndSendPacket(i, this);
+            packets[i] = SYSTEM_CONTROLLER->getCurrentTime() + this->timeout;
+            ++packetsSent;
         }
     }
+    std::cout << "System time" << SYSTEM_CONTROLLER->getCurrentTime() << std::endl;
+
+    std::cout << "sent out more packets" << std::endl;
+    // update number of outstanding packets
+    packetsSent = 0;
+    for (int i = 0; i < totalPackets; i++){
+        if (packets[i] > 0){
+            packetsSent++;
+        }
+    }
+    this->outstanding = packetsSent;
 
     if (this->progress < this->totalPackets) {
         // Schedule the next maintenance for this flow to be frequent
@@ -129,26 +137,7 @@ void Flow::maintain() {
     }
 }
 
-int Flow::getNextPacketId() {
-    int id = FLOW_END;
-    if (this->outstanding.size() != 0) {
-        DataPacket *last = this->outstanding.back();
-        id = last->getId() + 1;
-    }
-    else {
-        for (int i = 0; i < totalPackets; i++) {
-            if (this->packets[i] == 0) {
-                id = i;
-                break;
-            }
-        }
-    }
-    if (id == FLOW_END || id >= this->totalPackets) {
-        return FLOW_END;
-    }
-    return id;
-}
-
+            
 Host *Flow::getStart(){
     return source;
 }
@@ -170,7 +159,7 @@ double Flow::getStats(std::string stat, int period) {
         return (double)this->dataReceived / (double)period;
     }
     else if (stat.compare("rtt") == 0) {
-        return (double)this->outstanding.size() * (double)period /
+        return (double)this->outstanding * (double)period /
             (double)this->dataReceived;
     }
 }

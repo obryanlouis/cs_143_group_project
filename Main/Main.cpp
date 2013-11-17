@@ -12,11 +12,9 @@ int main( int argc, const char* argv[] ) {
     Router *router1, *router2, *router3, *router4;
     host1 = new Host(1);
     host2 = new Host(2);
-    flow1 = new Flow(1, 102400, host1, host2);
+    flow1 = new Flow(1, (10240 * 3), host1, host2);
     router1 = new Router(1);
     router2 = new Router(2);
-    /*router3 = new Router(3);
-    router4 = new Router(4);*/
     link1 = new Link(1, host1, router1, 10000, 20, 100);
     link2 = new Link(2, router1, router2, 10000, 10, 100);
     link3 = new Link(3, router2, host2, 10000, 10, 100);
@@ -47,7 +45,6 @@ int main( int argc, const char* argv[] ) {
     SYSTEM_CONTROLLER->run();
 
 
-    std::cout << "Need to uncomment routerUpdate(args) line in Controller::initSystems.";
     
 	return 0;
 }

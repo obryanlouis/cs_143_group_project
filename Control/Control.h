@@ -120,9 +120,6 @@ public:
 
     // DEBUG: Allow other classes to add packets to the list of
     // all packets, and to remove them
-    void addPacket(Packet *p);
-    void removePacket(Packet *p);
-    void checkPackets();
     void assertPacketExists(Packet *p);
     void assertNodeExists(Node *n);
 
