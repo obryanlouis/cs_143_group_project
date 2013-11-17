@@ -250,7 +250,16 @@ void Controller::initSystem(){
     printSystem(args);
 }
 
+void checkPacketSource(Packet *p) {
+    if (p->getSource() == NULL) {
+        std::cout << "Packet source null\n";
+        exit(1);
+    }
+}
+
+
 void Controller::addPacket(Packet *p) {
+    checkPacketSource(p);
     packets[p] = 1;
 }
 void Controller::removePacket(Packet *p) {
@@ -267,21 +276,18 @@ void Controller::checkPackets() {
             exit(1);
         }
         assertPacketExists(packet);
-        if (packet->getSource() == NULL) {
-            std::cout << "Controller::checkPackets : Packet source null\n";
-            exit(1);
-        }
         int type = packet->getType();
         if (type < 0 || type > 3) {
             std::cout << "Controller::checkPackets : INVALID PACKET TYPE\n";
             exit(1);
         }
+        checkPacketSource(packet);
     }
 }
 
 void Controller::assertPacketExists(Packet *p) {
     if (!packets[p]) {
-        std::cout << "Packet does not exist.\n";
+        std::cout << "Packet at " << p << " does not exist.\n";
         exit(1);
     }
 }

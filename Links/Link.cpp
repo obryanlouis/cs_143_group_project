@@ -59,6 +59,10 @@ void Link::handlePacket(Packet* packet) {
     if (!(size + this->capacityUsed > this->capacity)) {
         // Add the packet
         this->buffer.push(packet);
+        std::cout << "\t\t\t\t\t\t"
+                  << this->infoString() 
+                  << " added packet at " << packet
+                  << "\n";
         this->capacityUsed += size;
         unsigned int time;
         unsigned int currentTime = SYSTEM_CONTROLLER->getCurrentTime();
@@ -82,7 +86,7 @@ void Link::handlePacket(Packet* packet) {
 
 Packet* Link::popPacket() {
     assert (this->buffer.size() != 0);
-    Packet *packet = this->buffer.back();
+    Packet *packet = this->buffer.front();
     this->buffer.pop();
     this->dataSent += packet->getSize();
     this->capacityUsed -= packet->getSize();
@@ -134,7 +138,13 @@ void sendAnotherPacket(void *arg) {
     unsigned int propogationTime = link->getDelay();
     // Pop the next packet
     Packet *packet = link->popPacket();
+    
+    // DEBUG
     SYSTEM_CONTROLLER->assertPacketExists(packet);
+    std::cout << "\t\t\t\t\t\t"
+        << "Address of packet sent by " << link->infoString() 
+        << ": " << packet << "\n";
+
     // Get the next node, which is the opposite end from which the
     // packet came from.
     Node *nextNode;
