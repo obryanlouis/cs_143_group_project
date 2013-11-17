@@ -2,7 +2,7 @@
 
 #include "Flow.h"
 #include <sstream>
-
+#include <climits>
 
 extern Controller *SYSTEM_CONTROLLER; 
 
@@ -53,17 +53,14 @@ void Flow::handlePacket(AckPacket *p) {
         "at time " << SYSTEM_CONTROLLER->getCurrentTime() << "\n";
 
     // update progress
-    if (this->packets.count(p->getId()) > 0){
+    if (this->packets.count(p->getId()) != UINT_MAX){
         this->progress++;
     }  
-
-    std::cout << "Package acknowledge " << packets.size() << std::endl;
-
-    // done with that packet ID, so remove from map to mark done
-    this->packets.erase(p->getId());
+    // done with that packet ID, so set its timeout to super long
+    // so it'll never get sent
     
-    std::cout << "Package acknowledge " << packets.size() << std::endl;
-
+    this->packets[p->getId()] = UINT_MAX; 
+    
     // TODO: update window size
     this->windowSize += 1;
 
@@ -106,8 +103,9 @@ void Flow::maintain() {
     if (dropped) this->windowSize /= 2;
     if (this->windowSize == 0) this->windowSize = 1;
 
-    std::cout << "window size " << windowSize << std::endl;
-    std::cout << "remaining " << totalPackets - progress << std::endl;
+for (int i = 0; i < totalPackets; i++){
+    std::cout << i << "has timeout of " << packets[i] << std::endl;}
+
 
     // make and send packet 
     int packetsSent = 0;
@@ -115,15 +113,14 @@ void Flow::maintain() {
         if (this->packets.count(i) > 0
             && packets[i] <= SYSTEM_CONTROLLER->getCurrentTime()
             && packetsSent < windowSize) {
-           
-            std::cout << "Packet" << i << "timeout of " << packets[i] << std::endl;
             
             makeAndSendPacket(i, this);
             packets[i] = SYSTEM_CONTROLLER->getCurrentTime() + this->timeout;
             ++packetsSent;
         }
     }
-    std::cout << "System time" << SYSTEM_CONTROLLER->getCurrentTime() << std::endl;
+
+
 
     std::cout << "sent out more packets" << std::endl;
     // update number of outstanding packets
