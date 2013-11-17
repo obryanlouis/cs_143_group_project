@@ -89,6 +89,9 @@ void Controller::updateMyRouters(){
     {
         (*it)->broadcastRoutingTable();
     }
+
+    // DEBUG
+    printRoutingTables();
 }
 
 void Controller::decrementFlowsLeft() {
@@ -318,6 +321,14 @@ void Controller::assertNodeExists(Node *n) {
     }
 }
 
+void Controller::printRoutingTables() {
+    for (std::list<Router* >::iterator it = routers_p->begin();
+            it != routers_p->end(); it++)
+    {
+        (*it)->print(); 
+    }
+}
+
 /* Scheduler functions */
 /* Initiate scheduler by creating schedule queue and putting in initial events. */ 
 Scheduler::Scheduler(){
@@ -343,9 +354,6 @@ bool Scheduler::doNext(){
 
         delete new_event; 
         this->events_p->pop();
-
-        // DEBUG: Check that all packets are valid
-        SYSTEM_CONTROLLER->checkPackets();
 
         return true;
     }

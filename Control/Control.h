@@ -1,6 +1,5 @@
 // Control.h
 
-
 #ifndef CONTROL_H
 #define CONTROL_H
 
@@ -122,12 +121,15 @@ public:
 
     // DEBUG: Allow other classes to add packets to the list of
     // all packets, and to remove them
-    void addPacket(Packet *p);
-    void removePacket(Packet *p);
-    void checkPackets();
     void assertPacketExists(Packet *p);
     void assertNodeExists(Node *n);
     int numTotalPackets();
+    void addPacket(Packet *p);
+    void removePacket(Packet *p);
+    void checkPackets();
+
+    // DEBUG: Other functions
+    void printRoutingTables();
 
     void run();
 

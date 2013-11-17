@@ -35,7 +35,7 @@ std::string Router::infoString(){
 }
 
 void Router::handlePacket(Packet *packet){
-    // Node::handlePacket(packet);
+    Node::handlePacket(packet);
     std::cout << "T"
               << SYSTEM_CONTROLLER->getCurrentTime()
               << ":"
@@ -163,7 +163,17 @@ for (std::map<Node*, std::pair<int, Link* > >::iterator it
         Node *node = it->first;
         int id = node->getId();
         int distance = it->second.first;
+        Link *link = it->second.second;
         std::cout << "The distance to " << node->infoString() << " is " << distance
-            << "\n";
+            << "via ";
+        if (link == 0){
+            std::cout << "no idea" << std::endl;
+        }
+        else std::cout << link->infoString() << std::endl;
     }
+}
+
+void Router::print() {
+    std::cout << infoString() << " routing table:\n";
+    routingTable_p->print();
 }

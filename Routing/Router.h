@@ -58,6 +58,9 @@ public:
 
     virtual std::string infoString();
 
+    // DEBUG
+    void print();
+
 };
 
 #endif

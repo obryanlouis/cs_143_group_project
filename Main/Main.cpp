@@ -8,9 +8,6 @@ using namespace std;
 
 extern Controller *SYSTEM_CONTROLLER; 
 
-// Read in the input from an xml document containing the network specifications
-// following the schema described in network_schema
-
 // Some structs to store the object info for:
 struct HostInfo {
     int hostId;
@@ -114,12 +111,18 @@ int main(int argc, char **argv) {
     // input should just have one argument, and it should be the xml file
     // containing the specification
 
-    if (argc != 2) {
+    // DEBUG: Uncomment these lines when we want to get a file from a
+    // specific location.
+
+    /*if (argc != 2) {
         cout << "usage: read_input inputFile" << endl;
         exit(1);
     }
 
-    char* input = argv[1];
+    char* input = argv[1];*/
+
+    // DEBUG: use a default file input.xml
+    string input = "input.xml";
 
     int              snapshotTime;
     int              routingUpdateTime;
@@ -131,7 +134,7 @@ int main(int argc, char **argv) {
     pugi::xml_document doc;
         // create an xml_document to load the file
 
-    pugi::xml_parse_result result = doc.load_file(input);
+    pugi::xml_parse_result result = doc.load_file(input.data());
 
     cout << "**************************************************"
               << endl

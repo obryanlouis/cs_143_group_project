@@ -37,3 +37,15 @@ bool RoutingTable::containsEntry(Node *node) {
     return this->mapping.count(node);
 }
 
+void RoutingTable::print() {
+    for (std::map<Node*, std::pair<int, Link*> >::iterator it = mapping.begin();
+            it != mapping.end(); it++)
+    {
+        if (it->first != NULL && it->second.second != NULL) {
+            std::cout << "Distance to Node " << it->first->infoString()
+                << " is " << it->second.first << " via " 
+                << it->second.second->infoString()
+                << "\n";
+        }
+    }
+}

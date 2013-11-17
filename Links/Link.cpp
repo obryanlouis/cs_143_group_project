@@ -127,7 +127,6 @@ void sendPacketCallback(void* args) {
     // Unpack the arguments
     void **argArray = (void **)args;
     Node *n = (Node *)argArray[0];
-    SYSTEM_CONTROLLER->assertNodeExists(n);
     Packet *p = (Packet *)argArray[1];
     n->handlePacket(p);
     // Clean up
@@ -143,20 +142,25 @@ void sendAnotherPacket(void *arg) {
     // Pop the next packet
     Packet *packet = link->popPacket();
     
-    // DEBUG
-    SYSTEM_CONTROLLER->assertPacketExists(packet);
+    std::cout << "sendAnotherPacket -- start" << "\n";
     std::cout << "\t\t\t\t\t\t"
         << "Address of packet sent by " << link->infoString() 
-        << ": " << packet << "\n";
+        << ": " << packet << "is " << packet->infoString() << "\n";
 
     // Get the next node, which is the opposite end from which the
     // packet came from.
     Node *nextNode;
     if (link->getEnd2() == packet->getPreviousNode()) {
+        std::cout << link->infoString() << " sending packet from "
+        << link->getEnd2()->infoString() << " to "
+        << link->getEnd1()->infoString() << std::endl;
         nextNode = link->getEnd1();
     }
     else {
-        nextNode = link->getEnd2();
+        std::cout << link->infoString() << " sending packet from "
+        << link->getEnd1()->infoString() << " to "
+        << link->getEnd2()->infoString() << std::endl;
+        nextNode = link->getEnd2() ;
     }
     // Store the node and the packet as an argument for the callback
     // The array `args` WILL BE FREED in the callback, so can't be
@@ -173,6 +177,8 @@ void sendAnotherPacket(void *arg) {
     // Make a new event and add it to the controller's schedule
     Event *e = new Event(currentTime + propogationTime, fp, (void *)args);
     SYSTEM_CONTROLLER->add(e);
+
+    std::cout << "sendAnotherPacket end" << std::endl;
 }
 
 int Link::getDelay() {
