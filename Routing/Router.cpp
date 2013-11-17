@@ -25,7 +25,7 @@ Router::Router(int in_id, std::list<Link*> l)
 }
 
 Router::~Router() {
-    // delete this->routingTable_p;
+    delete this->routingTable_p;
 }
 
 std::string Router::infoString(){
@@ -58,6 +58,7 @@ void Router::handlePacket(Packet *packet){
     case Packet::HOSTROUTE:
         // the host is telling this router that it exists 
         this->updateSingleNode(H->getHost(), H->getLink());
+        SYSTEM_CONTROLLER->removePacket(H);
         delete H;
         break;
     case Packet::ROUTERROUTE:
@@ -68,8 +69,9 @@ void Router::handlePacket(Packet *packet){
         if (updated) {
             this->broadcastRoutingTable();
         }
-   // TODO: Figure out why leaving "delete R" uncommented breaks things. 
-        //delete R;
+        // TODO: Figure out why leaving "delete R" uncommented breaks things. 
+        SYSTEM_CONTROLLER->removePacket(R);
+        delete R;
         break;
     case Packet::ACK:
         // handle acknowledgement packets: same as data packets
@@ -93,6 +95,7 @@ void Router::broadcastRoutingTable() {
     {
         RouterRoutingPacket *newRoutingPacket 
             = new RouterRoutingPacket(this, NULL, *it, this->routingTable_p);
+        SYSTEM_CONTROLLER->addPacket(newRoutingPacket);
         newRoutingPacket->setPreviousNode(this);
         (*it)->handlePacket(newRoutingPacket);
     }

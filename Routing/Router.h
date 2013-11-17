@@ -22,7 +22,7 @@ class Router : public Node {
 	RoutingTable *routingTable_p;
         // the router's routing table
     void updateSingleNode(Host *host, Link *link);
-        // Updates the routing table's to a single host
+        // Updates the routing table's path to a single host
 	
 public:
     // CONSTRUCTORS AND DESTRUCTORS

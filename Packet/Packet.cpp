@@ -48,11 +48,11 @@ Link* RoutingPacket::getLink(){
     return this->link;
 }
 
-std::string RoutingPacket::infoString(){
-    std::stringstream ss;
-    std::cout << "(route pkt from" << getSource()->infoString()  << ")";
-    return ss.str(); 
-}
+//std::string RoutingPacket::infoString(){
+//    std::stringstream ss;
+//    std::cout << "(route pkt from" << getSource()->infoString()  << ")";
+//    return ss.str(); 
+//}
 
 /************** RouterRoutingPacket ******************/
 

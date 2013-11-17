@@ -77,7 +77,7 @@ public:
     ~RoutingPacket();
 
     Link* getLink();
-    virtual std::string infoString();
+    virtual std::string infoString() = 0;
 };
 
 // The packet type that routers will send out

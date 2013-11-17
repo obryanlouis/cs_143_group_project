@@ -235,13 +235,11 @@ void removeOldStatsFiles() {
             }
         }
     }
-    std::cout << "Successfully removed old stats files.\n";
 }
 
 void Controller::initSystem(){
     // Init flows
     this->flowsLeft = flows_p->size();
-    std::cout << "Number of input flows: " << flowsLeft << "\n";
 
     // Delete old stats files
     removeOldStatsFiles();
@@ -250,6 +248,51 @@ void Controller::initSystem(){
     void *args;
     routerUpdate(args);
     printSystem(args);
+}
+
+void Controller::addPacket(Packet *p) {
+    packets[p] = 1;
+}
+void Controller::removePacket(Packet *p) {
+    packets.erase(p);
+}
+void Controller::checkPackets() {
+    std::cout << "Total Packets in system: " << packets.size() << "\n";
+    for (std::map<Packet *, bool>::iterator it = packets.begin();
+        it != packets.end(); it++)
+    {
+        Packet *packet = it->first;
+        if (packet == NULL) {
+            std::cout << "Controller::checkPackets : NULL PACKET\n";
+            exit(1);
+        }
+        assertPacketExists(packet);
+        if (packet->getSource() == NULL) {
+            std::cout << "Controller::checkPackets : Packet source null\n";
+            exit(1);
+        }
+        int type = packet->getType();
+        if (type < 0 || type > 3) {
+            std::cout << "Controller::checkPackets : INVALID PACKET TYPE\n";
+            exit(1);
+        }
+    }
+}
+
+void Controller::assertPacketExists(Packet *p) {
+    if (!packets[p]) {
+        std::cout << "Packet does not exist.\n";
+        exit(1);
+    }
+}
+
+void Controller::assertNodeExists(Node *n) {
+    if (std::find(hosts_p->begin(), hosts_p->end(), n) == hosts_p->end() &&
+        std::find(routers_p->begin(), routers_p->end(), n) == routers_p->end())
+    {
+        std::cout << "Node does not exist.\n";
+        exit(1);
+    }
 }
 
 /* Scheduler functions */
@@ -277,6 +320,9 @@ bool Scheduler::doNext(){
 
         delete new_event; 
         this->events_p->pop();
+
+        // DEBUG: Check that all packets are valid
+        SYSTEM_CONTROLLER->checkPackets();
 
         return true;
     }

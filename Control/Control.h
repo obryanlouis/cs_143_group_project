@@ -99,6 +99,9 @@ private:
     int flowsLeft;
 
     friend void makePlots();
+
+    // DEBUG: Keep track of all packets
+    std::map<Packet *, bool> packets;
     
 public:
     Controller();
@@ -114,6 +117,14 @@ public:
     void printMySystem();
     void updateMyRouters();
     void add(Event *event_p);
+
+    // DEBUG: Allow other classes to add packets to the list of
+    // all packets, and to remove them
+    void addPacket(Packet *p);
+    void removePacket(Packet *p);
+    void checkPackets();
+    void assertPacketExists(Packet *p);
+    void assertNodeExists(Node *n);
 
     void run();
 

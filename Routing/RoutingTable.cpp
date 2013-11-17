@@ -15,9 +15,7 @@ RoutingTable::RoutingTable(RoutingTable *old)
      "| new: " << &mapping<<std::endl << "size=" << mapping.size() << std::endl;
 }
 
-RoutingTable::~RoutingTable(){
-    delete &mapping;
-}
+RoutingTable::~RoutingTable() { }
 
 Link* RoutingTable::nextLink(Node *r)
 {

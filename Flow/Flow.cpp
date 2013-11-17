@@ -71,6 +71,7 @@ void Flow::handlePacket(AckPacket *p) {
             "sending and receiving all packets.\n";
     }
 
+    SYSTEM_CONTROLLER->removePacket(p);
     delete p;
 }
 
@@ -81,6 +82,7 @@ void maintainFlowCallback(void *arg) {
 
 void makeAndSendPacket(int id, Flow *flow) {
     DataPacket *p = new DataPacket(id, flow, SYSTEM_CONTROLLER->getCurrentTime());
+    SYSTEM_CONTROLLER->addPacket(p);
     // Send the packet
     std::cout << "Flow " << flow->getId() << " is sending packet " 
         << id << " to Host " << flow->source->getId() << "\n";

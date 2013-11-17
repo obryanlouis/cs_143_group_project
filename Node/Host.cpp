@@ -51,6 +51,7 @@ void Host::handlePacket(Packet *packet){
     AckPacket *ack;     // to be used for handling data packets
     Flow *flow = this->flow_p;      // to be used for handling data packets
     HostRoutingPacket *routingPacket;
+    RouterRoutingPacket *rp = (RouterRoutingPacket *)packet;
 
     switch (packet->getType())
     {
@@ -59,8 +60,11 @@ void Host::handlePacket(Packet *packet){
         // it that they are there.
         routingPacket = new HostRoutingPacket(this, 0, 
                 this->links.front(), this);
+        SYSTEM_CONTROLLER->addPacket(routingPacket);
         routingPacket->setPreviousNode(this);
         this->links.front()->handlePacket(routingPacket);
+        SYSTEM_CONTROLLER->removePacket(rp);
+        delete rp;
         break;
     case Packet::ACK:
         // handle acknowledgement packets: adjust the receive rate of the
@@ -88,6 +92,7 @@ void Host::handlePacket(Packet *packet){
 
             // also needs to send back an acknowledgement packet
             ack = new AckPacket((DataPacket *)packet);
+            SYSTEM_CONTROLLER->addPacket(ack);
             ack->setPreviousNode(this);
             // Send the packet back to the host
             this->links.front()->handlePacket(ack);

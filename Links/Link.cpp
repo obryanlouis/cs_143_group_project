@@ -49,9 +49,11 @@ std::string Link::infoString(){
 }
 
 void Link::handlePacket(Packet* packet) {
-    std::cout << "T" << SYSTEM_CONTROLLER->getCurrentTime() << \
+    std::cout << "T " << SYSTEM_CONTROLLER->getCurrentTime() << \
         ":" << this->infoString() << " is handling "<< \
         packet->infoString() << std::endl;
+    int type = packet->getType();
+    assert(type >= 0 && type <= 3);
     int size = packet->getSize();
     // If there is space remaining in the buffer
     if (!(size + this->capacityUsed > this->capacity)) {
@@ -72,6 +74,7 @@ void Link::handlePacket(Packet* packet) {
     }
     else {
         // Otherwise, delete the packet
+        SYSTEM_CONTROLLER->removePacket(packet);
         delete packet;
         this->packetLoss += size;
     }
@@ -116,8 +119,9 @@ void sendPacketCallback(void* args) {
     // Unpack the arguments
     void **argArray = (void **)args;
     Node *n = (Node *)argArray[0];
+    SYSTEM_CONTROLLER->assertNodeExists(n);
     Packet *p = (Packet *)argArray[1];
-    Link *l = (Link *)argArray[2];
+    SYSTEM_CONTROLLER->assertPacketExists(p);
     n->handlePacket(p);
     // Clean up
     free(argArray);
@@ -130,10 +134,7 @@ void sendAnotherPacket(void *arg) {
     unsigned int propogationTime = link->getDelay();
     // Pop the next packet
     Packet *packet = link->popPacket();
-    assert(packet != NULL);
-    if (packet->getType() == Packet::ROUTERROUTE && SYSTEM_CONTROLLER->getCurrentTime() == 10) {
-        int x = 1;
-    }
+    SYSTEM_CONTROLLER->assertPacketExists(packet);
     // Get the next node, which is the opposite end from which the
     // packet came from.
     Node *nextNode;
@@ -146,10 +147,13 @@ void sendAnotherPacket(void *arg) {
     // Store the node and the packet as an argument for the callback
     // The array `args` WILL BE FREED in the callback, so can't be
     // used afterward.
-    void **args = (void **)malloc(sizeof(void *) * 3);
+    void **args = (void **)malloc(sizeof(void *) * 2);
+    if (args == NULL) {
+        std::cout << "Out of memory.\n";
+        exit(1);
+    }
     args[0] = nextNode;
     args[1] = packet;
-    args[2] = link;
     // Make a callback for the event to execute
     void (*fp)(void*) = &sendPacketCallback;
     // Make a new event and add it to the controller's schedule
