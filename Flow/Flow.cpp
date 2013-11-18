@@ -21,7 +21,7 @@ Flow::Flow(int in_ID, int in_size, Host *in_source, Host *in_destination)
         packets[i] = 0;
     }
     this->windowSize = 10;
-    this->timeout = 40000000;
+    this->timeout = 80;
     in_source->setFlow(this);
 }
 
