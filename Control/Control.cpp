@@ -7,7 +7,6 @@
  */
 // This can't be static...
 Controller *SYSTEM_CONTROLLER;
-using namespace FileConsts;
 
 extern void makePlots(); 
 
