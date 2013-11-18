@@ -36,29 +36,33 @@
 	<g transform="translate(55.3,426.9)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
 		<text> 0</text>
 	</g>
-	<path  d='M63.6,354.8 L72.6,354.8 M575.0,354.8 L566.0,354.8 '></path>
-	<g transform="translate(55.3,359.3)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
+	<path  d='M63.6,364.4 L72.6,364.4 M575.0,364.4 L566.0,364.4 '></path>
+	<g transform="translate(55.3,368.9)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
+		<text> 2</text>
+	</g>
+	<path  d='M63.6,306.5 L72.6,306.5 M575.0,306.5 L566.0,306.5 '></path>
+	<g transform="translate(55.3,311.0)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
+		<text> 4</text>
+	</g>
+	<path  d='M63.6,248.5 L72.6,248.5 M575.0,248.5 L566.0,248.5 '></path>
+	<g transform="translate(55.3,253.0)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
+		<text> 6</text>
+	</g>
+	<path  d='M63.6,190.6 L72.6,190.6 M575.0,190.6 L566.0,190.6 '></path>
+	<g transform="translate(55.3,195.1)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
+		<text> 8</text>
+	</g>
+	<path  d='M63.6,132.6 L72.6,132.6 M575.0,132.6 L566.0,132.6 '></path>
+	<g transform="translate(55.3,137.1)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
 		<text> 10</text>
 	</g>
-	<path  d='M63.6,287.2 L72.6,287.2 M575.0,287.2 L566.0,287.2 '></path>
-	<g transform="translate(55.3,291.7)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
-		<text> 20</text>
-	</g>
-	<path  d='M63.6,219.5 L72.6,219.5 M575.0,219.5 L566.0,219.5 '></path>
-	<g transform="translate(55.3,224.0)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
-		<text> 30</text>
-	</g>
-	<path  d='M63.6,151.9 L72.6,151.9 M575.0,151.9 L566.0,151.9 '></path>
-	<g transform="translate(55.3,156.4)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
-		<text> 40</text>
-	</g>
-	<path  d='M63.6,84.3 L72.6,84.3 M575.0,84.3 L566.0,84.3 '></path>
-	<g transform="translate(55.3,88.8)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
-		<text> 50</text>
+	<path  d='M63.6,74.7 L72.6,74.7 M575.0,74.7 L566.0,74.7 '></path>
+	<g transform="translate(55.3,79.2)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
+		<text> 12</text>
 	</g>
 	<path  d='M63.6,16.7 L72.6,16.7 M575.0,16.7 L566.0,16.7 '></path>
 	<g transform="translate(55.3,21.2)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:end">
-		<text> 60</text>
+		<text> 14</text>
 	</g>
 	<path  d='M63.6,422.4 L63.6,413.4 M63.6,16.7 L63.6,25.7 '></path>
 	<g transform="translate(63.6,444.9)" style="stroke:none; fill:black; font-family:Arial; font-size:12.00pt; text-anchor:middle">
@@ -101,9 +105,9 @@
 		L125.0,422.4 L135.2,422.4 L145.4,422.4 L155.7,422.4 L165.9,422.4 L176.1,422.4 L186.3,422.4 L196.6,422.4 
 		L206.8,422.4 L217.0,422.4 L227.2,422.4 L237.5,422.4 L247.7,422.4 L257.9,422.4 L268.2,422.4 L278.4,422.4 
 		L288.6,422.4 L298.8,422.4 L309.1,422.4 L319.3,422.4 L329.5,422.4 L339.8,422.4 L350.0,422.4 L360.2,422.4 
-		L370.4,422.4 L380.7,422.4 L390.9,422.4 L390.9,335.9 L401.1,335.9 L401.1,76.2 L411.4,76.2 L411.4,422.4 
-		L421.6,422.4 L431.8,422.4 L442.0,422.4 L452.3,422.4 L462.5,422.4 L472.7,422.4 L482.9,422.4 L493.2,422.4 
-		L503.4,422.4 L513.6,422.4 L523.9,422.4 L534.1,422.4 L544.3,422.4 '></path>
+		L370.4,422.4 L380.7,422.4 L390.9,422.4 L401.1,422.4 L401.1,51.5 L411.4,51.5 L411.4,422.4 L421.6,422.4 
+		L431.8,422.4 L442.0,422.4 L452.3,422.4 L462.5,422.4 L472.7,422.4 L482.9,422.4 L493.2,422.4 L503.4,422.4 
+		L513.6,422.4 L523.9,422.4 L534.1,422.4 L544.3,422.4 '></path>
 </g>
 	</a>
 <g style="fill:none; color:black; stroke:currentColor; stroke-width:1.00; stroke-linecap:butt; stroke-linejoin:miter">

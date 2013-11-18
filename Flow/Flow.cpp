@@ -21,7 +21,7 @@ Flow::Flow(int in_ID, int in_size, Host *in_source, Host *in_destination)
         packets[i] = 0;
     }
     this->windowSize = 10;
-    this->timeout = 40000000;
+    this->timeout = 400;
     in_source->setFlow(this);
 }
 
@@ -97,8 +97,10 @@ void Flow::maintain() {
     // check if there are any dropped packets. If so, update window size.
     bool dropped = false;
     for (int i = 0; i < totalPackets; i++){
-        if (packets[i] < SYSTEM_CONTROLLER->getCurrentTime() && packets[i] != 0) 
+        if (packets[i] < SYSTEM_CONTROLLER->getCurrentTime() && packets[i] != 0) {
+            packets[i] = 0;
             dropped = true;
+        }
     }
     if (dropped) this->windowSize /= 2;
     if (this->windowSize == 0) this->windowSize = 1;
