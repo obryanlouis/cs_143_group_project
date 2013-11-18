@@ -27,19 +27,21 @@ class Node;
 /* Constants */
 static unsigned int ROUTING_UPDATE_PERIOD = 60000;
 static unsigned int SNAPSHOT_PERIOD = 5;
-static const unsigned int END_PERIOD = 100; // number of events to execute
+unsigned int END_PERIOD = 100; // number of events to execute
                                             // after flows done (for data 
                                             // collection)
-static const std::string LINK_OCCUPANCY_FILE = std::string("Output/LinkOccupancy.txt");
-static const std::string LINK_PACKET_LOSS_FILE = std::string("Output/LinkPacketLoss.txt");
-static const std::string LINK_FLOW_RATE_FILE = std::string("Output/LinkFlowRate.txt");
+namespace FileConsts {
+std::string LINK_OCCUPANCY_FILE = std::string("Output/LinkOccupancy.txt");
+std::string LINK_PACKET_LOSS_FILE = std::string("Output/LinkPacketLoss.txt");
+std::string LINK_FLOW_RATE_FILE = std::string("Output/LinkFlowRate.txt");
 
-static const std::string FLOW_SEND_FILE = std::string("Output/FlowSend.txt");
-static const std::string FLOW_RECEIVE_FILE = std::string("Output/FlowReceive.txt");
-static const std::string FLOW_RTT_FILE = std::string("Output/FlowRTT.txt");
+std::string FLOW_SEND_FILE = std::string("Output/FlowSend.txt");
+std::string FLOW_RECEIVE_FILE = std::string("Output/FlowReceive.txt");
+std::string FLOW_RTT_FILE = std::string("Output/FlowRTT.txt");
 
-static const std::string HOST_SEND_FILE = std::string("Output/HostSend.txt");
-static const std::string HOST_RECEIVE_FILE = std::string("Output/HostReceive.txt");
+std::string HOST_SEND_FILE = std::string("Output/HostSend.txt");
+std::string HOST_RECEIVE_FILE = std::string("Output/HostReceive.txt");
+}
 
 /* Events that get put into the scheduler */
 class Event {
@@ -59,7 +61,7 @@ public:
 
     ~Event(){}
 
-    unsigned int getTime() const { return time; }
+    const unsigned int getTime() { return time; }
     void execute();
 };
 
