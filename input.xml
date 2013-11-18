@@ -38,7 +38,7 @@
         <flow id="1">
             <source>1</source>
             <destination>2</destination>
-            <flowSize>1024</flowSize>
+            <flowSize>102400</flowSize>
             <flowStartTime>100</flowStartTime>
         </flow>
     </networkFlows>
