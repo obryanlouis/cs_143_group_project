@@ -60,7 +60,7 @@ void makePlots() {
             command << "plot \""
                     << dataFile
                     << "\""
-                    << " using 1:" << k++ << " with steps title \""
+                    << " using 1:" << k++ << " with points pointtype 7 pointsize 0.5 title \""
                     << (*it)->getId()
                     << "\"\n";
             fputs(command.str().data(), fp);
@@ -115,7 +115,7 @@ void makePlots() {
             command << "plot \""
                     << dataFile
                     << "\""
-                    << " using 1:" << k++ << " with steps title \""
+                    << " using 1:" << k++ << " with points pointtype 7 pointsize 0.5 title \""
                     << (*it)->getId()
                     << "\"\n";
             std::cout << command.str();
@@ -170,7 +170,7 @@ void makePlots() {
             command << "plot \""
                     << dataFile
                     << "\""
-                    << " using 1:" << k++ << " with steps title \""
+                    << " using 1:" << k++ << " with points pointtype 7 pointsize 0.5 title \""
                     << (*it)->getId()
                     << "\"\n";
             std::cout << command.str();
