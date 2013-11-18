@@ -30,7 +30,7 @@ static unsigned int SNAPSHOT_PERIOD = 5;
 unsigned int END_PERIOD = 100; // number of events to execute
                                             // after flows done (for data 
                                             // collection)
-namespace FileConsts {
+namespace {
 std::string LINK_OCCUPANCY_FILE = std::string("Output/LinkOccupancy.txt");
 std::string LINK_PACKET_LOSS_FILE = std::string("Output/LinkPacketLoss.txt");
 std::string LINK_FLOW_RATE_FILE = std::string("Output/LinkFlowRate.txt");
