@@ -1,3 +1,4 @@
 bin/*
 Output/*
+Output/*.svg
 input.xml
