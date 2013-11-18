@@ -8,6 +8,7 @@
 
 extern Controller *SYSTEM_CONTROLLER;
 
+
 /*
  *  Plots all the figures.
  */
@@ -180,3 +181,4 @@ void makePlots() {
     }
 
 }
+
