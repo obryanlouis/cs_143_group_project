@@ -69,6 +69,8 @@ unsigned int Controller::getCurrentTime() {
 
 void Controller::run(std::string inputFile){
     this->initSystem(inputFile);
+    ROUTING_UPDATE_PERIOD = this->routingUpdateTime;
+    SNAPSHOT_PERIOD       = this->snapshotTime;
 
     bool noError = true;
     while (noError && this->flowsLeft != 0) {
