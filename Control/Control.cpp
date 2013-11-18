@@ -7,6 +7,7 @@
  */
 // This can't be static...
 Controller *SYSTEM_CONTROLLER;
+using namespace FileConsts;
 
 extern void makePlots(); 
 
@@ -17,8 +18,27 @@ Controller::Controller(){
     this->schedule_p = new Scheduler();
 }
 
-Controller::~Controller()
-{}
+Controller::~Controller(){
+    // delete all routers, links, flows, and hosts in the system 
+  /*  while(!this->routers.empty()){
+         delete this->routers.front();
+         this->routers.pop_front();
+    }
+    while(!this->links.empty()){
+         std::cout << links.front();
+         delete this->links.front();
+         this->links.pop_front();
+    }
+    while(!this->flows.empty()){
+         delete this->flows.front();
+         this->flows.pop_front();
+    }
+    while(!this->hosts.empty()){
+         delete this->hosts.front();
+         this->hosts.pop_front();
+    }
+    */
+}
 
 void Controller::addRouter(Router *router){
     this->routers.push_back(router);
