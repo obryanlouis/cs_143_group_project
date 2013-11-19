@@ -9,9 +9,11 @@
 #include <sstream>
 #include "Node.h"
 #include "Control.h"
+#include "Buffer.h"
 
 class Node;
 class Packet;
+class Buffer;
 
 /* Link class which controls packet transfer between routers. */
 class Link {
@@ -25,14 +27,14 @@ private:
         // The other endpoint of the link
     int capacity; 
         // maximum capacity (in bytes)
-    int capacityUsed;
-        // the current amount of the buffer's capacity that has been used
     int delay; 
         // time delay for travel through link (ignoring in/out time)
         // units: ms
-    std::queue<Packet*> buffer; 
+    Buffer *buffer1;
+    Buffer *buffer2;
+    /*std::queue<Packet*> buffer; 
         // FIFO queue of packets
-        // units: KB
+        // units: KB*/
     int dataSent;
         // used for stat keeping
     int packetLoss;
@@ -44,6 +46,7 @@ private:
         // 1 if the packet is dropped
     unsigned int nextFree;
         // The next time that the queue will be free
+    Buffer * getBuffer(Node *end);
 
 
 public:
@@ -67,7 +70,7 @@ public:
     void setEnds(Node *n1, Node *n2);
     std::string infoString();
 
-    Packet* popPacket();
+    Packet* popPacket(Node *end);
     void handlePacket(Packet* packet);
         // Handles an incoming packet by either adding it to the buffer, or 
         // dropping it. Also schedules an event to execute that will simulate

@@ -26,3 +26,7 @@ void Node::addLink(Link *link) {
 int Node::getId() {
     return this->nodeId;
 }
+
+std::string Node::infoString() {
+    return "";
+}

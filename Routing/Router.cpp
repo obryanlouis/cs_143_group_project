@@ -148,7 +148,7 @@ void Router::updateSingleNode(Host *host, Link *link) {
     // The router is directly connected to this host through the
     // link. Just set the distance to this host to be the link's
     // delay.
-    std::pair<int, Link*> pair = std::make_pair<int, Link*>(
+    std::pair<int, Link*> pair = std::make_pair(
             link->getDelay(), link);
     (*this->routingTable_p)[host] = pair;
 }

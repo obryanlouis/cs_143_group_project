@@ -29,7 +29,7 @@ public:
     void addLink(Link *link);
     int getId();
 
-    virtual std::string infoString() = 0;
+    virtual std::string infoString();
 };
 
 #endif

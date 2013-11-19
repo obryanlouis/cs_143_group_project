@@ -261,14 +261,26 @@ void removeOldStatsFiles() {
     }
 }
 
-Node* Controller::getNode(int type, int id, std::map<int, Host* > hostsById,
+Node * Controller::getNode(int type, int id, std::map<int, Host* > hostsById,
         std::map<int, Router* > routersById)
 {
     if (type == 0) {
-        return hostsById[id];
+        if (hostsById.find(id) != hostsById.end()) {
+            return hostsById[id];
+        }
+        else {
+            std::cout << "Host Id in input not found: " << id << "\n";
+            exit(1);
+        }
     }
     else if (type == 1) {
-        return routersById[id];
+        if (routersById.find(id) != routersById.end()) {
+            return routersById[id];
+        }
+        else {
+            std::cout << "Router Id in input not found: " << id << "\n";
+            exit(1);
+        }
     }
     std::cout << "Invalid node type: " << type << "\n";
     exit(1);
@@ -298,7 +310,7 @@ void Controller::initSystem(std::string inputFile){
     {
         Flow *f = new Flow(it->flowId, it->flowSize,
                 hostsById[it->sourceId], hostsById[it->destinationId]);
-        SYSTEM_CONTROLLER->addFlow(f, it->startTime);
+        SYSTEM_CONTROLLER->addFlow(f, 1000 * it->startTime);
     }
 
     for (std::list<RouterInfo>::iterator it = routerInfos.begin();
