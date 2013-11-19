@@ -132,6 +132,9 @@ public:
     void setSnapshotTime(int t);
     void setRoutingUpdateTime(int t);
 
+    // Output
+    int numLinksToPrint();
+
     // DEBUG: Allow other classes to add packets to the list of
     // all packets, and to remove them
     void assertPacketExists(Packet *p);

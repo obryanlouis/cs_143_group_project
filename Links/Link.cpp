@@ -89,11 +89,14 @@ void Link::handlePacket(Packet* packet) {
             << " out of " << this->capacity << "\n";
         unsigned int time;
         unsigned int currentTime = SYSTEM_CONTROLLER->getCurrentTime();
+        // Processing time in ms
+        unsigned int processingTime = (int)(((double)8 / (double)1000) * 
+                (double)packet->getSize() / (double)rate);
         if (buffer->nextFree > currentTime) {
-            time = buffer->nextFree + packet->getSize() / rate;
+            time = buffer->nextFree + processingTime;
         }
         else {
-            time = currentTime + packet->getSize() / rate;
+            time = currentTime + processingTime;
         }
         void ** args = (void **)malloc(2 * sizeof(void *));
         checkMalloc(args);

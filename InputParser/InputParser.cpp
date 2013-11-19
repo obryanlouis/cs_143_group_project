@@ -10,9 +10,10 @@ RouterInfo::RouterInfo(int id)
     : routerId(id)
 {}
 
-LinkInfo::LinkInfo(int id, int rate, int delay, int size, int n1t,
+LinkInfo::LinkInfo(int print, int id, int rate, int delay, int size, int n1t,
         int n1id, int n2t, int n2id)
-    : linkId(id)
+    : print(print)
+    , linkId(id)
     , linkRate(rate)
     , linkDelay(delay)
     , bufferSize(size)
@@ -120,6 +121,20 @@ void InputParser::run(int                   &snapshotTime,
         std::cout << "    " << link.name() << ": "
              << id_att.name() << "=" << id_att.value() << std::endl;
 
+        // print
+        pugi::xml_attribute print_att = link.attribute("print");
+        if (print_att.as_int()) {
+            std::cout << "Link "
+                      << id_att.as_int()
+                      << " set to print\n";
+        }
+        else {
+            std::cout << "Link "
+                      << id_att.as_int()
+                      << " not set to print\n";
+        }
+
+
         // link rate
         pugi::xml_node rate_node = link.child("linkRate");
         std::cout << "          " << rate_node.name()
@@ -154,6 +169,7 @@ void InputParser::run(int                   &snapshotTime,
                   << "=" << node2_node.child_value() << std::endl;
 
         LinkInfo info(
+                print_att.as_int(),
                 id_att.as_int(),
                 atoi(rate_node.child_value()),
                 atoi(delay_node.child_value()),

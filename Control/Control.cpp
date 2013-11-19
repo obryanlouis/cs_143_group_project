@@ -63,19 +63,30 @@ void Controller::addFlow(Flow *flow, unsigned int startTime){
 
 }
 
+int Controller::numLinksToPrint() {
+    int num = 0;
+    for (std::list<LinkInfo>::iterator it = linkInfos.begin();
+            it != linkInfos.end(); it++)
+    {
+        if (it->print)
+            num++;
+    }
+    return num;
+}
+
 unsigned int Controller::getCurrentTime() {
     return SYSTEM_TIME;
 }
 
 void Controller::run(std::string inputFile){
     this->initSystem(inputFile);
-    ROUTING_UPDATE_PERIOD = this->routingUpdateTime;
-    SNAPSHOT_PERIOD       = this->snapshotTime;
 
     bool noError = true;
     while (noError && this->flowsLeft != 0) {
         noError = this->schedule_p->doNext();
-        printRoutingTables();
+
+        // DEBUG
+        //printRoutingTables();
     }
 
     if (!noError){
@@ -102,9 +113,6 @@ void Controller::updateMyRouters(){
     {
         (*it)->broadcastRoutingTable();
     }
-
-    // DEBUG
-    printRoutingTables();
 }
 
 void Controller::decrementFlowsLeft() {
@@ -112,11 +120,11 @@ void Controller::decrementFlowsLeft() {
 }
 
 void Controller::printMySystem() {
-    std::cout << "***Printing System***" <<std::endl;
+    //std::cout << "***Printing System***" <<std::endl;
     unsigned int currentTime = this->schedule_p->getCurrentTime();
     std::map<std::string, std::ofstream*> files;
     // Links
-    std::cout << "  Outputting Link information." << std::endl;
+    //std::cout << "  Outputting Link information." << std::endl;
     std::ofstream occupancyFile, lossFile, rateFile;
     occupancyFile.open(LINK_OCCUPANCY_FILE.data(), std::ios::app);
     lossFile.open(LINK_PACKET_LOSS_FILE.data(), std::ios::app);
@@ -129,7 +137,7 @@ void Controller::printMySystem() {
     {
         std::ofstream *file = i->second;
         std::string stat = i->first;
-        (*file) << currentTime;
+        (*file) << (double)currentTime / 1000;
         for (std::list<Link*>::iterator it = this->links.begin();
              it != this->links.end(); it++)
         {
@@ -146,7 +154,7 @@ void Controller::printMySystem() {
            (*it)->resetStats();
     }
 
-    std::cout << "  Outputting Flow information." << std::endl;
+    //std::cout << "  Outputting Flow information." << std::endl;
     std::ofstream flowSendFile, flowReceiveFile, flowRTTFile;
     flowSendFile.open(FLOW_SEND_FILE.data(), std::ios::app);
     flowReceiveFile.open(FLOW_RECEIVE_FILE.data(), std::ios::app);
@@ -160,7 +168,7 @@ void Controller::printMySystem() {
     {
         std::ofstream *file = i->second;
         std::string stat = i->first;
-        (*file) << currentTime;
+        (*file) << (double)currentTime / 1000;
         for (std::list<Flow*>::iterator it = this->flows.begin();
              it != this->flows.end(); it++)
         {
@@ -178,7 +186,7 @@ void Controller::printMySystem() {
            (*it)->resetStats();
     }
 
-    std::cout << "Outputting Host information." << "\n";
+    //std::cout << "Outputting Host information." << "\n";
     files.clear();
     std::ofstream hostSendFile, hostReceiveFile;
     hostSendFile.open(HOST_SEND_FILE.data(), std::ios::app);
@@ -190,7 +198,7 @@ void Controller::printMySystem() {
     {
         std::ofstream *file = i->second;
         std::string stat = i->first;
-        (*file) << currentTime;
+        (*file) << (double)currentTime / 1000;
         for (std::list<Host*>::iterator it = this->hosts.begin();
              it != this->hosts.end(); it++)
         {
@@ -207,7 +215,7 @@ void Controller::printMySystem() {
            (*it)->resetStats();
     }
 
-    std::cout << "--Done printing system." << std::endl;
+    //std::cout << "--Done printing system." << std::endl;
 }
 
 void Controller::add(Event *event_p) {
@@ -223,6 +231,7 @@ void Controller::setRoutingUpdateTime(int t) {
 }
 
 void routerUpdate(void* args){
+    SYSTEM_CONTROLLER->printRoutingTables();
     SYSTEM_CONTROLLER->updateMyRouters();
     void (*fp)(void*) = &routerUpdate;
     SYSTEM_CONTROLLER->add  \
@@ -296,6 +305,9 @@ void Controller::initSystem(std::string inputFile){
             this->routerInfos,
             this->linkInfos,
             this->flowInfos);
+
+    ROUTING_UPDATE_PERIOD = this->routingUpdateTime;
+    SNAPSHOT_PERIOD       = this->snapshotTime;
 
     // Create the objects
     for (std::list<HostInfo>::iterator it = hostInfos.begin(); it != hostInfos.end(); it++)
@@ -418,6 +430,9 @@ void Controller::printRoutingTables() {
     for (std::list<Router* >::iterator it = routers.begin();
             it != routers.end(); it++)
     {
+        std::cout << "Routing table print at time "
+                  << SYSTEM_CONTROLLER->getCurrentTime()
+                  << "\n";
         (*it)->print(); 
     }
 }
