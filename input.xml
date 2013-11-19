@@ -13,8 +13,8 @@
     </networkRouters>
     <networkLinks>
         <link id="1">
-            <linkRate>10</linkRate>
-            <linkDelay>1</linkDelay>
+            <linkRate>100</linkRate>
+            <linkDelay>10</linkDelay>
             <bufferSize>10000</bufferSize>
             <node1 type="0">1</node1>
             <node2 type="1">1</node2>
@@ -39,7 +39,7 @@
             <source>1</source>
             <destination>2</destination>
             <flowSize>10240</flowSize>
-            <flowStartTime>2</flowStartTime>
+            <flowStartTime>9</flowStartTime>
         </flow>
     </networkFlows>
 </Network>
