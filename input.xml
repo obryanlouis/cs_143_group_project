@@ -39,7 +39,7 @@
             <source>1</source>
             <destination>2</destination>
             <flowSize>10240</flowSize>
-            <flowStartTime>2550</flowStartTime>
+            <flowStartTime>2</flowStartTime>
         </flow>
     </networkFlows>
 </Network>
