@@ -14,14 +14,14 @@ Flow::Flow(int in_ID, int in_size, Host *in_source, Host *in_destination)
     , progress(0)
     , dataSent(0)
     , dataReceived(0)
+    , windowSize(1)
+    , timeout(80)
 {
     // Calculate the number of packets we need based on size of flow 
     this->totalPackets = (in_size + (Packet::DATASIZE - 1)) / Packet::DATASIZE;
     for (int i = 0; i < totalPackets; i++){
         packets[i] = 0;
     }
-    this->windowSize = 10;
-    this->timeout = 80;
     in_source->setFlow(this);
 }
 
@@ -49,11 +49,11 @@ std::string Flow::infoString(){
 
 void Flow::handlePacket(AckPacket *p) {
     SYSTEM_CONTROLLER->checkPackets();
-    std::cout << "Flow " << flowId << " has received an acknowledgement packet "
+    std::cout << "Flow " << flowId << " has received an acknowledgement packet for packet " << p->getId() <<
         "at time " << SYSTEM_CONTROLLER->getCurrentTime() << "\n";
 
     // update progress
-    if (this->packets.count(p->getId()) != UINT_MAX){
+    if (this->packets[p->getId()] != UINT_MAX){
         this->progress++;
     }  
     // done with that packet ID, so set its timeout to super long
@@ -97,12 +97,12 @@ void Flow::maintain() {
     // check if there are any dropped packets. If so, update window size.
     bool dropped = false;
     for (int i = 0; i < totalPackets; i++){
-        if (packets[i] < SYSTEM_CONTROLLER->getCurrentTime() && packets[i] != 0) {
+        if (packets[i] <= SYSTEM_CONTROLLER->getCurrentTime() && packets[i] != 0) {
             packets[i] = 0;
             dropped = true;
         }
     }
-    if (dropped) this->windowSize /= 2;
+    if (dropped) this->windowSize = 1;
     if (this->windowSize == 0) this->windowSize = 1;
 
     // make and send packet 
@@ -136,6 +136,8 @@ void Flow::maintain() {
             FLOW_MAINTENANCE_PERIOD, &maintainFlowCallback, this);
         SYSTEM_CONTROLLER->add(e);
     }
+
+    std::cout << "Current window size: " << windowSize << std::endl;
 }
 
             
@@ -164,6 +166,9 @@ double Flow::getStats(std::string stat, int period) {
     else if (stat.compare("rtt") == 0) {
         return (double)this->outstanding * (double)period /
             (double)this->dataReceived;
+    }
+    else if (stat.compare("window") == 0) {
+        return (double)this->windowSize;
     }
 }
 

@@ -25,6 +25,8 @@ void makePlots() {
                 "Flow_Send_Rates.svg", "Mbps"));
     files.push_back(std::make_tuple(FLOW_RTT_FILE,
                 "Flow_RTT.svg", "ms"));
+    files.push_back(std::make_tuple(FLOW_WINDOW_FILE,
+                "Flow_Window.svg","Packets"));
 
     for (std::list<std::tuple<std::string, std::string, std::string > >::iterator iter = files.begin();
         iter != files.end(); iter++)

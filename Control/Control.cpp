@@ -155,14 +155,16 @@ void Controller::printMySystem() {
     }
 
     //std::cout << "  Outputting Flow information." << std::endl;
-    std::ofstream flowSendFile, flowReceiveFile, flowRTTFile;
+    std::ofstream flowSendFile, flowReceiveFile, flowRTTFile, flowWindowFile;
     flowSendFile.open(FLOW_SEND_FILE.data(), std::ios::app);
     flowReceiveFile.open(FLOW_RECEIVE_FILE.data(), std::ios::app);
     flowRTTFile.open(FLOW_RTT_FILE.data(), std::ios::app);
+    flowWindowFile.open(FLOW_WINDOW_FILE.data(), std::ios::app);
     files.clear();
     files["send rate"] = &flowSendFile;
     files["receive rate"] = &flowReceiveFile;
     files["rtt"] = &flowRTTFile;
+    files["window"] = &flowWindowFile;
     for (std::map<std::string, std::ofstream*>::iterator i = files.begin();
          i != files.end(); i++)
     {
@@ -253,6 +255,7 @@ void removeOldStatsFiles() {
     filenames.push_back(FLOW_SEND_FILE);
     filenames.push_back(FLOW_RECEIVE_FILE);
     filenames.push_back(FLOW_RTT_FILE);
+    filenames.push_back(FLOW_WINDOW_FILE);
     filenames.push_back(HOST_SEND_FILE);
     filenames.push_back(HOST_RECEIVE_FILE);
 
