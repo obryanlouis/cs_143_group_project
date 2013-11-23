@@ -44,7 +44,7 @@ class Flow {
         // data sent in last time interval
     int dataReceived;
         // data received in last time interval
-    unsigned int timeout;
+    double timeout;
         // the timeout for packets. if this has expired, then the
         // flow should resend the packet
     int windowSize;

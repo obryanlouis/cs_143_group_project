@@ -110,19 +110,19 @@ class DataPacket : public Packet {
 protected:
     int packetId;
         // The id of the packet
-    unsigned int startTime;
+    double startTime;
         // The time this packet was sent from its destination
     Flow *flow_p;
         // The flow this packet is associated with.
 
 public:
-    DataPacket(int id, Flow *flow, unsigned int in_startTime);
+    DataPacket(int id, Flow *flow, double in_startTime);
     DataPacket(DataPacket *old);
     ~DataPacket();
 
     int getId();
         // Returns the packet id
-    unsigned int getStartTime();
+    double getStartTime();
         // Returns time packet originally sent. 
     Flow* getFlow();
         // Return the flow this packet is associated to.

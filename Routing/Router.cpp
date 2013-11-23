@@ -111,7 +111,17 @@ Link* Router::getNextLink(Node *destination) {
 
 Node* Router::getNextNode(Node *destination) {
     std::cout << "getting next node" << std::endl;
-	return this->routingTable_p->nextNode(destination);
+	Node * result = this->routingTable_p->nextNode(destination);
+    if (result == NULL) {
+        std::cout << "Can't reach Host "
+                  << destination->infoString()
+                  << " from Router "
+                  << infoString()
+                  << ".\n Allow more time for routing table updates "
+                  << "or change the network configuration.\n";
+        exit(1);
+    }
+    return result;
 }
 
 
@@ -126,20 +136,30 @@ bool Router::updateRoutingTable(RoutingTable *t, Link *l) {
     for (std::map<Node*, std::pair<int, Link*> >::iterator it = t->mapping.begin();
         it != t->mapping.end(); ++it) {
         Node *r = it->first;
+        // Get the link weight, which is measured in ms
+        int linkWgt = l->getDelay() + 
+            (int)(((double)l->getOccupancy() / (double)l->getRate()) * 
+                    ((double)1000 / (double)8));
+        if (l->getOccupancy() == 0) {
+            std::cout << "Link " << l->infoString() << " occupancy is 0.\n";
+        }
+        else {
+            std::cout << "Link " << l->infoString() << " occupancy is not 0.\n";
+        }
         // If this routing table doesn't have an entry for this node, or its distance
         // is greater than the calculated distance, then create/update the entry.
         // Prevent paths that would go back through this router.
         if ((routingTable_p->mapping.count(r) == 0 ||
-            (*routingTable_p)[r].first + l->getDelay() > t->mapping[r].first)
+            (*routingTable_p)[r].first > linkWgt + t->mapping[r].first)
             && t->mapping[r].second != l) {
-            (*routingTable_p)[r].first = t->mapping[r].first + l->getDelay();
+            (*routingTable_p)[r].first = t->mapping[r].first + linkWgt;
             (*routingTable_p)[r].second = l;
             changed = true;
         }
     }
 
     std::cout << infoString() << std::endl;
-    debugRoutingTable();
+    //debugRoutingTable();
     return changed;
 }
 
@@ -148,7 +168,7 @@ void Router::updateSingleNode(Host *host, Link *link) {
     // The router is directly connected to this host through the
     // link. Just set the distance to this host to be the link's
     // delay.
-    std::pair<int, Link*> pair = std::make_pair<int, Link*>(
+    std::pair<int, Link*> pair = std::make_pair(
             link->getDelay(), link);
     (*this->routingTable_p)[host] = pair;
 }
@@ -167,7 +187,7 @@ for (std::map<Node*, std::pair<int, Link* > >::iterator it
         std::cout << "The distance to " << node->infoString() << " is " << distance
             << "via ";
         if (link == 0){
-            std::cout << "no idea" << std::endl;
+            std::cout << " no idea" << std::endl;
         }
         else std::cout << link->infoString() << std::endl;
     }

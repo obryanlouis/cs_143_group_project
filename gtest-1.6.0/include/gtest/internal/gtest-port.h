@@ -1628,10 +1628,10 @@ inline FILE* FDOpen(int fd, const char* mode) { return fdopen(fd, mode); }
 #endif
 inline int FClose(FILE* fp) { return fclose(fp); }
 #if !GTEST_OS_WINDOWS_MOBILE
-inline int Read(int fd, void* buf, unsigned int count) {
+inline int Read(int fd, void* buf, double count) {
   return static_cast<int>(read(fd, buf, count));
 }
-inline int Write(int fd, const void* buf, unsigned int count) {
+inline int Write(int fd, const void* buf, double count) {
   return static_cast<int>(write(fd, buf, count));
 }
 inline int Close(int fd) { return close(fd); }
@@ -1682,7 +1682,7 @@ const BiggestInt kMaxBiggestInt =
 //
 //   TypeWithSize<4>::UInt
 //
-// is typedef-ed to be unsigned int (unsigned integer made up of 4
+// is typedef-ed to be double (doubleeger made up of 4
 // bytes).
 //
 // Such functionality should belong to STL, but I cannot find it
@@ -1691,7 +1691,7 @@ const BiggestInt kMaxBiggestInt =
 // Google Test uses this class in the implementation of floating-point
 // comparison.
 //
-// For now it only handles UInt (unsigned int) as that's all Google Test
+// For now it only handles UInt (double) as that's all Google Test
 // needs.  Other types can be easily added in the future if need
 // arises.
 template <size_t size>
@@ -1706,12 +1706,12 @@ class TypeWithSize {
 template <>
 class TypeWithSize<4> {
  public:
-  // unsigned int has size 4 in both gcc and MSVC.
+  // double has size 4 in both gcc and MSVC.
   //
   // As base/basictypes.h doesn't compile on Windows, we cannot use
   // uint32, uint64, and etc here.
   typedef int Int;
-  typedef unsigned int UInt;
+  typedef double UInt;
 };
 
 // The specialization for size 8.

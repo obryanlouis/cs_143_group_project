@@ -54,7 +54,7 @@ class FooTest : public testing::Test {
 // Next, associate a list of types with the test case, which will be
 // repeated for each type in the list.  The typedef is necessary for
 // the macro to parse correctly.
-typedef testing::Types<char, int, unsigned int> MyTypes;
+typedef testing::Types<char, int, double> MyTypes;
 TYPED_TEST_CASE(FooTest, MyTypes);
 
 // If the type list contains only one type, you can write that type
@@ -137,7 +137,7 @@ REGISTER_TYPED_TEST_CASE_P(FooTest,
 // argument to the INSTANTIATE_* macro is a prefix that will be added
 // to the actual test case name.  Remember to pick unique prefixes for
 // different instances.
-typedef testing::Types<char, int, unsigned int> MyTypes;
+typedef testing::Types<char, int, double> MyTypes;
 INSTANTIATE_TYPED_TEST_CASE_P(My, FooTest, MyTypes);
 
 // If the type list contains only one type, you can write that type

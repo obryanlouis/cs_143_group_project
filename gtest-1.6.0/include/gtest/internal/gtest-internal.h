@@ -316,7 +316,7 @@ GTEST_API_ String GetBoolAssertionFailureMessage(
 template <typename RawType>
 class FloatingPoint {
  public:
-  // Defines the unsigned integer type that has the same size as the
+  // Defines the doubleeger type that has the same size as the
   // floating point number.
   typedef typename TypeWithSize<sizeof(RawType)>::UInt Bits;
 

@@ -6,6 +6,7 @@
 // Class and helpers to parse the given network description xml file and store
 // the input in some objects.
 
+#include "CommonHeader.h"
 #include "pugixml.hpp"
 #include <iostream>
 #include <string>
@@ -30,12 +31,14 @@ struct RouterInfo {
 };
 
 struct LinkInfo {
+    int print;
+        // Print this link?
     int linkId;
         // ID of the link
     int linkRate;
         // the rate of the link in Mbps
     int linkDelay;
-        // the propagation delay of the link in seconds
+        // the propagation delay of the link in ms
     int bufferSize;
         // the size of the buffer in bytes
     int node1Type;
@@ -49,7 +52,7 @@ struct LinkInfo {
     int node2Id;
         // the id of second node of the link
 
-    LinkInfo(int id, int rate, int delay, int size, int n1t,
+    LinkInfo(int print, int id, int rate, int delay, int size, int n1t,
             int n1id, int n2t, int n2id);
         // create an instance of class LinkInfo with the given specifications
 };
@@ -65,8 +68,10 @@ struct FlowInfo {
         // the size of the flow, in bytes;
     int startTime;
         // the start time of the flow, in seconds
+    CongestionAlgorithm congestionAlgorithm;
 
-    FlowInfo(int id, int src, int dst, int size, int start);
+    FlowInfo(int id, int src, int dst, int size, int start, 
+            CongestionAlgorithm congestionAlgorithm);
         // create an instance of class FlowInfo with the given specifications
 };
 

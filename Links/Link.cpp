@@ -3,6 +3,13 @@
 extern Controller *SYSTEM_CONTROLLER; 
 void sendAnotherPacket(void *arg);
 
+void checkMalloc(void *arg) {
+    if (arg == NULL) {
+        std::cout << "Out of memory.\n";
+        exit(1);
+    }
+}
+
 Link::Link(int in_ID, Node *in_end1, Node *in_end2, int in_capacity,
     int in_delay, int in_rate)
     : ID(in_ID)
@@ -12,12 +19,13 @@ Link::Link(int in_ID, Node *in_end1, Node *in_end2, int in_capacity,
     , delay(in_delay)
     , dataSent(0)
     , packetLoss(0)
-    , capacityUsed(0)
     , rate(in_rate)
 { 
     nextFree = SYSTEM_CONTROLLER->getCurrentTime();
     in_end1->addLink(this);
     in_end2->addLink(this);
+    buffer1 = new Buffer(1);
+    buffer2 = new Buffer(2);
 }
 
 void Link::resetStats() {
@@ -37,6 +45,14 @@ Node *Link::getEnd2() {
     return this->end2_p; 
 }
 
+Buffer * Link::getBuffer(Node *end) {
+    assert(end1_p == end || end2_p == end);
+    if (end1_p == end)
+        return buffer1;
+    return buffer2;
+}
+
+
 void Link::setEnds(Node *n1, Node *n2) {
     this->end1_p = n1;
     this->end2_p = n2;
@@ -55,45 +71,61 @@ void Link::handlePacket(Packet* packet) {
     int type = packet->getType();
     assert(type >= 0 && type <= 3);
     int size = packet->getSize();
+    Node *prev = packet->getPreviousNode();
+    SYSTEM_CONTROLLER->checkPackets();
+    Buffer *buffer = getBuffer(prev);
     // If there is space remaining in the buffer
-    if (!(size + this->capacityUsed > this->capacity)) {
+    if (!(size + buffer->capacityUsed > this->capacity)) {
         // Add the packet
-        this->buffer.push(packet);
+        buffer->push(packet);
         std::cout << "\t\t\t\t\t\t"
                   << this->infoString() 
                   << " added packet at " << packet
+                  << " to buffer "
+                  << buffer->infoString()
                   << "\n";
-        this->capacityUsed += size;
-        unsigned int time;
-        unsigned int currentTime = SYSTEM_CONTROLLER->getCurrentTime();
-        if (this->nextFree > currentTime) {
-            time = nextFree + packet->getSize() / rate;
+        buffer->capacityUsed += size;
+        std::cout << "Buffer capacity used: " << buffer->capacityUsed
+            << " out of " << this->capacity << "\n";
+        double time;
+        double currentTime = SYSTEM_CONTROLLER->getCurrentTime();
+        // Processing time in microseconds
+        double processingTime = (double)8 * 
+                (double)packet->getSize() / (double)rate;
+        if (buffer->nextFree > currentTime) {
+            time = buffer->nextFree + processingTime;
         }
         else {
-            time = currentTime;
+            time = currentTime + processingTime;
         }
-        Event *e = new Event(time, &sendAnotherPacket, this);
+        void ** args = (void **)malloc(2 * sizeof(void *));
+        checkMalloc(args);
+        args[0] = this;
+        args[1] = prev;
+        Event *e = new Event(time, &sendAnotherPacket, (void *)args);
         SYSTEM_CONTROLLER->add(e);
-        nextFree = time;
+        buffer->nextFree = time;
     }
     else {
         // Otherwise, delete the packet
+        std::cout << "Link " << infoString() << " deleted packet "
+            << packet->infoString() << "\n";
         delete packet;
         this->packetLoss += size;
     }
 }
 
-Packet* Link::popPacket() {
-    assert (this->buffer.size() != 0);
-    Packet *packet = this->buffer.front();
-    this->buffer.pop();
+Packet* Link::popPacket(Node *end) {
+    Buffer *buffer = getBuffer(end);
+    Packet *packet = buffer->front();
+    buffer->pop();
     this->dataSent += packet->getSize();
-    this->capacityUsed -= packet->getSize();
+    buffer->capacityUsed -= packet->getSize();
     return packet;
 }
 
 int Link::getOccupancy() {
-    return this->capacityUsed;
+    return buffer1->capacityUsed + buffer2->capacityUsed;
 }
 
 int Link::getPacketLoss() {
@@ -109,21 +141,18 @@ double Link::getStat(std::string stat, int period) {
         return (double) this->getOccupancy();
     }
     else if (stat.compare("loss") == 0) {
-        return (double) this->getPacketLoss() / period;
+        return (((double) this->getPacketLoss()) / period) *
+            ((double) 8/ (double) 1000);
     }
     else if (stat.compare("data sent") == 0) {
-        return (double) this->getDataSent() / period;
+        return (((double) this->getDataSent()) / period) *
+            ((double) 8/ (double) 1000);
     }
     throw new std::string("You tried to compute the stat " + stat
         + " but this stat doesn't exist.");
 }
 
 void sendPacketCallback(void* args) {
-    // DEBUG
-    if (SYSTEM_CONTROLLER->numTotalPackets() == 19) {
-        std::cout << "break here\n";
-    }
-
     // Unpack the arguments
     void **argArray = (void **)args;
     Node *n = (Node *)argArray[0];
@@ -136,11 +165,14 @@ void sendPacketCallback(void* args) {
 
 void sendAnotherPacket(void *arg) {
     // Get the current time and propagation time to schedule the next event
-    Link * link = (Link *)arg;
-    unsigned int currentTime = SYSTEM_CONTROLLER->getCurrentTime();
-    unsigned int propogationTime = link->getDelay();
+    void ** theseArgs = (void **) arg;
+    Link * link = (Link *)theseArgs[0];
+    Node * end = (Node *)theseArgs[1];
+    free(theseArgs);
+    double currentTime = SYSTEM_CONTROLLER->getCurrentTime();
+    double propogationTime = link->getDelay();
     // Pop the next packet
-    Packet *packet = link->popPacket();
+    Packet *packet = link->popPacket(end);
     
     std::cout << "sendAnotherPacket -- start" << "\n";
     std::cout << "\t\t\t\t\t\t"
@@ -166,10 +198,7 @@ void sendAnotherPacket(void *arg) {
     // The array `args` WILL BE FREED in the callback, so can't be
     // used afterward.
     void **args = (void **)malloc(sizeof(void *) * 2);
-    if (args == NULL) {
-        std::cout << "Out of memory.\n";
-        exit(1);
-    }
+    checkMalloc(args);
     args[0] = nextNode;
     args[1] = packet;
     // Make a callback for the event to execute

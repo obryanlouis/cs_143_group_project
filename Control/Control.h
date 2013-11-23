@@ -12,8 +12,8 @@
 #include <queue>
 #include <stdio.h>
 
+#include "CommonHeader.h"
 #include "Flow.h"
-//#include "Link.h"
 #include "Node.h"
 #include "Router.h"
 #include "Header.h"
@@ -25,11 +25,11 @@ class Flow;
 class Node;
 
 /* Constants */
-static unsigned int ROUTING_UPDATE_PERIOD = 60000;
-static unsigned int SNAPSHOT_PERIOD = 5;
-static unsigned int END_PERIOD = 100; // number of events to execute
-                                      // after flows done (for data 
-                                      // collection)
+static double ROUTING_UPDATE_PERIOD = 60000;
+static double SNAPSHOT_PERIOD = 1;
+static double END_PERIOD = 100; // number of events to execute
+                                            // after flows done (for data 
+                                            // collection)
 namespace {
 std::string LINK_OCCUPANCY_FILE = std::string("Output/LinkOccupancy.txt");
 std::string LINK_PACKET_LOSS_FILE = std::string("Output/LinkPacketLoss.txt");
@@ -38,6 +38,7 @@ std::string LINK_FLOW_RATE_FILE = std::string("Output/LinkFlowRate.txt");
 std::string FLOW_SEND_FILE = std::string("Output/FlowSend.txt");
 std::string FLOW_RECEIVE_FILE = std::string("Output/FlowReceive.txt");
 std::string FLOW_RTT_FILE = std::string("Output/FlowRTT.txt");
+std::string FLOW_WINDOW_FILE = std::string("Output/FlowWindow.txt");
 
 std::string HOST_SEND_FILE = std::string("Output/HostSend.txt");
 std::string HOST_RECEIVE_FILE = std::string("Output/HostReceive.txt");
@@ -46,14 +47,14 @@ std::string HOST_RECEIVE_FILE = std::string("Output/HostReceive.txt");
 /* Events that get put into the scheduler */
 class Event {
 private:
-    unsigned int time;
+    double time;
     void (*fp)(void*);
         // A function pointer to a function to execute during Event::execute
     void *arg;
         // The argument to the function pointer
 
 public:
-    Event(unsigned int in_time, void (*fp)(void*), void *arg)
+    Event(double in_time, void (*fp)(void*), void *arg)
         :time(in_time)
         ,arg(arg)
         ,fp(fp)
@@ -61,7 +62,7 @@ public:
 
     ~Event(){}
 
-    const unsigned int getTime() { return time; }
+    const double getTime() { return time; }
     void execute();
 };
 
@@ -84,9 +85,10 @@ public:
 
     void add(Event* event_p);
     bool doNext();
+    void setTime(double time);
 
     void printAndDestroySchedule();
-    unsigned int getCurrentTime();
+    double getCurrentTime();
 };
 
 /* Master controller. Deals with input and output. 
@@ -109,6 +111,7 @@ private:
     int                     flowsLeft;
     std::map<int, Host* >   hostsById;
     std::map<int, Router* > routersById;
+    std::string             inputFile;
 
     friend void makePlots();
 
@@ -121,9 +124,9 @@ public:
 
     void addRouter(Router *router);
     void addLink(Link *link);
-    void addFlow(Flow *flow, unsigned int startTime);
+    void addFlow(Flow *flow, double startTime);
     void addHost(Host *host);
-    unsigned int getCurrentTime();
+    double getCurrentTime();
     void decrementFlowsLeft();
  
     void printMySystem();
@@ -131,6 +134,10 @@ public:
     void add(Event *event_p);
     void setSnapshotTime(int t);
     void setRoutingUpdateTime(int t);
+    void setInputFile(std::string inputFile);
+
+    // Output
+    int numLinksToPrint();
 
     // DEBUG: Allow other classes to add packets to the list of
     // all packets, and to remove them
@@ -144,10 +151,11 @@ public:
     // DEBUG: Other functions
     void printRoutingTables();
 
-    void run(std::string inputFile);
+    void run();
+    void initRoutingTables();
+    void initSystem();
 
 private:
-    void initSystem(std::string inputFile);
     Node* getNode(int type, int id, std::map<int, Host* > hostsById,
             std::map<int, Router* > routersById);
 
@@ -155,6 +163,6 @@ private:
 };
 
 /* Only Scheduler should update the following */
-static unsigned int SYSTEM_TIME;
+static double SYSTEM_TIME;
 
 #endif

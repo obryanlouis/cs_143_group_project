@@ -2690,10 +2690,10 @@ inline FILE* FDOpen(int fd, const char* mode) { return fdopen(fd, mode); }
 #endif
 inline int FClose(FILE* fp) { return fclose(fp); }
 #if !GTEST_OS_WINDOWS_MOBILE
-inline int Read(int fd, void* buf, unsigned int count) {
+inline int Read(int fd, void* buf, double count) {
   return static_cast<int>(read(fd, buf, count));
 }
-inline int Write(int fd, const void* buf, unsigned int count) {
+inline int Write(int fd, const void* buf, double count) {
   return static_cast<int>(write(fd, buf, count));
 }
 inline int Close(int fd) { return close(fd); }
@@ -2744,7 +2744,7 @@ const BiggestInt kMaxBiggestInt =
 //
 //   TypeWithSize<4>::UInt
 //
-// is typedef-ed to be unsigned int (unsigned integer made up of 4
+// is typedef-ed to be double (doubleeger made up of 4
 // bytes).
 //
 // Such functionality should belong to STL, but I cannot find it
@@ -2753,7 +2753,7 @@ const BiggestInt kMaxBiggestInt =
 // Google Test uses this class in the implementation of floating-point
 // comparison.
 //
-// For now it only handles UInt (unsigned int) as that's all Google Test
+// For now it only handles UInt (double) as that's all Google Test
 // needs.  Other types can be easily added in the future if need
 // arises.
 template <size_t size>
@@ -2768,12 +2768,12 @@ class TypeWithSize {
 template <>
 class TypeWithSize<4> {
  public:
-  // unsigned int has size 4 in both gcc and MSVC.
+  // double has size 4 in both gcc and MSVC.
   //
   // As base/basictypes.h doesn't compile on Windows, we cannot use
   // uint32, uint64, and etc here.
   typedef int Int;
-  typedef unsigned int UInt;
+  typedef double UInt;
 };
 
 // The specialization for size 8.
@@ -6996,7 +6996,7 @@ GTEST_API_ String GetBoolAssertionFailureMessage(
 template <typename RawType>
 class FloatingPoint {
  public:
-  // Defines the unsigned integer type that has the same size as the
+  // Defines the doubleeger type that has the same size as the
   // floating point number.
   typedef typename TypeWithSize<sizeof(RawType)>::UInt Bits;
 
@@ -9585,7 +9585,7 @@ inline void PrintTo(bool x, ::std::ostream* os) {
 // code otherwise and also as its decimal code (except for L'\0').
 // The L'\0' char is printed as "L'\\0'". The decimal code is printed
 // as signed integer when wchar_t is implemented by the compiler
-// as a signed type and is printed as an unsigned integer when wchar_t
+// as a signed type and is printed as an doubleeger when wchar_t
 // is implemented as an unsigned type.
 GTEST_API_ void PrintTo(wchar_t wc, ::std::ostream* os);
 
@@ -16887,7 +16887,7 @@ class FooTest : public testing::Test {
 // Next, associate a list of types with the test case, which will be
 // repeated for each type in the list.  The typedef is necessary for
 // the macro to parse correctly.
-typedef testing::Types<char, int, unsigned int> MyTypes;
+typedef testing::Types<char, int, double> MyTypes;
 TYPED_TEST_CASE(FooTest, MyTypes);
 
 // If the type list contains only one type, you can write that type
@@ -16970,7 +16970,7 @@ REGISTER_TYPED_TEST_CASE_P(FooTest,
 // argument to the INSTANTIATE_* macro is a prefix that will be added
 // to the actual test case name.  Remember to pick unique prefixes for
 // different instances.
-typedef testing::Types<char, int, unsigned int> MyTypes;
+typedef testing::Types<char, int, double> MyTypes;
 INSTANTIATE_TYPED_TEST_CASE_P(My, FooTest, MyTypes);
 
 // If the type list contains only one type, you can write that type

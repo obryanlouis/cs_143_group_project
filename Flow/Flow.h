@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <string>
 
+#include "CommonHeader.h"
 #include "Control.h"
 #include "Header.h"
 #include "Packet.h"
@@ -34,7 +35,7 @@ class Flow {
         // Number of packets in the flow
     int progress;
         // Number of packets successfully transferred so far
-    std::map<int, unsigned int> packets;
+    std::map<int, double> packets;
         // A map that will keep track of whether or not packets have
         // been successfully sent and received.
         // The key is the packet Id.
@@ -50,14 +51,16 @@ class Flow {
         // data sent in last time interval
     int dataReceived;
         // data received in last time interval
-    unsigned int timeout;
+    double timeout;
         // the timeout for packets. if this has expired, then the
         // flow should resend the packet
     int windowSize;
+    CongestionAlgorithm congestionAlgorithm;
     void maintain();
 
 public:
-    Flow(int in_ID, int in_size, Host *in_source, Host *in_destination);
+    Flow(int in_ID, int in_size, Host *in_source, Host *in_destination,
+            CongestionAlgorithm algorithm);
         // Create an object of class Flow with the given specifications
     ~Flow();
         // Destroy this instance of Flow

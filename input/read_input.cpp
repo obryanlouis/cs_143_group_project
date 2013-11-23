@@ -100,10 +100,20 @@ Node * getNode(int type, int id, map<int, Host* > hostsById,
         map<int, Router* > routersById)
 {
     if (type == 0) {
-        return hostsById[id];
+        if (std::find(hostsById.begin(), hostsById.end(), id)) {
+            return hostsById[id];
+        }
+        else {
+            std::cout << "Host Id in input not found: " << id << "\n";
+        }
     }
     else if (type == 1) {
-        return routersById[id];
+        if (std::find(routersById.begin(), routersById.end(), id)) {
+            return routersById[id];
+        }
+        else {
+            std::cout << "Router Id in input not found: " << id << "\n";
+        }
     }
     std::cout << "Invalid node type: " << type << "\n";
     exit(1);
