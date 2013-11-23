@@ -10,8 +10,8 @@ void checkMalloc(void *arg) {
     }
 }
 
-Link::Link(int in_ID, Node *in_end1, Node *in_end2, int in_capacity,
-    int in_delay, int in_rate)
+Link::Link(int in_ID, Node *in_end1, Node *in_end2, double in_capacity,
+    double in_delay, double in_rate)
     : ID(in_ID)
     , end1_p(in_end1)
     , end2_p(in_end2)
@@ -33,7 +33,7 @@ void Link::resetStats() {
     this->packetLoss = 0;
 }
 
-int Link::getRate() { 
+double Link::getRate() { 
     return this->rate; 
 }
 
@@ -70,9 +70,12 @@ void Link::handlePacket(Packet* packet) {
         packet->infoString() << std::endl;
     int type = packet->getType();
     assert(type >= 0 && type <= 3);
-    int size = packet->getSize();
+    double size = packet->getSize();
     Node *prev = packet->getPreviousNode();
+
+    // DEBUG
     SYSTEM_CONTROLLER->checkPackets();
+
     Buffer *buffer = getBuffer(prev);
     // If there is space remaining in the buffer
     if (!(size + buffer->capacityUsed > this->capacity)) {
@@ -89,8 +92,8 @@ void Link::handlePacket(Packet* packet) {
             << " out of " << this->capacity << "\n";
         double time;
         double currentTime = SYSTEM_CONTROLLER->getCurrentTime();
-        // Processing time in microseconds
-        double processingTime = (double)8 * 
+        // Processing time in milliseconds
+        double processingTime = (double)1000 * 
                 (double)packet->getSize() / (double)rate;
         if (buffer->nextFree > currentTime) {
             time = buffer->nextFree + processingTime;
@@ -124,27 +127,30 @@ Packet* Link::popPacket(Node *end) {
     return packet;
 }
 
-int Link::getOccupancy() {
+double Link::getOccupancy() {
     return buffer1->capacityUsed + buffer2->capacityUsed;
 }
 
-int Link::getPacketLoss() {
+double Link::getPacketLoss() {
     return this->packetLoss;
 }
 
-int Link::getDataSent() {
+double Link::getDataSent() {
     return this->dataSent;
 }
 
-double Link::getStat(std::string stat, int period) {
+double Link::getStat(std::string stat, double period) {
     if (stat.compare("occupancy") == 0) {
+        // Output is in bytes
         return (double) this->getOccupancy();
     }
     else if (stat.compare("loss") == 0) {
+        // Output is in Mbps
         return (((double) this->getPacketLoss()) / period) *
             ((double) 8/ (double) 1000);
     }
     else if (stat.compare("data sent") == 0) {
+        // Output is in Mbps
         return (((double) this->getDataSent()) / period) *
             ((double) 8/ (double) 1000);
     }
@@ -210,7 +216,7 @@ void sendAnotherPacket(void *arg) {
     std::cout << "sendAnotherPacket end" << std::endl;
 }
 
-int Link::getDelay() {
+double Link::getDelay() {
     return this->delay;
 }
 

@@ -62,8 +62,9 @@
         <flow id="1">
             <source>1</source>
             <destination>2</destination>
-            <flowSize>20000</flowSize>
+            <flowSize>2000</flowSize>
             <flowStartTime>0</flowStartTime>
+            <!-- Options: reno, vegas -->
             <congestionAlgorithm>reno</congestionAlgorithm>
         </flow>
     </networkFlows>
