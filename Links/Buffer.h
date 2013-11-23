@@ -9,7 +9,7 @@ class Buffer {
 private:
     std::queue<Packet*> buffer; 
 public:
-    int capacityUsed;
+    double capacityUsed;
     double nextFree;
     void push(Packet *p);
     void pop();

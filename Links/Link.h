@@ -25,44 +25,42 @@ private:
         // One endpoint of the link
 	Node *end2_p;
         // The other endpoint of the link
-    int capacity; 
+    double capacity; 
         // maximum capacity (in bytes)
-    int delay; 
+    double delay; 
         // time delay for travel through link (ignoring in/out time)
         // units: ms
     Buffer *buffer1;
     Buffer *buffer2;
-    /*std::queue<Packet*> buffer; 
         // FIFO queue of packets
-        // units: KB*/
-    int dataSent;
+    double dataSent;
         // used for stat keeping
-    int packetLoss;
+    double packetLoss;
         // used for stat keeping 
-	int rate;	
-	    // the link rate in Mbps
+	double rate;	
+	    // the link rate in bytes / sec
     int pushPacket(Packet *in_packet);
         // push the packet onto the buffer. Returns 0 if successfuly and
         // 1 if the packet is dropped
     double nextFree;
-        // The next time that the queue will be free
+        // The next time that the queue will be free (ms)
     Buffer * getBuffer(Node *end);
 
 
 public:
     Link () { }
-    Link(int in_ID, Node *in_end1, Node *in_end2, int in_capacity,
-        int in_delay, int in_rate);
+    Link(int in_ID, Node *in_end1, Node *in_end2, double in_capacity,
+        double in_delay, double in_rate);
 
     ~Link() { }
     
 	void resetStats();
-	int getOccupancy();
-	int getPacketLoss();
-	int getDataSent();
-	double getStat(std::string stat, int period);
-	int getRate();
-	int getDelay();
+	double getOccupancy();
+	double getPacketLoss();
+	double getDataSent();
+	double getStat(std::string stat, double period);
+	double getRate();
+	double getDelay();
 	
     int getId();
 	Node *getEnd1();
