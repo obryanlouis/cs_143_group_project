@@ -336,8 +336,8 @@ void Controller::initSystem(){
                 hostsById, routersById);
         Node *n2 = getNode(it->node2Type, it->node2Id,
                 hostsById, routersById);
-        Link *l = new Link(it->linkId, n1, n2, it->bufferSize, it->linkRate,
-                it->linkDelay);
+        Link *l = new Link(it->linkId, n1, n2, 1000 * it->bufferSize,
+                it->linkDelay, 1000000 * it->linkRate / 8);
         SYSTEM_CONTROLLER->addLink(l);
     }
 
@@ -348,10 +348,10 @@ void Controller::initSystem(){
     for (std::list<FlowInfo>::iterator it = flowInfos.begin();
          it != flowInfos.end(); it++)
     {
-        Flow *f = new Flow(it->flowId, it->flowSize,
+        Flow *f = new Flow(it->flowId, 1000000 * it->flowSize,
                 hostsById[it->sourceId], hostsById[it->destinationId],
                 it->congestionAlgorithm);
-        SYSTEM_CONTROLLER->addFlow(f, 1000 * it->startTime);
+        SYSTEM_CONTROLLER->addFlow(f, it->startTime);
     }
 
     // Init flows

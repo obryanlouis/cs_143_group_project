@@ -13,6 +13,7 @@
 #include <cstdlib>
 #include <list>
 
+
 // Some structs to store the object info for:
 struct HostInfo {
     int hostId;
@@ -31,28 +32,28 @@ struct RouterInfo {
 };
 
 struct LinkInfo {
-    int print;
+    int    print;
         // Print this link?
-    int linkId;
+    int    linkId;
         // ID of the link
-    int linkRate;
+    double linkRate;
         // the rate of the link in Mbps
-    int linkDelay;
+    int    linkDelay;
         // the propagation delay of the link in ms
-    int bufferSize;
-        // the size of the buffer in bytes
-    int node1Type;
+    int    bufferSize;
+        // the size of the buffer in kilobytes
+    int    node1Type;
         // the type of the first node of the link
         // 0 = host, 1 = router
-    int node1Id;
+    int    node1Id;
         // the id of first node of the link
-    int node2Type;
+    int    node2Type;
         // the type of the second node of the link
         // 0 = host, 1 = router
-    int node2Id;
+    int    node2Id;
         // the id of second node of the link
 
-    LinkInfo(int print, int id, int rate, int delay, int size, int n1t,
+    LinkInfo(int print, int id, double rate, int delay, int size, int n1t,
             int n1id, int n2t, int n2id);
         // create an instance of class LinkInfo with the given specifications
 };
@@ -65,12 +66,12 @@ struct FlowInfo {
     int destinationId;
         // the id of the destination host of the flow
     int flowSize;
-        // the size of the flow, in bytes;
-    int startTime;
+        // the size of the flow, in megabytes
+    double startTime;
         // the start time of the flow, in seconds
     CongestionAlgorithm congestionAlgorithm;
 
-    FlowInfo(int id, int src, int dst, int size, int start, 
+    FlowInfo(int id, int src, int dst, int size, double start, 
             CongestionAlgorithm congestionAlgorithm);
         // create an instance of class FlowInfo with the given specifications
 };

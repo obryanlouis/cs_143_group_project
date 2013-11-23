@@ -10,7 +10,7 @@ RouterInfo::RouterInfo(int id)
     : routerId(id)
 {}
 
-LinkInfo::LinkInfo(int print, int id, int rate, int delay, int size, int n1t,
+LinkInfo::LinkInfo(int print, int id, double rate, int delay, int size, int n1t,
         int n1id, int n2t, int n2id)
     : print(print)
     , linkId(id)
@@ -23,7 +23,7 @@ LinkInfo::LinkInfo(int print, int id, int rate, int delay, int size, int n1t,
     , node2Id(n2id)
 {}
 
-FlowInfo::FlowInfo(int id, int src, int dst, int size, int start,
+FlowInfo::FlowInfo(int id, int src, int dst, int size, double start,
         CongestionAlgorithm congestionAlgorithm)
     : flowId(id)
     , sourceId(src)
@@ -175,7 +175,7 @@ void InputParser::run(int                   &snapshotTime,
                 id_att.as_int(),
                 atoi(rate_node.child_value()),
                 atoi(delay_node.child_value()),
-                atoi(size_node.child_value()),
+                atof(size_node.child_value()),
                 node1_type.as_int(),
                 atoi(node1_node.child_value()),
                 node2_type.as_int(),
@@ -237,7 +237,7 @@ void InputParser::run(int                   &snapshotTime,
                 atoi(src_node.child_value()),
                 atoi(dst_node.child_value()),
                 atoi(size_node.child_value()),
-                atoi(time_node.child_value()),
+                atof(time_node.child_value()),
                 congestionAlgorithm);
 
         flows.push_back(info);
