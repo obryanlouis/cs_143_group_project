@@ -136,12 +136,19 @@ bool Router::updateRoutingTable(RoutingTable *t, Link *l) {
     for (std::map<Node*, std::pair<int, Link*> >::iterator it = t->mapping.begin();
         it != t->mapping.end(); ++it) {
         Node *r = it->first;
+        // Get the link weight, which is measured in ms
+        int linkWgt = l->getDelay() + 
+            (int)(((double)l->getOccupancy() / (double)l->getRate()) * 
+                    ((double)1000 / (double)8));
+        if (l->getOccupancy() == 0) {
+            std::cout << "Link " << l->infoString() << " occupancy is 0.\n";
+        }
+        else {
+            std::cout << "Link " << l->infoString() << " occupancy is not 0.\n";
+        }
         // If this routing table doesn't have an entry for this node, or its distance
         // is greater than the calculated distance, then create/update the entry.
         // Prevent paths that would go back through this router.
-        int linkWgt = l->getDelay(); /*+ 
-            (int)(((double)l->getOccupancy() / (double)l->getRate()) * 
-                    ((double)1000 / (double)8));*/
         if ((routingTable_p->mapping.count(r) == 0 ||
             (*routingTable_p)[r].first > linkWgt + t->mapping[r].first)
             && t->mapping[r].second != l) {

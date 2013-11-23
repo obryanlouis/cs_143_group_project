@@ -27,7 +27,9 @@ int main(int argc, char **argv) {
     // Initialize the System Controller
     SYSTEM_CONTROLLER = new Controller();
 
-    SYSTEM_CONTROLLER->run(input);
+    SYSTEM_CONTROLLER->setInputFile(input);
+
+    SYSTEM_CONTROLLER->run();
               
 #if 0
     // print some stuff

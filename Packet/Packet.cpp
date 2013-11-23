@@ -111,7 +111,7 @@ std::string HostRoutingPacket::infoString(){
 
 
 /************* DataPacket ***********************/
-DataPacket::DataPacket(int in_id, Flow *flow, unsigned int in_startTime)
+DataPacket::DataPacket(int in_id, Flow *flow, double in_startTime)
     :Packet(Packet::DATA, Packet::DATASIZE,\
            (Node *)(flow->getStart()), (Node *)(flow->getDestination()))
     , packetId(in_id)
@@ -136,7 +136,7 @@ int DataPacket::getId(){
     return this->packetId;
 }
 
-unsigned int DataPacket::getStartTime(){
+double DataPacket::getStartTime(){
     return this->startTime;
 }
 

@@ -2,7 +2,8 @@
 
 <Network>
     <snapshotTime>50</snapshotTime>
-    <routingTableUpdateTime>5000</routingTableUpdateTime>
+    <routingTableUpdateTime>1000</routingTableUpdateTime>
+    <congestionAlgorithm>reno</congestionAlgorithm>
     <networkHosts>
         <host id="1" />
         <host id="2" />
@@ -63,7 +64,7 @@
             <source>1</source>
             <destination>2</destination>
             <flowSize>20000</flowSize>
-            <flowStartTime>6</flowStartTime>
+            <flowStartTime>0</flowStartTime>
         </flow>
     </networkFlows>
 </Network>

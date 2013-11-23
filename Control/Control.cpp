@@ -9,6 +9,8 @@
 Controller *SYSTEM_CONTROLLER;
 
 extern void makePlots(); 
+void routerUpdate(void* args);
+void printSystem(void* args);
 
 /* Controller functions */
 Controller::Controller(){
@@ -18,25 +20,6 @@ Controller::Controller(){
 }
 
 Controller::~Controller(){
-    // delete all routers, links, flows, and hosts in the system 
-  /*  while(!this->routers.empty()){
-         delete this->routers.front();
-         this->routers.pop_front();
-    }
-    while(!this->links.empty()){
-         std::cout << links.front();
-         delete this->links.front();
-         this->links.pop_front();
-    }
-    while(!this->flows.empty()){
-         delete this->flows.front();
-         this->flows.pop_front();
-    }
-    while(!this->hosts.empty()){
-         delete this->hosts.front();
-         this->hosts.pop_front();
-    }
-    */
 }
 
 void Controller::addRouter(Router *router){
@@ -53,7 +36,7 @@ void Controller::addHost(Host *host) {
 
 extern void maintainFlowCallback(void *arg);
 
-void Controller::addFlow(Flow *flow, unsigned int startTime){
+void Controller::addFlow(Flow *flow, double startTime){
     this->flows.push_back(flow);
 
     // Create first flow event for this flow 
@@ -74,12 +57,30 @@ int Controller::numLinksToPrint() {
     return num;
 }
 
-unsigned int Controller::getCurrentTime() {
+double Controller::getCurrentTime() {
     return SYSTEM_TIME;
 }
 
-void Controller::run(std::string inputFile){
-    this->initSystem(inputFile);
+void Controller::initRoutingTables() {
+    void *args;
+    updateMyRouters();
+    while (this->packets.size() != 0) {
+        this->schedule_p->doNext();
+    }
+    this->schedule_p->setTime(0);
+}
+
+void Controller::setInputFile(std::string inputFile) {
+    this->inputFile = inputFile;
+}
+
+void Controller::run() {
+    this->initSystem();
+
+    // Do first router update/system print
+    void *args;
+    routerUpdate(args);
+    printSystem(args);
 
     bool noError = true;
     while (noError && this->flowsLeft != 0) {
@@ -121,7 +122,7 @@ void Controller::decrementFlowsLeft() {
 
 void Controller::printMySystem() {
     //std::cout << "***Printing System***" <<std::endl;
-    unsigned int currentTime = this->schedule_p->getCurrentTime();
+    double currentTime = this->schedule_p->getCurrentTime();
     std::map<std::string, std::ofstream*> files;
     // Links
     //std::cout << "  Outputting Link information." << std::endl;
@@ -298,9 +299,9 @@ Node * Controller::getNode(int type, int id, std::map<int, Host* > hostsById,
     exit(1);
 }
 
-void Controller::initSystem(std::string inputFile){
+void Controller::initSystem(){
     // Run the parser
-    InputParser parser(inputFile);
+    InputParser parser(this->inputFile);
     parser.run(
             this->snapshotTime,
             this->routingUpdateTime,
@@ -320,14 +321,6 @@ void Controller::initSystem(std::string inputFile){
         SYSTEM_CONTROLLER->addHost(h);
     }
  
-    for (std::list<FlowInfo>::iterator it = flowInfos.begin();
-         it != flowInfos.end(); it++)
-    {
-        Flow *f = new Flow(it->flowId, it->flowSize,
-                hostsById[it->sourceId], hostsById[it->destinationId]);
-        SYSTEM_CONTROLLER->addFlow(f, 1000 * it->startTime);
-    }
-
     for (std::list<RouterInfo>::iterator it = routerInfos.begin();
          it != routerInfos.end(); it++)
     {
@@ -348,17 +341,24 @@ void Controller::initSystem(std::string inputFile){
         SYSTEM_CONTROLLER->addLink(l);
     }
 
+    // Update the routing tables so that there aren't any seg faults
+    this->initRoutingTables();
+
+    // Add the flows AFTER initializing the routing tables
+    for (std::list<FlowInfo>::iterator it = flowInfos.begin();
+         it != flowInfos.end(); it++)
+    {
+        Flow *f = new Flow(it->flowId, it->flowSize,
+                hostsById[it->sourceId], hostsById[it->destinationId],
+                it->congestionAlgorithm);
+        SYSTEM_CONTROLLER->addFlow(f, 1000 * it->startTime);
+    }
 
     // Init flows
     this->flowsLeft = flows.size();
 
     // Delete old stats files
     removeOldStatsFiles();
-
-    // Do first router update/system print
-    void *args;
-    routerUpdate(args);
-    printSystem(args);
 }
 
 void checkPacketSource(Packet *p) {
@@ -447,6 +447,10 @@ Scheduler::Scheduler(){
     SYSTEM_TIME = 0;
 }
 
+void Scheduler::setTime(double time) {
+    SYSTEM_TIME = time;
+}
+
 Scheduler::~Scheduler(){
     delete[] events_p;
 }
@@ -481,7 +485,7 @@ void Scheduler::printAndDestroySchedule(){
     }
 }
 
-unsigned int Scheduler::getCurrentTime() {
+double Scheduler::getCurrentTime() {
     return SYSTEM_TIME;
 }
 

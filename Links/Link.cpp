@@ -87,11 +87,11 @@ void Link::handlePacket(Packet* packet) {
         buffer->capacityUsed += size;
         std::cout << "Buffer capacity used: " << buffer->capacityUsed
             << " out of " << this->capacity << "\n";
-        unsigned int time;
-        unsigned int currentTime = SYSTEM_CONTROLLER->getCurrentTime();
-        // Processing time in ms
-        unsigned int processingTime = (int)(((double)8 / (double)1000) * 
-                (double)packet->getSize() / (double)rate);
+        double time;
+        double currentTime = SYSTEM_CONTROLLER->getCurrentTime();
+        // Processing time in microseconds
+        double processingTime = (double)8 * 
+                (double)packet->getSize() / (double)rate;
         if (buffer->nextFree > currentTime) {
             time = buffer->nextFree + processingTime;
         }
@@ -169,8 +169,8 @@ void sendAnotherPacket(void *arg) {
     Link * link = (Link *)theseArgs[0];
     Node * end = (Node *)theseArgs[1];
     free(theseArgs);
-    unsigned int currentTime = SYSTEM_CONTROLLER->getCurrentTime();
-    unsigned int propogationTime = link->getDelay();
+    double currentTime = SYSTEM_CONTROLLER->getCurrentTime();
+    double propogationTime = link->getDelay();
     // Pop the next packet
     Packet *packet = link->popPacket(end);
     

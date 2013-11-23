@@ -10,7 +10,7 @@ private:
     std::queue<Packet*> buffer; 
 public:
     int capacityUsed;
-    unsigned int nextFree;
+    double nextFree;
     void push(Packet *p);
     void pop();
     Packet *front();

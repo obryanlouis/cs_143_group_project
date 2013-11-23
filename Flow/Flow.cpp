@@ -6,7 +6,8 @@
 
 extern Controller *SYSTEM_CONTROLLER; 
 
-Flow::Flow(int in_ID, int in_size, Host *in_source, Host *in_destination)
+Flow::Flow(int in_ID, int in_size, Host *in_source, Host *in_destination,
+        CongestionAlgorithm algorithm)
     : flowId(in_ID)
     , size(in_size)
     , source(in_source)
@@ -16,6 +17,7 @@ Flow::Flow(int in_ID, int in_size, Host *in_source, Host *in_destination)
     , dataReceived(0)
     , windowSize(1)
     , timeout(80)
+    , congestionAlgorithm(algorithm)
 {
     // Calculate the number of packets we need based on size of flow 
     this->totalPackets = (in_size + (Packet::DATASIZE - 1)) / Packet::DATASIZE;

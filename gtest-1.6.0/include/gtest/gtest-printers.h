@@ -400,7 +400,7 @@ inline void PrintTo(bool x, ::std::ostream* os) {
 // code otherwise and also as its decimal code (except for L'\0').
 // The L'\0' char is printed as "L'\\0'". The decimal code is printed
 // as signed integer when wchar_t is implemented by the compiler
-// as a signed type and is printed as an unsigned integer when wchar_t
+// as a signed type and is printed as an doubleeger when wchar_t
 // is implemented as an unsigned type.
 GTEST_API_ void PrintTo(wchar_t wc, ::std::ostream* os);
 

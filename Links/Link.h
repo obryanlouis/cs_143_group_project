@@ -44,7 +44,7 @@ private:
     int pushPacket(Packet *in_packet);
         // push the packet onto the buffer. Returns 0 if successfuly and
         // 1 if the packet is dropped
-    unsigned int nextFree;
+    double nextFree;
         // The next time that the queue will be free
     Buffer * getBuffer(Node *end);
 

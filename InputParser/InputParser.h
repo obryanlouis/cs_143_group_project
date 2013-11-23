@@ -6,6 +6,7 @@
 // Class and helpers to parse the given network description xml file and store
 // the input in some objects.
 
+#include "CommonHeader.h"
 #include "pugixml.hpp"
 #include <iostream>
 #include <string>
@@ -67,8 +68,10 @@ struct FlowInfo {
         // the size of the flow, in bytes;
     int startTime;
         // the start time of the flow, in seconds
+    CongestionAlgorithm congestionAlgorithm;
 
-    FlowInfo(int id, int src, int dst, int size, int start);
+    FlowInfo(int id, int src, int dst, int size, int start, 
+            CongestionAlgorithm congestionAlgorithm);
         // create an instance of class FlowInfo with the given specifications
 };
 

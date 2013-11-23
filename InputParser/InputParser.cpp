@@ -23,12 +23,14 @@ LinkInfo::LinkInfo(int print, int id, int rate, int delay, int size, int n1t,
     , node2Id(n2id)
 {}
 
-FlowInfo::FlowInfo(int id, int src, int dst, int size, int start)
+FlowInfo::FlowInfo(int id, int src, int dst, int size, int start,
+        CongestionAlgorithm congestionAlgorithm)
     : flowId(id)
     , sourceId(src)
     , destinationId(dst)
     , flowSize(size)
     , startTime(start)
+    , congestionAlgorithm(congestionAlgorithm)
 {}
 
 
@@ -193,6 +195,23 @@ void InputParser::run(int                   &snapshotTime,
         std::cout << "    " << flow.name() << ": "
              << id_att.name() << "=" << id_att.value() << std::endl;
 
+        // congestion control algorithm
+        pugi::xml_node congestion = flow.child("congestionAlgorithm");
+        CongestionAlgorithm congestionAlgorithm;
+        std::string ctext(congestion.text().get());
+        if (ctext.compare("reno") == 0) {
+            congestionAlgorithm = RENO;
+        }
+        else if (ctext.compare("vegas") == 0) {
+            congestionAlgorithm = VEGAS;
+        }
+        else {
+            std::cout << "Invalid congestion control algorithm: "
+                      << ctext
+                      << ".\n"
+                      << "Options are: reno, vegas\n";
+        }
+
         // source host
         pugi::xml_node src_node = flow.child("source");
         std::cout << "          " << src_node.name()
@@ -218,7 +237,8 @@ void InputParser::run(int                   &snapshotTime,
                 atoi(src_node.child_value()),
                 atoi(dst_node.child_value()),
                 atoi(size_node.child_value()),
-                atoi(time_node.child_value()));
+                atoi(time_node.child_value()),
+                congestionAlgorithm);
 
         flows.push_back(info);
     }

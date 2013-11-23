@@ -122,15 +122,15 @@ GTEST_API_ bool ParseInt32Flag(
 // Returns a random seed in range [1, kMaxRandomSeed] based on the
 // given --gtest_random_seed flag value.
 inline int GetRandomSeedFromFlag(Int32 random_seed_flag) {
-  const unsigned int raw_seed = (random_seed_flag == 0) ?
-      static_cast<unsigned int>(GetTimeInMillis()) :
-      static_cast<unsigned int>(random_seed_flag);
+  const double raw_seed = (random_seed_flag == 0) ?
+      static_cast<double>(GetTimeInMillis()) :
+      static_cast<double>(random_seed_flag);
 
   // Normalizes the actual seed to range [1, kMaxRandomSeed] such that
   // it's easy to type.
   const int normalized_seed =
       static_cast<int>((raw_seed - 1U) %
-                       static_cast<unsigned int>(kMaxRandomSeed)) + 1;
+                       static_cast<double>(kMaxRandomSeed)) + 1;
   return normalized_seed;
 }
 

@@ -875,21 +875,21 @@ PUGI__NS_BEGIN
 					}
 				}
 				// 110xxxxx -> U+0080..U+07FF
-				else if (static_cast<unsigned int>(lead - 0xC0) < 0x20 && size >= 2 && (data[1] & 0xc0) == 0x80)
+				else if (static_cast<double>(lead - 0xC0) < 0x20 && size >= 2 && (data[1] & 0xc0) == 0x80)
 				{
 					result = Traits::low(result, ((lead & ~0xC0) << 6) | (data[1] & utf8_byte_mask));
 					data += 2;
 					size -= 2;
 				}
 				// 1110xxxx -> U+0800-U+FFFF
-				else if (static_cast<unsigned int>(lead - 0xE0) < 0x10 && size >= 3 && (data[1] & 0xc0) == 0x80 && (data[2] & 0xc0) == 0x80)
+				else if (static_cast<double>(lead - 0xE0) < 0x10 && size >= 3 && (data[1] & 0xc0) == 0x80 && (data[2] & 0xc0) == 0x80)
 				{
 					result = Traits::low(result, ((lead & ~0xE0) << 12) | ((data[1] & utf8_byte_mask) << 6) | (data[2] & utf8_byte_mask));
 					data += 3;
 					size -= 3;
 				}
 				// 11110xxx -> U+10000..U+10FFFF
-				else if (static_cast<unsigned int>(lead - 0xF0) < 0x08 && size >= 4 && (data[1] & 0xc0) == 0x80 && (data[2] & 0xc0) == 0x80 && (data[3] & 0xc0) == 0x80)
+				else if (static_cast<double>(lead - 0xF0) < 0x08 && size >= 4 && (data[1] & 0xc0) == 0x80 && (data[2] & 0xc0) == 0x80 && (data[3] & 0xc0) == 0x80)
 				{
 					result = Traits::high(result, ((lead & ~0xF0) << 18) | ((data[1] & utf8_byte_mask) << 12) | ((data[2] & utf8_byte_mask) << 6) | (data[3] & utf8_byte_mask));
 					data += 4;
@@ -921,17 +921,17 @@ PUGI__NS_BEGIN
 					data += 1;
 				}
 				// U+E000..U+FFFF
-				else if (static_cast<unsigned int>(lead - 0xE000) < 0x2000)
+				else if (static_cast<double>(lead - 0xE000) < 0x2000)
 				{
 					result = Traits::low(result, lead);
 					data += 1;
 				}
 				// surrogate pair lead
-				else if (static_cast<unsigned int>(lead - 0xD800) < 0x400 && data + 1 < end)
+				else if (static_cast<double>(lead - 0xD800) < 0x400 && data + 1 < end)
 				{
 					uint16_t next = opt_swap::value ? endian_swap(data[1]) : data[1];
 
-					if (static_cast<unsigned int>(next - 0xDC00) < 0x400)
+					if (static_cast<double>(next - 0xDC00) < 0x400)
 					{
 						result = Traits::high(result, 0x10000 + ((lead & 0x3ff) << 10) + (next & 0x3ff));
 						data += 2;
@@ -1080,7 +1080,7 @@ PUGI__NS_BEGIN
 	};
 	
 #ifdef PUGIXML_WCHAR_MODE
-	#define PUGI__IS_CHARTYPE_IMPL(c, ct, table) ((static_cast<unsigned int>(c) < 128 ? table[static_cast<unsigned int>(c)] : table[128]) & (ct))
+	#define PUGI__IS_CHARTYPE_IMPL(c, ct, table) ((static_cast<double>(c) < 128 ? table[static_cast<double>(c)] : table[128]) & (ct))
 #else
 	#define PUGI__IS_CHARTYPE_IMPL(c, ct, table) (table[static_cast<unsigned char>(c)] & (ct))
 #endif
@@ -1090,7 +1090,7 @@ PUGI__NS_BEGIN
 
 	PUGI__FN bool is_little_endian()
 	{
-		unsigned int ui = 1;
+		double ui = 1;
 
 		return *reinterpret_cast<unsigned char*>(&ui) == 1;
 	}
@@ -1619,7 +1619,7 @@ PUGI__NS_BEGIN
 		{
 			case '#':	// &#...
 			{
-				unsigned int ucsc = 0;
+				double ucsc = 0;
 
 				if (stre[1] == 'x') // &#x... (hex code)
 				{
@@ -1631,9 +1631,9 @@ PUGI__NS_BEGIN
 
 					for (;;)
 					{
-						if (static_cast<unsigned int>(ch - '0') <= 9)
+						if (static_cast<double>(ch - '0') <= 9)
 							ucsc = 16 * ucsc + (ch - '0');
-						else if (static_cast<unsigned int>((ch | ' ') - 'a') <= 5)
+						else if (static_cast<double>((ch | ' ') - 'a') <= 5)
 							ucsc = 16 * ucsc + ((ch | ' ') - 'a' + 10);
 						else if (ch == ';')
 							break;
@@ -1653,7 +1653,7 @@ PUGI__NS_BEGIN
 
 					for (;;)
 					{
-						if (static_cast<unsigned int>(ch - '0') <= 9)
+						if (static_cast<double>(ch - '0') <= 9)
 							ucsc = 10 * ucsc + (ch - '0');
 						else if (ch == ';')
 							break;
@@ -1847,7 +1847,7 @@ PUGI__NS_BEGIN
 		}
 	};
 	
-	PUGI__FN strconv_pcdata_t get_strconv_pcdata(unsigned int optmask)
+	PUGI__FN strconv_pcdata_t get_strconv_pcdata(double optmask)
 	{
 		PUGI__STATIC_ASSERT(parse_escapes == 0x10 && parse_eol == 0x20);
 
@@ -2012,7 +2012,7 @@ PUGI__NS_BEGIN
 		}
 	};
 
-	PUGI__FN strconv_attribute_t get_strconv_attribute(unsigned int optmask)
+	PUGI__FN strconv_attribute_t get_strconv_attribute(double optmask)
 	{
 		PUGI__STATIC_ASSERT(parse_escapes == 0x10 && parse_eol == 0x20 && parse_wconv_attribute == 0x40 && parse_wnorm_attribute == 0x80);
 		
@@ -2176,7 +2176,7 @@ PUGI__NS_BEGIN
 			return s;
 		}
 
-		char_t* parse_exclamation(char_t* s, xml_node_struct* cursor, unsigned int optmsk, char_t endch)
+		char_t* parse_exclamation(char_t* s, xml_node_struct* cursor, double optmsk, char_t endch)
 		{
 			// parse node contents, starting with exclamation mark
 			++s;
@@ -2287,7 +2287,7 @@ PUGI__NS_BEGIN
 			return s;
 		}
 
-		char_t* parse_question(char_t* s, xml_node_struct*& ref_cursor, unsigned int optmsk, char_t endch)
+		char_t* parse_question(char_t* s, xml_node_struct*& ref_cursor, double optmsk, char_t endch)
 		{
 			// load into registers
 			xml_node_struct* cursor = ref_cursor;
@@ -2380,7 +2380,7 @@ PUGI__NS_BEGIN
 			return s;
 		}
 
-		char_t* parse(char_t* s, xml_node_struct* xmldoc, unsigned int optmsk, char_t endch)
+		char_t* parse(char_t* s, xml_node_struct* xmldoc, double optmsk, char_t endch)
 		{
 			strconv_attribute_t strconv_attribute = get_strconv_attribute(optmsk);
 			strconv_pcdata_t strconv_pcdata = get_strconv_pcdata(optmsk);
@@ -2611,7 +2611,7 @@ PUGI__NS_BEGIN
 			return s;
 		}
 
-		static xml_parse_result parse(char_t* buffer, size_t length, xml_node_struct* root, unsigned int optmsk)
+		static xml_parse_result parse(char_t* buffer, size_t length, xml_node_struct* root, double optmsk)
 		{
 			xml_document_struct* xmldoc = static_cast<xml_document_struct*>(root);
 
@@ -2682,7 +2682,7 @@ PUGI__NS_BEGIN
 		assert(length > 0);
 
 		// discard last character if it's the lead of a surrogate pair 
-		return (sizeof(wchar_t) == 2 && static_cast<unsigned int>(static_cast<uint16_t>(data[length - 1]) - 0xD800) < 0x400) ? length - 1 : length;
+		return (sizeof(wchar_t) == 2 && static_cast<double>(static_cast<uint16_t>(data[length - 1]) - 0xD800) < 0x400) ? length - 1 : length;
 	}
 
 	PUGI__FN size_t convert_buffer(char_t* r_char, uint8_t* r_u8, uint16_t* r_u16, uint32_t* r_u32, const char_t* data, size_t length, xml_encoding encoding)
@@ -3021,7 +3021,7 @@ PUGI__NS_BEGIN
 					break;
 				default: // s is not a usual symbol
 				{
-					unsigned int ch = static_cast<unsigned int>(*s++);
+					double ch = static_cast<double>(*s++);
 					assert(ch < 32);
 
 					writer.write('&', '#', static_cast<char_t>((ch / 10) + '0'), static_cast<char_t>((ch % 10) + '0'), ';');
@@ -3030,7 +3030,7 @@ PUGI__NS_BEGIN
 		}
 	}
 
-	PUGI__FN void text_output(xml_buffered_writer& writer, const char_t* s, chartypex_t type, unsigned int flags)
+	PUGI__FN void text_output(xml_buffered_writer& writer, const char_t* s, chartypex_t type, double flags)
 	{
 		if (flags & format_no_escapes)
 			writer.write(s);
@@ -3060,7 +3060,7 @@ PUGI__NS_BEGIN
 		while (*s);
 	}
 
-	PUGI__FN void node_output_attributes(xml_buffered_writer& writer, const xml_node& node, unsigned int flags)
+	PUGI__FN void node_output_attributes(xml_buffered_writer& writer, const xml_node& node, double flags)
 	{
 		const char_t* default_name = PUGIXML_TEXT(":anonymous");
 
@@ -3076,12 +3076,12 @@ PUGI__NS_BEGIN
 		}
 	}
 
-	PUGI__FN void node_output(xml_buffered_writer& writer, const xml_node& node, const char_t* indent, unsigned int flags, unsigned int depth)
+	PUGI__FN void node_output(xml_buffered_writer& writer, const xml_node& node, const char_t* indent, double flags, double depth)
 	{
 		const char_t* default_name = PUGIXML_TEXT(":anonymous");
 
 		if ((flags & format_indent) != 0 && (flags & format_raw) == 0)
-			for (unsigned int i = 0; i < depth; ++i) writer.write(indent);
+			for (double i = 0; i < depth; ++i) writer.write(indent);
 
 		switch (node.type())
 		{
@@ -3140,7 +3140,7 @@ PUGI__NS_BEGIN
 					node_output(writer, n, indent, flags, depth + 1);
 
 				if ((flags & format_indent) != 0 && (flags & format_raw) == 0)
-					for (unsigned int i = 0; i < depth; ++i) writer.write(indent);
+					for (double i = 0; i < depth; ++i) writer.write(indent);
 				
 				writer.write('<', '/');
 				writer.write(name);
@@ -3299,14 +3299,14 @@ PUGI__NS_BEGIN
 	#endif
 	}
 
-	PUGI__FN unsigned int get_value_uint(const char_t* value, unsigned int def)
+	PUGI__FN double get_value_uint(const char_t* value, double def)
 	{
 		if (!value) return def;
 
 	#ifdef PUGIXML_WCHAR_MODE
-		return static_cast<unsigned int>(wcstoul(value, 0, 10));
+		return static_cast<double>(wcstoul(value, 0, 10));
 	#else
-		return static_cast<unsigned int>(strtoul(value, 0, 10));
+		return static_cast<double>(strtoul(value, 0, 10));
 	#endif
 	}
 
@@ -3364,7 +3364,7 @@ PUGI__NS_BEGIN
 		return set_value_buffer(dest, header, header_mask, buf);
 	}
 
-	PUGI__FN bool set_value_convert(char_t*& dest, uintptr_t& header, uintptr_t header_mask, unsigned int value)
+	PUGI__FN bool set_value_convert(char_t*& dest, uintptr_t& header, uintptr_t header_mask, double value)
 	{
 		char buf[128];
 		sprintf(buf, "%u", value);
@@ -3425,7 +3425,7 @@ PUGI__NS_BEGIN
 		return status_ok;
 	}
 
-	PUGI__FN xml_parse_result load_file_impl(xml_document& doc, FILE* file, unsigned int options, xml_encoding encoding)
+	PUGI__FN xml_parse_result load_file_impl(xml_document& doc, FILE* file, double options, xml_encoding encoding)
 	{
 		if (!file) return make_parse_result(status_file_not_found);
 
@@ -3580,7 +3580,7 @@ PUGI__NS_BEGIN
 		return status_ok;
 	}
 
-	template <typename T> PUGI__FN xml_parse_result load_stream_impl(xml_document& doc, std::basic_istream<T>& stream, unsigned int options, xml_encoding encoding)
+	template <typename T> PUGI__FN xml_parse_result load_stream_impl(xml_document& doc, std::basic_istream<T>& stream, double options, xml_encoding encoding)
 	{
 		void* buffer = 0;
 		size_t size = 0;
@@ -3637,7 +3637,7 @@ PUGI__NS_BEGIN
 	}
 #endif
 
-	PUGI__FN bool save_file_impl(const xml_document& doc, FILE* file, const char_t* indent, unsigned int flags, xml_encoding encoding)
+	PUGI__FN bool save_file_impl(const xml_document& doc, FILE* file, const char_t* indent, double flags, xml_encoding encoding)
 	{
 		if (!file) return false;
 
@@ -3785,7 +3785,7 @@ namespace pugi
 		return impl::get_value_int(_attr ? _attr->value : 0, def);
 	}
 
-	PUGI__FN unsigned int xml_attribute::as_uint(unsigned int def) const
+	PUGI__FN double xml_attribute::as_uint(double def) const
 	{
 		return impl::get_value_uint(_attr ? _attr->value : 0, def);
 	}
@@ -3842,7 +3842,7 @@ namespace pugi
 		return *this;
 	}
 
-	PUGI__FN xml_attribute& xml_attribute::operator=(unsigned int rhs)
+	PUGI__FN xml_attribute& xml_attribute::operator=(double rhs)
 	{
 		set_value(rhs);
 		return *this;
@@ -3881,7 +3881,7 @@ namespace pugi
 		return impl::set_value_convert(_attr->value, _attr->header, impl::xml_memory_page_value_allocated_mask, rhs);
 	}
 
-	PUGI__FN bool xml_attribute::set_value(unsigned int rhs)
+	PUGI__FN bool xml_attribute::set_value(double rhs)
 	{
 		if (!_attr) return false;
 
@@ -4652,7 +4652,7 @@ namespace pugi
 		return _root;
 	}
 
-	PUGI__FN void xml_node::print(xml_writer& writer, const char_t* indent, unsigned int flags, xml_encoding encoding, unsigned int depth) const
+	PUGI__FN void xml_node::print(xml_writer& writer, const char_t* indent, double flags, xml_encoding encoding, double depth) const
 	{
 		if (!_root) return;
 
@@ -4662,14 +4662,14 @@ namespace pugi
 	}
 
 #ifndef PUGIXML_NO_STL
-	PUGI__FN void xml_node::print(std::basic_ostream<char, std::char_traits<char> >& stream, const char_t* indent, unsigned int flags, xml_encoding encoding, unsigned int depth) const
+	PUGI__FN void xml_node::print(std::basic_ostream<char, std::char_traits<char> >& stream, const char_t* indent, double flags, xml_encoding encoding, double depth) const
 	{
 		xml_writer_stream writer(stream);
 
 		print(writer, indent, flags, encoding, depth);
 	}
 
-	PUGI__FN void xml_node::print(std::basic_ostream<wchar_t, std::char_traits<wchar_t> >& stream, const char_t* indent, unsigned int flags, unsigned int depth) const
+	PUGI__FN void xml_node::print(std::basic_ostream<wchar_t, std::char_traits<wchar_t> >& stream, const char_t* indent, double flags, double depth) const
 	{
 		xml_writer_stream writer(stream);
 
@@ -4787,7 +4787,7 @@ namespace pugi
 		return impl::get_value_int(d ? d->value : 0, def);
 	}
 
-	PUGI__FN unsigned int xml_text::as_uint(unsigned int def) const
+	PUGI__FN double xml_text::as_uint(double def) const
 	{
 		xml_node_struct* d = _data();
 
@@ -4829,7 +4829,7 @@ namespace pugi
 		return dn ? impl::set_value_convert(dn->value, dn->header, impl::xml_memory_page_value_allocated_mask, rhs) : false;
 	}
 
-	PUGI__FN bool xml_text::set(unsigned int rhs)
+	PUGI__FN bool xml_text::set(double rhs)
 	{
 		xml_node_struct* dn = _data_new();
 
@@ -4862,7 +4862,7 @@ namespace pugi
 		return *this;
 	}
 
-	PUGI__FN xml_text& xml_text::operator=(unsigned int rhs)
+	PUGI__FN xml_text& xml_text::operator=(double rhs)
 	{
 		set(rhs);
 		return *this;
@@ -5179,14 +5179,14 @@ namespace pugi
 	}
 
 #ifndef PUGIXML_NO_STL
-	PUGI__FN xml_parse_result xml_document::load(std::basic_istream<char, std::char_traits<char> >& stream, unsigned int options, xml_encoding encoding)
+	PUGI__FN xml_parse_result xml_document::load(std::basic_istream<char, std::char_traits<char> >& stream, double options, xml_encoding encoding)
 	{
 		reset();
 
 		return impl::load_stream_impl(*this, stream, options, encoding);
 	}
 
-	PUGI__FN xml_parse_result xml_document::load(std::basic_istream<wchar_t, std::char_traits<wchar_t> >& stream, unsigned int options)
+	PUGI__FN xml_parse_result xml_document::load(std::basic_istream<wchar_t, std::char_traits<wchar_t> >& stream, double options)
 	{
 		reset();
 
@@ -5194,7 +5194,7 @@ namespace pugi
 	}
 #endif
 
-	PUGI__FN xml_parse_result xml_document::load(const char_t* contents, unsigned int options)
+	PUGI__FN xml_parse_result xml_document::load(const char_t* contents, double options)
 	{
 		// Force native encoding (skip autodetection)
 	#ifdef PUGIXML_WCHAR_MODE
@@ -5206,7 +5206,7 @@ namespace pugi
 		return load_buffer(contents, impl::strlength(contents) * sizeof(char_t), options, encoding);
 	}
 
-	PUGI__FN xml_parse_result xml_document::load_file(const char* path_, unsigned int options, xml_encoding encoding)
+	PUGI__FN xml_parse_result xml_document::load_file(const char* path_, double options, xml_encoding encoding)
 	{
 		reset();
 
@@ -5215,7 +5215,7 @@ namespace pugi
 		return impl::load_file_impl(*this, file, options, encoding);
 	}
 
-	PUGI__FN xml_parse_result xml_document::load_file(const wchar_t* path_, unsigned int options, xml_encoding encoding)
+	PUGI__FN xml_parse_result xml_document::load_file(const wchar_t* path_, double options, xml_encoding encoding)
 	{
 		reset();
 
@@ -5224,7 +5224,7 @@ namespace pugi
 		return impl::load_file_impl(*this, file, options, encoding);
 	}
 
-	PUGI__FN xml_parse_result xml_document::load_buffer_impl(void* contents, size_t size, unsigned int options, xml_encoding encoding, bool is_mutable, bool own)
+	PUGI__FN xml_parse_result xml_document::load_buffer_impl(void* contents, size_t size, double options, xml_encoding encoding, bool is_mutable, bool own)
 	{
 		reset();
 
@@ -5255,22 +5255,22 @@ namespace pugi
 		return res;
 	}
 
-	PUGI__FN xml_parse_result xml_document::load_buffer(const void* contents, size_t size, unsigned int options, xml_encoding encoding)
+	PUGI__FN xml_parse_result xml_document::load_buffer(const void* contents, size_t size, double options, xml_encoding encoding)
 	{
 		return load_buffer_impl(const_cast<void*>(contents), size, options, encoding, false, false);
 	}
 
-	PUGI__FN xml_parse_result xml_document::load_buffer_inplace(void* contents, size_t size, unsigned int options, xml_encoding encoding)
+	PUGI__FN xml_parse_result xml_document::load_buffer_inplace(void* contents, size_t size, double options, xml_encoding encoding)
 	{
 		return load_buffer_impl(contents, size, options, encoding, true, false);
 	}
 		
-	PUGI__FN xml_parse_result xml_document::load_buffer_inplace_own(void* contents, size_t size, unsigned int options, xml_encoding encoding)
+	PUGI__FN xml_parse_result xml_document::load_buffer_inplace_own(void* contents, size_t size, double options, xml_encoding encoding)
 	{
 		return load_buffer_impl(contents, size, options, encoding, true, true);
 	}
 
-	PUGI__FN void xml_document::save(xml_writer& writer, const char_t* indent, unsigned int flags, xml_encoding encoding) const
+	PUGI__FN void xml_document::save(xml_writer& writer, const char_t* indent, double flags, xml_encoding encoding) const
 	{
 		impl::xml_buffered_writer buffered_writer(writer, encoding);
 
@@ -5278,7 +5278,7 @@ namespace pugi
 		{
 			// BOM always represents the codepoint U+FEFF, so just write it in native encoding
 		#ifdef PUGIXML_WCHAR_MODE
-			unsigned int bom = 0xfeff;
+			double bom = 0xfeff;
 			buffered_writer.write(static_cast<wchar_t>(bom));
 		#else
 			buffered_writer.write('\xef', '\xbb', '\xbf');
@@ -5297,14 +5297,14 @@ namespace pugi
 	}
 
 #ifndef PUGIXML_NO_STL
-	PUGI__FN void xml_document::save(std::basic_ostream<char, std::char_traits<char> >& stream, const char_t* indent, unsigned int flags, xml_encoding encoding) const
+	PUGI__FN void xml_document::save(std::basic_ostream<char, std::char_traits<char> >& stream, const char_t* indent, double flags, xml_encoding encoding) const
 	{
 		xml_writer_stream writer(stream);
 
 		save(writer, indent, flags, encoding);
 	}
 
-	PUGI__FN void xml_document::save(std::basic_ostream<wchar_t, std::char_traits<wchar_t> >& stream, const char_t* indent, unsigned int flags) const
+	PUGI__FN void xml_document::save(std::basic_ostream<wchar_t, std::char_traits<wchar_t> >& stream, const char_t* indent, double flags) const
 	{
 		xml_writer_stream writer(stream);
 
@@ -5312,13 +5312,13 @@ namespace pugi
 	}
 #endif
 
-	PUGI__FN bool xml_document::save_file(const char* path_, const char_t* indent, unsigned int flags, xml_encoding encoding) const
+	PUGI__FN bool xml_document::save_file(const char* path_, const char_t* indent, double flags, xml_encoding encoding) const
 	{
 		FILE* file = fopen(path_, (flags & format_save_file_text) ? "w" : "wb");
 		return impl::save_file_impl(*this, file, indent, flags, encoding);
 	}
 
-	PUGI__FN bool xml_document::save_file(const wchar_t* path_, const char_t* indent, unsigned int flags, xml_encoding encoding) const
+	PUGI__FN bool xml_document::save_file(const wchar_t* path_, const char_t* indent, double flags, xml_encoding encoding) const
 	{
 		FILE* file = impl::open_file_wide(path_, (flags & format_save_file_text) ? L"w" : L"wb");
 		return impl::save_file_impl(*this, file, indent, flags, encoding);
@@ -6025,7 +6025,7 @@ PUGI__NS_BEGIN
 	// Converts symbol to lower case, if it is an ASCII one
 	PUGI__FN char_t tolower_ascii(char_t ch)
 	{
-		return static_cast<unsigned int>(ch - 'A') < 26 ? static_cast<char_t>(ch | ' ') : ch;
+		return static_cast<double>(ch - 'A') < 26 ? static_cast<char_t>(ch | ' ') : ch;
 	}
 
 	PUGI__FN xpath_string string_value(const xpath_node& na, xpath_allocator* alloc)
@@ -6078,9 +6078,9 @@ PUGI__NS_BEGIN
 		}
 	}
 	
-	PUGI__FN unsigned int node_height(xml_node n)
+	PUGI__FN double node_height(xml_node n)
 	{
-		unsigned int result = 0;
+		double result = 0;
 		
 		while (n)
 		{
@@ -6091,11 +6091,11 @@ PUGI__NS_BEGIN
 		return result;
 	}
 	
-	PUGI__FN bool node_is_before(xml_node ln, unsigned int lh, xml_node rn, unsigned int rh)
+	PUGI__FN bool node_is_before(xml_node ln, double lh, xml_node rn, double rh)
 	{
 		// normalize heights
-		for (unsigned int i = rh; i < lh; i++) ln = ln.parent();
-		for (unsigned int j = lh; j < rh; j++) rn = rn.parent();
+		for (double i = rh; i < lh; i++) ln = ln.parent();
+		for (double j = lh; j < rh; j++) rn = rn.parent();
 		
 		// one node is the ancestor of the other
 		if (ln == rn) return lh < rh;
@@ -6196,8 +6196,8 @@ PUGI__NS_BEGIN
 
 			if (ln == rn) return false;
 			
-			unsigned int lh = node_height(ln);
-			unsigned int rh = node_height(rn);
+			double lh = node_height(ln);
+			double rh = node_height(rn);
 			
 			return node_is_before(ln, lh, rn, rh);
 		}
@@ -6358,7 +6358,7 @@ PUGI__NS_BEGIN
 		{
 			while (exponent > 0)
 			{
-				assert(*mantissa == 0 || static_cast<unsigned int>(*mantissa - '0') <= 9);
+				assert(*mantissa == 0 || static_cast<double>(*mantissa - '0') <= 9);
 				*s++ = *mantissa ? *mantissa++ : '0';
 				exponent--;
 			}
@@ -6380,7 +6380,7 @@ PUGI__NS_BEGIN
 			// extra mantissa digits
 			while (*mantissa)
 			{
-				assert(static_cast<unsigned int>(*mantissa - '0') <= 9);
+				assert(static_cast<double>(*mantissa - '0') <= 9);
 				*s++ = *mantissa++;
 			}
 		}
@@ -6644,14 +6644,14 @@ PUGI__NS_BEGIN
 
 	static const xpath_node_set dummy_node_set;
 
-	PUGI__FN unsigned int hash_string(const char_t* str)
+	PUGI__FN double hash_string(const char_t* str)
 	{
 		// Jenkins one-at-a-time hash (http://en.wikipedia.org/wiki/Jenkins_hash_function#one-at-a-time)
-		unsigned int result = 0;
+		double result = 0;
 
 		while (*str)
 		{
-			result += static_cast<unsigned int>(*str++);
+			result += static_cast<double>(*str++);
 			result += result << 10;
 			result ^= result >> 6;
 		}
