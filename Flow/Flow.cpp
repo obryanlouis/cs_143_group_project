@@ -51,8 +51,9 @@ std::string Flow::infoString(){
 
 void Flow::handlePacket(AckPacket *p) {
     SYSTEM_CONTROLLER->checkPackets();
-    std::cout << "Flow " << flowId << " has received an acknowledgement packet for packet " << p->getId() <<
-        "at time " << SYSTEM_CONTROLLER->getCurrentTime() << "\n";
+    /*std::cout << "Flow " << flowId << " has received an acknowledgement"
+        << " packet for packet " << p->getId() <<
+        "at time " << SYSTEM_CONTROLLER->getCurrentTime() << "\n";*/
 
     // update progress
     if (this->packets[p->getId()] != UINT_MAX){
@@ -82,8 +83,8 @@ void maintainFlowCallback(void *arg) {
 void makeAndSendPacket(int id, Flow *flow) {
     DataPacket *p = new DataPacket(id, flow, SYSTEM_CONTROLLER->getCurrentTime());
     // Send the packet
-    std::cout << "Flow " << flow->getId() << " is sending packet " 
-        << id << " to Host " << flow->source->getId() << "\n";
+    /*std::cout << "Flow " << flow->getId() << " is sending packet " 
+        << id << " to Host " << flow->source->getId() << "\n";*/
     flow->source->handlePacket(p);
     flow->updateDataSent(p->getSize());
 }
@@ -139,7 +140,7 @@ void Flow::maintain() {
         SYSTEM_CONTROLLER->add(e);
     }
 
-    std::cout << "Current window size: " << windowSize << std::endl;
+    //std::cout << "Current window size: " << windowSize << std::endl;
 }
 
             

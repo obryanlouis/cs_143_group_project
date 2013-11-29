@@ -150,6 +150,7 @@ public:
 
     // DEBUG: Other functions
     void printRoutingTables();
+    friend void outputRoutingTables(void *args);
 
     void run();
     void initRoutingTables();

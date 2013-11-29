@@ -15,12 +15,13 @@ class Node;
 class RoutingTable
 {
 public:
+    friend void outputRoutingTables(void *args);
     friend class Router;
     RoutingTable();
     RoutingTable(RoutingTable *old);
     ~RoutingTable();
 
-	std::pair<int, Link*> & operator[] (Node *r) { return mapping[r]; }
+	std::pair<double, Link*> & operator[] (Node *r) { return mapping[r]; }
 
 	Link* nextLink(Node *r);
 	Node* nextNode(Node *r);
@@ -32,7 +33,7 @@ public:
     void print();
 	
 private:
-	std::map<Node*, std::pair<int, Link*> > mapping;
+	std::map<Node*, std::pair<double, Link*> > mapping;
 
 };
 

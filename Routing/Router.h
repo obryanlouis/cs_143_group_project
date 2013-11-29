@@ -18,11 +18,17 @@ class Node;
 class Host;
 
 class Router : public Node {
+    friend void outputRoutingTables(void *args);
 
+    static const int UPDATE_TOLERANCE = 5;
+        // only update the routing table if the distance would change by
+        // more than the tolerance
 	RoutingTable *routingTable_p;
         // the router's routing table
     void updateSingleNode(Host *host, Link *link);
         // Updates the routing table's path to a single host
+    void update(RoutingTable *t, double linkWgt, bool &changed, Node *r,
+            Link *l);
 	
 public:
     // CONSTRUCTORS AND DESTRUCTORS
