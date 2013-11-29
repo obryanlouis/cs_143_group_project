@@ -7,6 +7,7 @@
 #include "Node.h"
 #include "RoutingTable.h"
 
+#include <cmath>
 #include <stdlib.h>
 #include <math.h>
 #include <list>

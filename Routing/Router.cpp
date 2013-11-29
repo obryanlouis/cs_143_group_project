@@ -154,13 +154,12 @@ bool Router::updateRoutingTable(RoutingTable *t, Link *l) {
                         UPDATE_TOLERANCE < linkWgt + t->mapping[r].first);
                 bool wouldNormallyPassL = (routingTable_p->nextLink(r) == l);
                 bool nextLinkNotThisLink = (t->nextLink(r) != l);
-                bool approxEqual = abs((*routingTable_p)[r].first -
+                bool approxEqual = std::abs((*routingTable_p)[r].first -
                     linkWgt + t->mapping[r].first) <= UPDATE_TOLERANCE;
                 // doesn't seem to do much
                 bool lowerId = l->getId() < (*routingTable_p)[r].second->getId();
                 if ((smallerWeight && wouldNormallyPassL) || 
-                    (largerWeight) ||
-                    (approxEqual && lowerId)) {
+                    (largerWeight)) { 
                     update(t, linkWgt, changed, r, l);
                 }
             }
