@@ -10,9 +10,8 @@
 #include <algorithm>
 #include <string>
 
-#include "CommonHeader.h"
+#include "CongestionAlgorithm.h"
 #include "Control.h"
-#include "Header.h"
 #include "Packet.h"
 #include "Host.h"
 
@@ -55,12 +54,12 @@ class Flow {
         // the timeout for packets. if this has expired, then the
         // flow should resend the packet
     int windowSize;
-    CongestionAlgorithm congestionAlgorithm;
+    CongestionAlgorithm *congestionAlgorithm_p;
     void maintain();
 
 public:
     Flow(int in_ID, int in_size, Host *in_source, Host *in_destination,
-            CongestionAlgorithm algorithm);
+            CongestionAlgorithmType algorithm);
         // Create an object of class Flow with the given specifications
     ~Flow();
         // Destroy this instance of Flow

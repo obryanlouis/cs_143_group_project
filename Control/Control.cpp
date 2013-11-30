@@ -381,7 +381,7 @@ void Controller::initSystem(){
     {
         Flow *f = new Flow(it->flowId, 1000000 * it->flowSize,
                 hostsById[it->sourceId], hostsById[it->destinationId],
-                it->congestionAlgorithm);
+                it->congestionAlgorithmType);
         SYSTEM_CONTROLLER->addFlow(f, 1000 * it->startTime);
     }
 
