@@ -1,3 +1,5 @@
+// Link.cpp
+
 #include "Link.h"
 
 extern Controller *SYSTEM_CONTROLLER; 
@@ -223,3 +225,4 @@ double Link::getDelay() {
 int Link::getId(){
     return this->ID;
 }
+
