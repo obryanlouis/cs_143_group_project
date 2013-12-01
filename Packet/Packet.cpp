@@ -154,7 +154,7 @@ std::string DataPacket::infoString(){
 /**** AckPacket *****/
 AckPacket::AckPacket(DataPacket *old)
     :DataPacket(old)
-    ,ackId(old->packetId)
+    ,ackId(old->getId())
 {
     type = Packet::ACK;
     size = Packet::ACKSIZE;

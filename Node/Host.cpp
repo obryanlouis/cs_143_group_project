@@ -62,6 +62,7 @@ void Host::handlePacket(Packet *packet){
     Flow *flow = this->flow_p;      // to be used for handling data packets
     HostRoutingPacket *routingPacket;
     RouterRoutingPacket *rp = (RouterRoutingPacket *)packet;
+    DataPacket *dp;
 
     switch (packet->getType())
     {
@@ -97,9 +98,10 @@ void Host::handlePacket(Packet *packet){
             // handle data packets: adjust its own receive rate, but also look
             // at the packet's flow and adjust that flow's receive rate
             dataReceived += packet->getSize();
+            dp = (DataPacket *) packet;
 
             // Need to send back an acknowledgement packet of proper ID
-            ack = packet->getFlow()->atDest((DataPacket *) packet);
+            ack = dp->getFlow()->atDest(dp);
             ack->setPreviousNode(this);
             // Send the packet back to the host
             this->links.front()->handlePacket(ack);

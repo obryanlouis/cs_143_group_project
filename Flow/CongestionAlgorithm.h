@@ -42,7 +42,7 @@ private:
     double roundTripTime;
     double timeDeviation;
     double timeout;
-    double threashold;
+    double ssthreash;
     double alpha; // weighting for RTT updates
     double outstanding; 
     int sendNext;
@@ -53,8 +53,9 @@ private:
 public: 
     TCP_RENO(Flow *in_flow);
 
-    void scheduleFirstPacket(double startTime);
+    double getTimeOut();
 
+    void scheduleFirstPacket(double startTime);
     void packetDropped(int id);
     void ackRecieved(AckPacket *p);
     AckPacket *makeAckPacket(DataPacket *p);
