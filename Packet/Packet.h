@@ -142,7 +142,7 @@ public:
     ~DataPacket();
         // Destroy this instance of DataPacket
 
-    int getId();
+    virtual int getId();
         // Returns the packet id
     double getStartTime();
         // Returns time packet originally sent. 

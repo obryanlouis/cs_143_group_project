@@ -15,72 +15,89 @@ Flow::Flow(int in_ID, int in_size, Host *in_source, Host *in_destination,
     , progress(0)
     , dataSent(0)
     , dataReceived(0)
-    , windowSize(1)
     , timeout(80)
 {
     // Calculate the number of packets we need based on size of flow 
     this->totalPackets = (in_size + (Packet::DATASIZE - 1)) / Packet::DATASIZE;
+
+    if (this->totalPackets == 0) this->totalPacket = 1;
+
     for (int i = 0; i < totalPackets; i++){
-        packets[i] = 0;
+        this->packets[i] = 0;
     }
+
+    for (int i = 0; i < totalPacket; i++){
+        this->acks.insert(i);
+    }
+
     in_source->setFlow(this);
+    in_destination->setFlow2(this);
 
     // make congestion algorithm
     switch (algType) {
         case RENO:
-            congestionAlgorithm_p = new TCP_Reno();
-
+            congestionAlgorithm_p = new TCP_Reno(this);
         break;
         case VEGAS:
-            congestionAlgorithm_p = new TCP_Vegas();
+//            congestionAlgorithm_p = new TCP_Vegas(this);
         break;
 
         default:
             std::cout << "Invalid routing type" << std::endl;
-        
-        
+            exit(1);
     } 
+    
+
 }
 
 Flow::~Flow()
-{}
-
-void Flow::resetStats() {
-    dataSent = 0;
-    dataReceived = 0;
+{
+    delete congestionAlgorithm_p;
 }
 
-void Flow::updateDataSent(int bytes) {
-    dataSent += bytes;
+
+void Flow::startFlow(double startTime){
+    this->congestionAlgorithm_p->sendFirstPacket(startTime);
 }
 
-void Flow::updateDataReceived(int bytes) {
-    dataReceived += bytes;
+void Flow::sendNewPacket(DataPacket *p, double timeOut){
+
+    this->source->handlePacket(p)
+    this->updateDataSent(p->getSize());
+    this->packets[p->getId()] = timeOut;
+}
+    
+int Flow::getNextUnrecieved(){
+    return acks.begin();
 }
 
-std::string Flow::infoString(){
-    std::stringstream ss;
-    ss << "(Flow " << this->getId() << ")";
-    return ss.str();
+
+AckPacket* Flow::atDest(DataPacket *p){
+    // let the flow know that the destination has recieved the data
+    this->acks.erase(p->getId());
+    // let the congestion control algorithm make the ack packet
+    AckPacket *ack = this->congestionAlgorithm_p->makeAckPacket(p);
+    return ack;
 }
 
 void Flow::handlePacket(AckPacket *p) {
     SYSTEM_CONTROLLER->checkPackets();
-    /*std::cout << "Flow " << flowId << " has received an acknowledgement"
+    std::cout << "Flow " << flowId << " has received an acknowledgement"
         << " packet for packet " << p->getId() <<
-        "at time " << SYSTEM_CONTROLLER->getCurrentTime() << "\n";*/
+        "at time " << SYSTEM_CONTROLLER->getCurrentTime() << "\n";
+    std::cout << p->getStartTime() << std::endl;
 
-    // update progress
-    if (this->packets[p->getId()] != UINT_MAX){
+    // see if packet recieved before
+    if (this->packets[p->getId()] != DBL_MAX){
+        // update progress
         this->progress++;
+        // done with that packet ID, so set its timeout to super long
+        // so it'll never get sent
+        this->packets[p->getId()] = DBL_MAX; 
     }  
-    // done with that packet ID, so set its timeout to super long
-    // so it'll never get sent
-    
-    this->packets[p->getId()] = UINT_MAX; 
-    
-    // TODO: update window size
-    this->windowSize += 1;
+
+    // update window size
+    congestionAlgorithm_p->ackRecieved(p);
 
     // update other stats: dataSent, dataReceived
     std::cout << "Flow " << flowId << " progress: " << progress <<
@@ -90,75 +107,13 @@ void Flow::handlePacket(AckPacket *p) {
     delete p;
 }
 
-void maintainFlowCallback(void *arg) {
-    Flow *flow = (Flow *)arg;
-    flow->maintain();
+
+double Flow::getPacketTime(int id){
+    return packets[id];
 }
 
-void makeAndSendPacket(int id, Flow *flow) {
-    DataPacket *p = new DataPacket(id, flow, SYSTEM_CONTROLLER->getCurrentTime());
-    // Send the packet
-    /*std::cout << "Flow " << flow->getId() << " is sending packet " 
-        << id << " to Host " << flow->source->getId() << "\n";*/
-    flow->source->handlePacket(p);
-    flow->updateDataSent(p->getSize());
-}
 
-void Flow::maintain() {
-    // If this flow is done sending packets, inform the system controller and
-    // stop making calls to this function by not making new maintain event
-    if (this->progress == this->totalPackets) {
-        SYSTEM_CONTROLLER->decrementFlowsLeft();
-        return;
-    }
-
-    // check if there are any dropped packets. If so, update window size.
-    bool dropped = false;
-    for (int i = 0; i < totalPackets; i++){
-        if (packets[i] <= SYSTEM_CONTROLLER->getCurrentTime() && packets[i] != 0) {
-            packets[i] = 0;
-            dropped = true;
-        }
-    }
-    if (dropped) this->windowSize = 1;
-    if (this->windowSize == 0) this->windowSize = 1;
-
-    // make and send packet 
-    int packetsSent = 0;
-    for (int i = 0; i < totalPackets; i++){
-        if (this->packets.count(i) > 0
-            && packets[i] <= SYSTEM_CONTROLLER->getCurrentTime()
-            && packetsSent < windowSize) {
-            
-            makeAndSendPacket(i, this);
-            packets[i] = SYSTEM_CONTROLLER->getCurrentTime() + this->timeout;
-            ++packetsSent;
-        }
-    }
-
-
-
-    //std::cout << "sent out more packets" << std::endl;
-    // update number of outstanding packets
-    packetsSent = 0;
-    for (int i = 0; i < totalPackets; i++){
-        if (packets[i] > 0){
-            packetsSent++;
-        }
-    }
-    this->outstanding = packetsSent;
-
-    if (this->progress < this->totalPackets) {
-        // Schedule the next maintenance for this flow to be frequent
-        Event *e = new Event(SYSTEM_CONTROLLER->getCurrentTime() +
-            FLOW_MAINTENANCE_PERIOD, &maintainFlowCallback, this);
-        SYSTEM_CONTROLLER->add(e);
-    }
-
-    //std::cout << "Current window size: " << windowSize << std::endl;
-}
-
-            
+           
 Host *Flow::getStart(){
     return source;
 }
@@ -166,6 +121,7 @@ Host *Flow::getStart(){
 Host *Flow::getDestination(){
     return destination;
 }
+
 
 int Flow::getId() {
     return this->flowId;
@@ -186,12 +142,29 @@ double Flow::getStats(std::string stat, int period) {
             (double)this->dataReceived;
     }
     else if (stat.compare("window") == 0) {
-        return (double)this->windowSize;
+        return congestionAlgorithm_p->getWindowSize();
     }
 }
 
 
+void Flow::resetStats() {
+    dataSent = 0;
+    dataReceived = 0;
+}
 
+void Flow::updateDataSent(int bytes) {
+    dataSent += bytes;
+}
+
+void Flow::updateDataReceived(int bytes) {
+    dataReceived += bytes;
+}
+
+std::string Flow::infoString(){
+    std::stringstream ss;
+    ss << "(Flow " << this->getId() << ")";
+    return ss.str();
+}
 
 
 
