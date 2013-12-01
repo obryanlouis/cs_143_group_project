@@ -15,18 +15,17 @@ Flow::Flow(int in_ID, int in_size, Host *in_source, Host *in_destination,
     , progress(0)
     , dataSent(0)
     , dataReceived(0)
-    , timeout(80)
 {
     // Calculate the number of packets we need based on size of flow 
     this->totalPackets = (in_size + (Packet::DATASIZE - 1)) / Packet::DATASIZE;
 
-    if (this->totalPackets == 0) this->totalPacket = 1;
+    if (this->totalPackets == 0) this->totalPackets = 1;
 
     for (int i = 0; i < totalPackets; i++){
         this->packets[i] = 0;
     }
 
-    for (int i = 0; i < totalPacket; i++){
+    for (int i = 0; i < totalPackets; i++){
         this->acks.insert(i);
     }
 
@@ -36,7 +35,7 @@ Flow::Flow(int in_ID, int in_size, Host *in_source, Host *in_destination,
     // make congestion algorithm
     switch (algType) {
         case RENO:
-            congestionAlgorithm_p = new TCP_Reno(this);
+            congestionAlgorithm_p = new TCP_RENO(this);
         break;
         case VEGAS:
 //            congestionAlgorithm_p = new TCP_Vegas(this);
@@ -57,27 +56,29 @@ Flow::~Flow()
 
 
 void Flow::startFlow(double startTime){
-    this->congestionAlgorithm_p->sendFirstPacket(startTime);
+    this->congestionAlgorithm_p->scheduleFirstPacket(startTime);
 }
 
 void Flow::sendNewPacket(DataPacket *p, double timeOut){
 
-    this->source->handlePacket(p)
+    this->source->handlePacket(p);
     this->updateDataSent(p->getSize());
     this->packets[p->getId()] = timeOut;
 }
     
 int Flow::getNextUnrecieved(){
-    return acks.begin();
+    return *(acks.begin());
 }
 
 
 AckPacket* Flow::atDest(DataPacket *p){
     // let the flow know that the destination has recieved the data
     this->acks.erase(p->getId());
+    std::cout << "Tried to erase " << p->getId() << " new next unrecieved " << getNextUnrecieved() << std::endl;
     // let the congestion control algorithm make the ack packet
     AckPacket *ack = this->congestionAlgorithm_p->makeAckPacket(p);
-    return ack;
+ 
+   return ack;
 }
 
 void Flow::handlePacket(AckPacket *p) {
@@ -167,4 +168,6 @@ std::string Flow::infoString(){
 }
 
 
-
+int Flow::getTotalPackets(){
+    return totalPackets;
+}

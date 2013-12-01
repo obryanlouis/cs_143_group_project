@@ -92,6 +92,7 @@ public:
     int getId();
     std::string infoString();
     double getStats(std::string stat, int period);
+    int getTotalPackets();
 
 };
 

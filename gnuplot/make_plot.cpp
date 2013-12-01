@@ -14,56 +14,15 @@ enum StatType {
     FLOWSTAT,
     LINKSTAT,
     HOSTSTAT
-}
+};
 
-void makePlots() {
-
-    std::cout << "Making plots...\n";
-    /*std::cout << "Making Flow plots...\n";
-    
-    // Store the filename and y axis label for each flow statistic in a list
-    std::list<std::tuple<std::string, std::string, std::string > > files;
-    files.push_back(std::make_tuple(FLOW_RECEIVE_FILE,
-                "Flow_Receive_Rates.svg", "Mbps"));
-    files.push_back(std::make_tuple(FLOW_SEND_FILE,
-                "Flow_Send_Rates.svg", "Mbps"));
-    files.push_back(std::make_tuple(FLOW_RTT_FILE,
-                "Flow_RTT.svg", "ms"));
-    files.push_back(std::make_tuple(FLOW_WINDOW_FILE,
-                "Flow_Window.svg","Packets"));
-
-    // Iterate through this list, plotting each flow statistic
-    for (std::list<std::tuple<std::string, std::string, std::string > >::iterator iter = files.begin();
-        iter != files.end(); iter++)
+template <typename Iterator>
+void graphAll(Iterator first, Iterator second, std::string dataFile,
+        FILE *fp) {
+    int k = 2;
+    for (Iterator it = first ; it != second; it++)
     {
-        // Save the plots in the Output directory
-        std::string saveAs = "Output/" + std::get<1>(*iter);
-        std::string dataFile = std::get<0>(*iter);
-        std::string ylabel = std::get<2>(*iter);
-        FILE * fp = popen("gnuplot ", "w");    
-
-        // Plot Flows
-        std::vector<std::string > commands;
-        commands.push_back("set terminal svg size 1000,550");
-        commands.push_back("set object 1 rectangle from screen 0,0 to screen 1,1 fillcolor rgb\"white\" behind");
-        commands.push_back("set output \"" + saveAs + "\"");
-        std::stringstream multiplotCommand;
-        multiplotCommand << "set multiplot layout ";
-        multiplotCommand << SYSTEM_CONTROLLER->flows.size() << ",1";
-        commands.push_back(multiplotCommand.str());
-        commands.push_back("set xlabel \"Time (s)\"");
-        commands.push_back("set ylabel \"" + ylabel + "\"");
-        for (std::vector<std::string>::iterator it = commands.begin();
-            it != commands.end(); it++)
-        {
-            fputs(it->data(), fp); 
-            fputs("\n", fp);
-        }
-
-        int k = 2;
-        for (std::list<Flow* >::iterator it = SYSTEM_CONTROLLER->flows.begin();
-            it != SYSTEM_CONTROLLER->flows.end(); it++)
-        {
+        if (it->print) {
             std::stringstream command;
             if (k == 3)
                 command << "unset object 1\n";
@@ -71,18 +30,18 @@ void makePlots() {
                     << dataFile
                     << "\""
                     << " using 1:" << k++ << " with points pointtype 7 pointsize 0.5 title \""
-                    << (*it)->infoString()
+                    << it->getId()
                     << "\"\n";
             fputs(command.str().data(), fp);
         }
+    }
+}
 
-        pclose(fp);
-    }*/
+void makePlots() {
 
+    std::cout << "Making plots...\n";
 
-
-
-    // Store the filename and y axis label for each flow statistic in a list
+    // Store the filename and y axis label for each statistic in a list
     std::list<std::tuple<std::string, std::string, std::string,
        StatType > > files;
 
@@ -96,25 +55,30 @@ void makePlots() {
                 "Flow_Window.svg","Packets", FLOWSTAT));
 
     files.push_back(std::make_tuple(LINK_OCCUPANCY_FILE,
-                "Link_Occupancy.svg", "Bytes", LINKINFO));
+                "Link_Occupancy.svg", "Bytes", LINKSTAT));
     files.push_back(std::make_tuple(LINK_PACKET_LOSS_FILE,
-                "Link_Packet_Loss.svg", "Mbps", LINKINFO));
+                "Link_Packet_Loss.svg", "Mbps", LINKSTAT));
     files.push_back(std::make_tuple(LINK_FLOW_RATE_FILE,
-                "Link_Flow_Rate.svg", "Mbps", LINKINFO));
+                "Link_Flow_Rate.svg", "Mbps", LINKSTAT));
 
     files.push_back(std::make_tuple(HOST_SEND_FILE,
-                "Host_Send.svg", "Mbps", HOSTINFO));
+                "Host_Send.svg", "Mbps", HOSTSTAT));
     files.push_back(std::make_tuple(HOST_RECEIVE_FILE,
-                "Host_Receive.svg", "Mbps", HOSTINFO));
+                "Host_Receive.svg", "Mbps", HOSTSTAT));
 
-    for (std::list<std::tuple<std::string, std::string, std::string > >::iterator iter = files.begin();
+    // Iterate through each statistic and plot it with gnuplot
+    for (std::list<std::tuple<std::string, std::string, std::string, 
+            StatType > >::iterator iter = files.begin();
         iter != files.end(); iter++)
     {
         std::string saveAs = "Output/" + std::get<1>(*iter);
+        // Retrieve the file name
         std::string dataFile = std::get<0>(*iter);
+        // Retrieve the y axis label
         std::string ylabel = std::get<2>(*iter);
         FILE * fp = popen("gnuplot ", "w");    
 
+        // Execute gnuplot commands common for each stat file
         std::vector<std::string > commands;
         commands.push_back("set terminal svg size 1000,550");
         commands.push_back("set output \"" + saveAs + "\"");
@@ -133,178 +97,29 @@ void makePlots() {
             fputs("\n", fp);
         }
 
+        // Depending on the statistic type being graphed, graph all
+        // flows / links / hosts for the given statistic 
         StatType t = std::get<3>(*iter);
         std::list<SystemInfo>::iterator it;
         std::list<SystemInfo>::iterator end;
         if (t == FLOWSTAT) {
-            it = SYSTEM_CONTROLLER->flowInfos.begin();
-            end = SYSTEM_CONTROLLER->flowInfos.end();
+            graphAll(SYSTEM_CONTROLLER->flowInfos.begin(),
+                    SYSTEM_CONTROLLER->flowInfos.end(),
+                    dataFile, fp);
         }
         else if (t == HOSTSTAT) {
-            it = SYSTEM_CONTROLLER->hostInfos.begin();
-            end = SYSTEM_CONTROLLER->hostInfos.end();
+            graphAll(SYSTEM_CONTROLLER->hostInfos.begin(),
+                    SYSTEM_CONTROLLER->hostInfos.end(),
+                    dataFile, fp);
         }
         else if (t == LINKSTAT) {
-            it = SYSTEM_CONTROLLER->linkInfos.begin();
-            end = SYSTEM_CONTROLLER->linkInfos.end();
-        }
-
-        int k = 2;
-        for ( ; it != end; it++)
-        {
-            if (it->print) {
-                std::stringstream command;
-                if (k == 3)
-                    command << "unset object 1\n";
-                command << "plot \""
-                        << dataFile
-                        << "\""
-                        << " using 1:" << k++ << " with points pointtype 7 pointsize 0.5 title \""
-                        << it->linkId
-                        << "\"\n";
-                fputs(command.str().data(), fp);
-            }
+            graphAll(SYSTEM_CONTROLLER->linkInfos.begin(),
+                    SYSTEM_CONTROLLER->linkInfos.end(),
+                    dataFile, fp);
         }
 
         pclose(fp);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-
-
-
-
-
-
-    std::cout << "Making Link plots...\n";
-    
-    files.clear();
-    files.push_back(std::make_tuple(LINK_OCCUPANCY_FILE,
-                "Link_Occupancy.svg", "Bytes"));
-    files.push_back(std::make_tuple(LINK_PACKET_LOSS_FILE,
-                "Link_Packet_Loss.svg", "Mbps"));
-    files.push_back(std::make_tuple(LINK_FLOW_RATE_FILE,
-                "Link_Flow_Rate.svg", "Mbps"));
-
-    for (std::list<std::tuple<std::string, std::string, std::string > >::iterator iter = files.begin();
-        iter != files.end(); iter++)
-    {
-        std::string saveAs = "Output/" + std::get<1>(*iter);
-        std::string dataFile = std::get<0>(*iter);
-        std::string ylabel = std::get<2>(*iter);
-        FILE * fp = popen("gnuplot ", "w");    
-
-        // Plot Links
-        std::vector<std::string > commands;
-        commands.push_back("set terminal svg size 1000,550");
-        commands.push_back("set output \"" + saveAs + "\"");
-        commands.push_back("set object 1 rectangle from screen 0,0 to screen 1,1 fillcolor rgb\"white\" behind");
-        std::stringstream multiplotCommand;
-        multiplotCommand << "set multiplot layout ";
-        multiplotCommand << SYSTEM_CONTROLLER->numLinksToPrint() << ",1";
-        commands.push_back(multiplotCommand.str());
-        commands.push_back("set xlabel \"Time (s)\"");
-        commands.push_back("set ylabel \"" + ylabel + "\"");
-        int i = 1;
-        for (std::vector<std::string>::iterator it = commands.begin();
-            it != commands.end(); it++)
-        {
-            fputs(it->data(), fp); 
-            fputs("\n", fp);
-        }
-
-        int k = 2;
-        for (std::list<LinkInfo >::iterator it = SYSTEM_CONTROLLER->linkInfos.begin();
-            it != SYSTEM_CONTROLLER->linkInfos.end(); it++)
-        {
-            if (it->print) {
-                std::stringstream command;
-                if (k == 3)
-                    command << "unset object 1\n";
-                command << "plot \""
-                        << dataFile
-                        << "\""
-                        << " using 1:" << k++ << " with points pointtype 7 pointsize 0.5 title \""
-                        << it->linkId
-                        << "\"\n";
-                fputs(command.str().data(), fp);
-            }
-        }
-
-        pclose(fp);
-    }
-
-
-    std::cout << "Making Host plots...\n";
-    
-    files.clear();
-    files.push_back(std::make_tuple(HOST_SEND_FILE,
-                "Host_Send.svg", "Mbps"));
-    files.push_back(std::make_tuple(HOST_RECEIVE_FILE,
-                "Host_Receive.svg", "Mbps"));
-
-    for (std::list<std::tuple<std::string, std::string, std::string > >::iterator iter = files.begin();
-        iter != files.end(); iter++)
-    {
-        std::string saveAs = "Output/" + std::get<1>(*iter);
-        std::string dataFile = std::get<0>(*iter);
-        std::string ylabel = std::get<2>(*iter);
-        FILE * fp = popen("gnuplot ", "w");    
-
-        // Plot Hosts
-        std::vector<std::string > commands;
-        commands.push_back("set terminal svg size 1000,550");
-        commands.push_back("set output \"" + saveAs + "\"");
-        commands.push_back("set object 1 rectangle from screen 0,0 to screen 1,1 fillcolor rgb\"white\" behind");
-        std::stringstream multiplotCommand;
-        multiplotCommand << "set multiplot layout ";
-        multiplotCommand << SYSTEM_CONTROLLER->hosts.size() << ",1";
-        commands.push_back(multiplotCommand.str());
-        commands.push_back("set xlabel \"Time (s)\"");
-        commands.push_back("set ylabel \"" + ylabel + "\"");
-        int i = 1;
-        for (std::vector<std::string>::iterator it = commands.begin();
-            it != commands.end(); it++)
-        {
-            fputs(it->data(), fp); 
-            fputs("\n", fp);
-        }
-
-        int k = 2;
-        for (std::list<Host* >::iterator it = SYSTEM_CONTROLLER->hosts.begin();
-            it != SYSTEM_CONTROLLER->hosts.end(); it++)
-        {
-            std::stringstream command;
-            if (k == 3)
-                command << "unset object 1\n";
-            command << "plot \""
-                    << dataFile
-                    << "\""
-                    << " using 1:" << k++ << " with points pointtype 7 pointsize 0.5 title \""
-                    << (*it)->infoString()
-                    << "\"\n";
-            fputs(command.str().data(), fp);
-        }
-
-        pclose(fp);
-    }
-*/
 }
 

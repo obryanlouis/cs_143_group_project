@@ -15,9 +15,11 @@
 
 // The base class to store information
 class SystemInfo { 
+public:
     int    print;
         // Print this info?
-}
+    SystemInfo(int print);
+};
 
 // Some classes to store the object info for:
 class HostInfo : public SystemInfo {
@@ -25,8 +27,11 @@ public:
     int hostId;
         // ID of the host
 
-    HostInfo(int id);
+    HostInfo(int print, int id);
         // create an instance of class HostInfo with the given specifications
+
+    int getId();
+        // get the ID of this host
 };
 
 class RouterInfo : public SystemInfo {
@@ -62,6 +67,9 @@ public:
     LinkInfo(int print, int id, double rate, int delay, int size, int n1t,
             int n1id, int n2t, int n2id);
         // create an instance of class LinkInfo with the given specifications
+
+    int getId();
+        // get the ID of this Link
 };
 
 class FlowInfo : public SystemInfo {
@@ -72,15 +80,18 @@ public:
         // the id of the source host of the flow
     int destinationId;
         // the id of the destination host of the flow
-    int flowSize;
+    double flowSize;
         // the size of the flow, in megabytes
     double startTime;
         // the start time of the flow, in seconds
     CongestionAlgorithmType congestionAlgorithmType;
 
-    FlowInfo(int id, int src, int dst, int size, double start, 
+    FlowInfo(int print, int id, int src, int dst, double size, double start, 
             CongestionAlgorithmType congestionAlgorithmType);
         // create an instance of class FlowInfo with the given specifications
+
+    int getId();
+        // get the ID of this Host
 };
 
 class InputParser {

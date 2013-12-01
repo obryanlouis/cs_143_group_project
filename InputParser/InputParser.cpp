@@ -2,17 +2,23 @@
 
 #include "InputParser.h"
 
+SystemInfo::SystemInfo(int print)
+    : print(print)
+{}
+
 HostInfo::HostInfo(int print, int id)
-    : hostId(id)
+    : SystemInfo(print)
+    , hostId(id)
 {}
 
 RouterInfo::RouterInfo(int id)
-    : routerId(id)
+    : SystemInfo(0)
+    , routerId(id)
 {}
 
 LinkInfo::LinkInfo(int print, int id, double rate, int delay, int size,
         int n1t, int n1id, int n2t, int n2id)
-    : print(print)
+    : SystemInfo(print)
     , linkId(id)
     , linkRate(rate)
     , linkDelay(delay)
@@ -23,9 +29,10 @@ LinkInfo::LinkInfo(int print, int id, double rate, int delay, int size,
     , node2Id(n2id)
 {}
 
-FlowInfo::FlowInfo(int print, int id, int src, int dst, int size, double start,
+FlowInfo::FlowInfo(int print, int id, int src, int dst, double size, double start,
         CongestionAlgorithmType congestionAlgorithmType)
-    : flowId(id)
+    : SystemInfo(print)
+    , flowId(id)
     , sourceId(src)
     , destinationId(dst)
     , flowSize(size)
@@ -95,12 +102,12 @@ void InputParser::run(int                   &snapshotTime,
         pugi::xml_attribute print_att = host.attribute("print");
         if (print_att.as_int()) {
             std::cout << "Host "
-                      << id_att.as_int()
+                      << id.as_int()
                       << " set to print\n";
         }
         else {
             std::cout << "Host "
-                      << id_att.as_int()
+                      << id.as_int()
                       << " not set to print\n";
         }
 
@@ -278,3 +285,14 @@ void InputParser::run(int                   &snapshotTime,
               << std::endl << std::endl;
 }
 
+int HostInfo::getId() {
+    return hostId;
+}
+
+int FlowInfo::getId() {
+    return flowId;
+}
+
+int LinkInfo::getId() {
+    return linkId;
+}
