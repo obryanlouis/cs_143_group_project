@@ -10,8 +10,8 @@ RouterInfo::RouterInfo(int id)
     : routerId(id)
 {}
 
-LinkInfo::LinkInfo(int print, int id, double rate, int delay, int size, int n1t,
-        int n1id, int n2t, int n2id)
+LinkInfo::LinkInfo(int print, int id, double rate, int delay, int size,
+        int n1t, int n1id, int n2t, int n2id)
     : print(print)
     , linkId(id)
     , linkRate(rate)
@@ -34,15 +34,12 @@ FlowInfo::FlowInfo(int id, int src, int dst, int size, double start,
 {}
 
 
-
-
 InputParser::InputParser(std::string network)
     : inputNetwork(network)
 {}
 
 InputParser::~InputParser()
 {}
-
 
 void InputParser::run(int                   &snapshotTime,
                       int                   &routingUpdateTime,
@@ -251,5 +248,4 @@ void InputParser::run(int                   &snapshotTime,
               << "**************************************************"
               << std::endl << std::endl;
 }
-
 

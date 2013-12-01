@@ -11,9 +11,11 @@ extern Controller *SYSTEM_CONTROLLER;
 Router::Router(int id) { 
     // Make a new routing table
     this->routingTable_p = new RoutingTable();
-    // Add an entry to the routing table saying that the distance to this router
-    // is 0.
+
+    // Add an entry to the routing table saying that the distance
+    // to this router is 0.
     (*this->routingTable_p)[this] = std::make_pair<double, Link*>(0, NULL);
+
     // Set the id of this router
     this->nodeId = id;
 }
@@ -127,7 +129,6 @@ void Router::update(RoutingTable *t, double linkWgt, bool &changed,
 }
 
 
-/*  Updates the routing table of this router based on a neighbor's table   */
 bool Router::updateRoutingTable(RoutingTable *t, Link *l) {
     assert(t != NULL);
     assert(l != NULL);
@@ -179,7 +180,6 @@ void Router::updateSingleNode(Host *host, Link *link) {
     (*this->routingTable_p)[host] = pair;
 }
 
-// Prints the routing table of this router to the terminal
 void Router::debugRoutingTable() {
 for (std::map<Node*, std::pair<double, Link* > >::iterator it
             = this->routingTable_p->mapping.begin();
@@ -190,8 +190,11 @@ for (std::map<Node*, std::pair<double, Link* > >::iterator it
         int id = node->getId();
         int distance = it->second.first;
         Link *link = it->second.second;
-        std::cout << "The distance to " << node->infoString() << " is " << distance
-            << "via ";
+        std::cout << "The distance to "
+                  << node->infoString()
+                  << " is "
+                  << distance
+                  << "via ";
         if (link == 0){
             std::cout << " no idea" << std::endl;
         }
@@ -203,3 +206,4 @@ void Router::print() {
     std::cout << infoString() << " routing table:\n";
     routingTable_p->print();
 }
+

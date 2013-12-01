@@ -30,15 +30,17 @@ class Router : public Node {
         // Updates the routing table's path to a single host
     void update(RoutingTable *t, double linkWgt, bool &changed, Node *r,
             Link *l);
+        // Updates the routing table for a given destination node r
 	
 public:
     // CONSTRUCTORS AND DESTRUCTORS
     Router(int id);
         // Create an instance of class Router
     Router(int in_id, std::list<Link*> l);
-        // Create an instance of class Router with the given id
+        // Create an instance of class Router with the given specifications
 
     ~Router();
+        // Destroy this instance of Router
 
     // Functions
 	Link *getNextLink(Node *destination);
@@ -61,9 +63,11 @@ public:
 
 
     void debugRoutingTable();
-        // Prints the routing table to the terminal
+        // Prints the routing table
 
     virtual std::string infoString();
+        // Prints information of the router as follows: "(Router x)",
+        // where x is the router's ID
 
     // DEBUG
     void print();
