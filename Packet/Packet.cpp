@@ -151,10 +151,10 @@ std::string DataPacket::infoString(){
     return ss.str();
 }
 
-
 /**** AckPacket *****/
 AckPacket::AckPacket(DataPacket *old)
     :DataPacket(old)
+    ,ackId(old->packetId)
 {
     type = Packet::ACK;
     size = Packet::ACKSIZE;
@@ -162,6 +162,22 @@ AckPacket::AckPacket(DataPacket *old)
     destination = old->getSource();
     delete old;
 }
+
+AckPacket::AckPacket(DataPacket *old, int id)
+    :DataPacket(old)
+    ,ackId(id)
+{
+    type = Packet::ACK;
+    size = Packet::ACKSIZE;
+    source = old->getDestination();
+    destination = old->getSource();
+    delete old;
+}
+
+int AckPacket::getId(){
+    return ackId;
+}
+<F3>
 
 AckPacket::~AckPacket(){/*std::cout << "    ~AckPacket";*/}
 
@@ -171,3 +187,5 @@ std::string AckPacket::infoString(){
         getFlow()->getId() << ")";
     return ss.str();
 }
+
+

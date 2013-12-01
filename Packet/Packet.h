@@ -132,9 +132,15 @@ public:
 };
 
 class AckPacket : public DataPacket {
+private:
+    int ackId;
 public:
     AckPacket(DataPacket* packet);
+    AckPacket(DataPacket* packet, int id);
     ~AckPacket();
+    int getId();
+        // returns ack ID. Same as packet ID if no packets dropped.
+        // otherwise, might be lower. 
     virtual std::string infoString();
 };
 

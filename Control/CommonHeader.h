@@ -1,3 +1,5 @@
+// CommonHeader.h
+
 #ifndef COMMONHEADER_H
 #define COMMONHEADER_H
 

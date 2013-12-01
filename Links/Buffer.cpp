@@ -1,3 +1,5 @@
+// Buffer.cpp
+
 #include "Buffer.h"
 
 void Buffer::push(Packet *p) {
@@ -8,7 +10,7 @@ void Buffer::pop() {
     buffer.pop();
 }
 
-Packet *Buffer::front() {
+Packet * Buffer::front() {
     return buffer.front();
 }
 
@@ -23,3 +25,4 @@ Buffer::Buffer(int id)
     , nextFree(0)
     , capacityUsed(0)
 {}
+

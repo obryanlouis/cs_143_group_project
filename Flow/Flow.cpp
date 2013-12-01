@@ -7,7 +7,7 @@
 extern Controller *SYSTEM_CONTROLLER; 
 
 Flow::Flow(int in_ID, int in_size, Host *in_source, Host *in_destination,
-        CongestionAlgorithm algorithm)
+        CongestionAlgorithmType algType)
     : flowId(in_ID)
     , size(in_size)
     , source(in_source)
@@ -17,7 +17,6 @@ Flow::Flow(int in_ID, int in_size, Host *in_source, Host *in_destination,
     , dataReceived(0)
     , windowSize(1)
     , timeout(80)
-    , congestionAlgorithm(algorithm)
 {
     // Calculate the number of packets we need based on size of flow 
     this->totalPackets = (in_size + (Packet::DATASIZE - 1)) / Packet::DATASIZE;
@@ -25,6 +24,22 @@ Flow::Flow(int in_ID, int in_size, Host *in_source, Host *in_destination,
         packets[i] = 0;
     }
     in_source->setFlow(this);
+
+    // make congestion algorithm
+    switch (algType) {
+        case RENO:
+            congestionAlgorithm_p = new TCP_Reno();
+
+        break;
+        case VEGAS:
+            congestionAlgorithm_p = new TCP_Vegas();
+        break;
+
+        default:
+            std::cout << "Invalid routing type" << std::endl;
+        
+        
+    } 
 }
 
 Flow::~Flow()

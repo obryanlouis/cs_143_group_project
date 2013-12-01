@@ -1,13 +1,12 @@
+// RoutingTable.cpp
 
 #include "RoutingTable.h"
 
 RoutingTable::RoutingTable()
-    :mapping()
 {
     std::cout << &(this->mapping) << std::endl;
 }
 
-// Copy-constructor
 RoutingTable::RoutingTable(RoutingTable *old)
     :mapping(old->mapping)
 {   
@@ -49,3 +48,4 @@ void RoutingTable::print() {
         }
     }
 }
+

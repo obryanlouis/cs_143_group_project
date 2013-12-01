@@ -2,9 +2,8 @@
 
 #include "Control.h"
 
-/* Pointer to the master controller. 
- * This is ONLY set by the Controller constructor. 
- */
+// Pointer to the master controller. 
+// This is ONLY set by the Controller constructor. 
 // This can't be static...
 Controller *SYSTEM_CONTROLLER;
 
@@ -12,21 +11,22 @@ extern void makePlots();
 void routerUpdate(void* args);
 void printSystem(void* args);
 
-/* Controller functions */
-Controller::Controller(){
+// Controller functions
+
+Controller::Controller() {
     SYSTEM_CONTROLLER = this;
 
     this->schedule_p = new Scheduler();
 }
 
-Controller::~Controller(){
-}
+Controller::~Controller()
+{}
 
-void Controller::addRouter(Router *router){
+void Controller::addRouter(Router *router) {
     this->routers.push_back(router);
 }
 
-void Controller::addLink(Link *link){
+void Controller::addLink(Link *link) {
     this->links.push_back(link);
 }
 
@@ -34,22 +34,17 @@ void Controller::addHost(Host *host) {
     this->hosts.push_back(host);
 }
 
-extern void maintainFlowCallback(void *arg);
-
-void Controller::addFlow(Flow *flow, double startTime){
+void Controller::addFlow(Flow *flow, double startTime) {
     this->flows.push_back(flow);
 
     // Create first flow event for this flow 
-    Event *e = new Event(startTime, &maintainFlowCallback, flow);
-    this->add(e);
-
-
+    flow->startFlow(startTime);
 }
 
 int Controller::numLinksToPrint() {
     int num = 0;
     for (std::list<LinkInfo>::iterator it = linkInfos.begin();
-            it != linkInfos.end(); it++)
+         it != linkInfos.end(); it++)
     {
         if (it->print)
             num++;
@@ -87,16 +82,16 @@ void Controller::run() {
         noError = this->schedule_p->doNext();
 
         // DEBUG
-        //printRoutingTables();
+        // printRoutingTables();
     }
 
-    if (!noError){
+    if (!noError) {
         std::cout << "ERROR HAS OCCURRED. ABORT." << std::endl;
         exit(1);
     }
 
     /*if (this -> flowsLeft == 0) {
-        for (int i = 0; i < END_PERIOD; i++){
+        for (int i = 0; i < END_PERIOD; i++) {
             this->schedule_p->doNext();
         }
     }*/
@@ -106,7 +101,7 @@ void Controller::run() {
     std::cout << "Network simulated successfully. YAY!" << std::endl;
 }
 
-void Controller::updateMyRouters(){
+void Controller::updateMyRouters() {
     std::cout << "***Updating Router Info*** " << std::endl;
 
     for (std::list<Router *>::iterator it = this->routers.begin();
@@ -236,8 +231,9 @@ void Controller::setRoutingUpdateTime(int t) {
 void outputRoutingTables(void * args) {
     std::ofstream file;
     file.open("routers.txt", std::ios::app);
-    for (std::list<Router* >::iterator iter = SYSTEM_CONTROLLER->routers.begin();
-            iter != SYSTEM_CONTROLLER->routers.end(); iter++)
+    for (std::list<Router* >::iterator iter =
+            SYSTEM_CONTROLLER->routers.begin();
+         iter != SYSTEM_CONTROLLER->routers.end(); iter++)
     {
         file      << "Routing table print at time "
                   << SYSTEM_CONTROLLER->getCurrentTime()
@@ -245,8 +241,9 @@ void outputRoutingTables(void * args) {
                   << "\n";
         std::map<Node*, std::pair<double, Link*> > mapping = 
             (*iter)->routingTable_p->mapping;
-        for (std::map<Node*, std::pair<double, Link*> >::iterator it = mapping.begin();
-                it != mapping.end(); it++)
+        for (std::map<Node*, std::pair<double, Link*> >::iterator it =
+                mapping.begin();
+             it != mapping.end(); it++)
         {
             if (it->first != NULL && it->second.second != NULL) {
                 file << "Distance to Node " << it->first->infoString()
@@ -260,7 +257,7 @@ void outputRoutingTables(void * args) {
     file.close();
 }
 
-void routerUpdate(void* args){
+void routerUpdate(void* args) {
     SYSTEM_CONTROLLER->printRoutingTables();
     SYSTEM_CONTROLLER->updateMyRouters();
     void (*fp)(void*) = &routerUpdate;
@@ -271,7 +268,7 @@ void routerUpdate(void* args){
         (new Event(SYSTEM_TIME + 500, &outputRoutingTables, 0));
 }
 
-void printSystem(void* args){
+void printSystem(void* args) {
     SYSTEM_CONTROLLER->printMySystem();
     void (*fp)(void*) = &printSystem;
     SYSTEM_CONTROLLER->add \
@@ -331,7 +328,7 @@ Node * Controller::getNode(int type, int id, std::map<int, Host* > hostsById,
     exit(1);
 }
 
-void Controller::initSystem(){
+void Controller::initSystem() {
     // Run the parser
     InputParser parser(this->inputFile);
     parser.run(
@@ -346,7 +343,8 @@ void Controller::initSystem(){
     SNAPSHOT_PERIOD       = this->snapshotTime;
 
     // Create the objects
-    for (std::list<HostInfo>::iterator it = hostInfos.begin(); it != hostInfos.end(); it++)
+    for (std::list<HostInfo>::iterator it = hostInfos.begin();
+         it != hostInfos.end(); it++)
     {
         Host *h = new Host(it->hostId);
         hostsById[it->hostId] = h;
@@ -381,7 +379,7 @@ void Controller::initSystem(){
     {
         Flow *f = new Flow(it->flowId, 1000000 * it->flowSize,
                 hostsById[it->sourceId], hostsById[it->destinationId],
-                it->congestionAlgorithm);
+                it->congestionAlgorithmType);
         SYSTEM_CONTROLLER->addFlow(f, 1000 * it->startTime);
     }
 
@@ -471,9 +469,10 @@ void Controller::printRoutingTables() {
     }
 }
 
-/* Scheduler functions */
-/* Initiate scheduler by creating schedule queue and putting in initial events. */ 
-Scheduler::Scheduler(){
+// Scheduler functions
+Scheduler::Scheduler() {
+    // Initiate scheduler by creating schedule queue and putting
+    // in initial events.
     events_p = new std::priority_queue<Event*, std::vector<Event*>, timecomp>; 
     SYSTEM_TIME = 0;
 }
@@ -482,16 +481,16 @@ void Scheduler::setTime(double time) {
     SYSTEM_TIME = time;
 }
 
-Scheduler::~Scheduler(){
+Scheduler::~Scheduler() {
     delete[] events_p;
 }
 
-void Scheduler::add(Event* event_p){
+void Scheduler::add(Event* event_p) {
     events_p->push(event_p);
 }
 
-bool Scheduler::doNext(){
-    if (this->events_p->size() != 0){
+bool Scheduler::doNext() {
+    if (this->events_p->size() != 0) {
         Event *new_event = this->events_p->top();
 
         // Update the current time of the scheduler and execute event.
@@ -508,8 +507,8 @@ bool Scheduler::doNext(){
     return false;
 }
 
-void Scheduler::printAndDestroySchedule(){
-    while (this->events_p->size() != 0){
+void Scheduler::printAndDestroySchedule() {
+    while (this->events_p->size() != 0) {
         Event* curr = this->events_p->top();
         this->events_p->pop();
         std::cout << "Time " << curr->getTime() << std::endl;
@@ -520,10 +519,8 @@ double Scheduler::getCurrentTime() {
     return SYSTEM_TIME;
 }
 
-/* Event functions */
-
-
-void Event::execute(){
+// Event functions
+void Event::execute() {
     this->fp(this->arg);
 }
 

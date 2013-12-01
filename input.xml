@@ -64,7 +64,7 @@
             <flowSize>20</flowSize>
             <flowStartTime>0.5</flowStartTime>
                 <!-- Options: reno, vegas -->
-            <congestionAlgorithm>reno</congestionAlgorithm>
+            <congestionAlgorithmType>reno</congestionAlgorithmType>
         </flow>
     </networkFlows>
 </Network>

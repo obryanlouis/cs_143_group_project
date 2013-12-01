@@ -10,8 +10,8 @@ RouterInfo::RouterInfo(int id)
     : routerId(id)
 {}
 
-LinkInfo::LinkInfo(int print, int id, double rate, int delay, int size, int n1t,
-        int n1id, int n2t, int n2id)
+LinkInfo::LinkInfo(int print, int id, double rate, int delay, int size,
+        int n1t, int n1id, int n2t, int n2id)
     : print(print)
     , linkId(id)
     , linkRate(rate)
@@ -24,16 +24,14 @@ LinkInfo::LinkInfo(int print, int id, double rate, int delay, int size, int n1t,
 {}
 
 FlowInfo::FlowInfo(int id, int src, int dst, int size, double start,
-        CongestionAlgorithm congestionAlgorithm)
+        CongestionAlgorithmType congestionAlgorithmType)
     : flowId(id)
     , sourceId(src)
     , destinationId(dst)
     , flowSize(size)
     , startTime(start)
-    , congestionAlgorithm(congestionAlgorithm)
+    , congestionAlgorithmType(congestionAlgorithmType)
 {}
-
-
 
 
 InputParser::InputParser(std::string network)
@@ -42,7 +40,6 @@ InputParser::InputParser(std::string network)
 
 InputParser::~InputParser()
 {}
-
 
 void InputParser::run(int                   &snapshotTime,
                       int                   &routingUpdateTime,
@@ -196,14 +193,14 @@ void InputParser::run(int                   &snapshotTime,
              << id_att.name() << "=" << id_att.value() << std::endl;
 
         // congestion control algorithm
-        pugi::xml_node congestion = flow.child("congestionAlgorithm");
-        CongestionAlgorithm congestionAlgorithm;
+        pugi::xml_node congestion = flow.child("congestionAlgorithmType");
+        CongestionAlgorithmType congestionAlgorithmType;
         std::string ctext(congestion.text().get());
         if (ctext.compare("reno") == 0) {
-            congestionAlgorithm = RENO;
+            congestionAlgorithmType = RENO;
         }
         else if (ctext.compare("vegas") == 0) {
-            congestionAlgorithm = VEGAS;
+            congestionAlgorithmType = VEGAS;
         }
         else {
             std::cout << "Invalid congestion control algorithm: "
@@ -238,7 +235,7 @@ void InputParser::run(int                   &snapshotTime,
                 atoi(dst_node.child_value()),
                 atoi(size_node.child_value()),
                 atof(time_node.child_value()),
-                congestionAlgorithm);
+                congestionAlgorithmType);
 
         flows.push_back(info);
     }
@@ -251,5 +248,4 @@ void InputParser::run(int                   &snapshotTime,
               << "**************************************************"
               << std::endl << std::endl;
 }
-
 
