@@ -13,7 +13,7 @@ Router::Router(int id) {
     this->routingTable_p = new RoutingTable();
     // Add an entry to the routing table saying that the distance to this router
     // is 0.
-    (*this->routingTable_p)[this] = std::make_pair<int, Link*>(0, NULL);
+    (*this->routingTable_p)[this] = std::make_pair<double, Link*>(0, NULL);
     // Set the id of this router
     this->nodeId = id;
 }
@@ -36,21 +36,16 @@ std::string Router::infoString(){
 
 void Router::handlePacket(Packet *packet){
     Node::handlePacket(packet);
-    std::cout << "T"
+    /*std::cout << "T"
               << SYSTEM_CONTROLLER->getCurrentTime()
               << ":"
               << this->infoString()
               << " is handling "
               << packet->infoString()
-              << std::endl;
+              << std::endl;*/
     assert(packet != NULL);
 
     bool  updated;   // to be used if the packet is for Routing Table Updates
-
-    // DEBUG
-    if (SYSTEM_CONTROLLER->numTotalPackets() == 19) {
-        std::cout << "break here\n";
-    }
 
     // Initialize variables to right type (must be done before switch table.)
     RouterRoutingPacket *R = (RouterRoutingPacket *) packet;
@@ -90,8 +85,8 @@ void Router::handlePacket(Packet *packet){
 }
 
 void Router::broadcastRoutingTable() {
-    std::cout << this->infoString() << " starting broadcasting routing table"
-        << " at time " << SYSTEM_CONTROLLER->getCurrentTime() << "\n";
+    /*std::cout << this->infoString() << " starting broadcasting routing table"
+        << " at time " << SYSTEM_CONTROLLER->getCurrentTime() << "\n";*/
     for (std::list<Link* >::iterator it = this->links.begin();
             it != this->links.end(); it++)
     {
@@ -100,17 +95,17 @@ void Router::broadcastRoutingTable() {
         newRoutingPacket->setPreviousNode(this);
         (*it)->handlePacket(newRoutingPacket);
     }
-    std::cout << this->infoString() << " finished broadcasting routing table"
-        << " at time " << SYSTEM_CONTROLLER->getCurrentTime() << "\n";
+    /*std::cout << this->infoString() << " finished broadcasting routing table"
+        << " at time " << SYSTEM_CONTROLLER->getCurrentTime() << "\n";*/
 }    
 
 Link* Router::getNextLink(Node *destination) {
-    std::cout << "getting next link" <<std::endl;
+    /*std::cout << "getting next link" <<std::endl;*/
 	return this->routingTable_p->nextLink(destination);
 }
 
 Node* Router::getNextNode(Node *destination) {
-    std::cout << "getting next node" << std::endl;
+    /*std::cout << "getting next node" << std::endl;*/
 	Node * result = this->routingTable_p->nextNode(destination);
     if (result == NULL) {
         std::cout << "Can't reach Host "
@@ -124,6 +119,13 @@ Node* Router::getNextNode(Node *destination) {
     return result;
 }
 
+void Router::update(RoutingTable *t, double linkWgt, bool &changed,
+        Node *r, Link *l) {
+    (*routingTable_p)[r].first = t->mapping[r].first + linkWgt;
+    (*routingTable_p)[r].second = l;
+    changed = true;
+}
+
 
 /*  Updates the routing table of this router based on a neighbor's table   */
 bool Router::updateRoutingTable(RoutingTable *t, Link *l) {
@@ -133,32 +135,36 @@ bool Router::updateRoutingTable(RoutingTable *t, Link *l) {
         int x = 1;
     }
     bool changed = false;
-    for (std::map<Node*, std::pair<int, Link*> >::iterator it = t->mapping.begin();
+    for (std::map<Node*, std::pair<double, Link*> >::iterator it = t->mapping.begin();
         it != t->mapping.end(); ++it) {
         Node *r = it->first;
-        // Get the link weight, which is measured in ms
-        int linkWgt = l->getDelay() + 
-            (int)(((double)l->getOccupancy() / (double)l->getRate()) * 
-                    ((double)1000 / (double)8));
-        if (l->getOccupancy() == 0) {
-            std::cout << "Link " << l->infoString() << " occupancy is 0.\n";
-        }
-        else {
-            std::cout << "Link " << l->infoString() << " occupancy is not 0.\n";
-        }
-        // If this routing table doesn't have an entry for this node, or its distance
-        // is greater than the calculated distance, then create/update the entry.
-        // Prevent paths that would go back through this router.
-        if ((routingTable_p->mapping.count(r) == 0 ||
-            (*routingTable_p)[r].first > linkWgt + t->mapping[r].first)
-            && t->mapping[r].second != l) {
-            (*routingTable_p)[r].first = t->mapping[r].first + linkWgt;
-            (*routingTable_p)[r].second = l;
-            changed = true;
+        if (r != this) {
+            // Get the link weight, which is measured in ms
+            double linkWgt = l->getDelay() + 
+                ((((double)l->getOccupancy() / (double)l->getRate()) * 
+                        (double)1000));
+            bool noEntry = (routingTable_p->mapping.count(r) == 0);
+            if (noEntry) {
+                update(t, linkWgt, changed, r, l);
+            }
+            else {
+                bool largerWeight = ((*routingTable_p)[r].first > 
+                    linkWgt + t->mapping[r].first + UPDATE_TOLERANCE);
+                bool smallerWeight = ((*routingTable_p)[r].first +
+                        UPDATE_TOLERANCE < linkWgt + t->mapping[r].first);
+                bool wouldNormallyPassL = (routingTable_p->nextLink(r) == l);
+                bool nextLinkNotThisLink = (t->nextLink(r) != l);
+                bool approxEqual = std::abs((*routingTable_p)[r].first -
+                    linkWgt + t->mapping[r].first) <= UPDATE_TOLERANCE;
+                if ((smallerWeight && wouldNormallyPassL) || 
+                    (largerWeight)) { 
+                    update(t, linkWgt, changed, r, l);
+                }
+            }
         }
     }
 
-    std::cout << infoString() << std::endl;
+    //std::cout << infoString() << std::endl;
     //debugRoutingTable();
     return changed;
 }
@@ -168,14 +174,14 @@ void Router::updateSingleNode(Host *host, Link *link) {
     // The router is directly connected to this host through the
     // link. Just set the distance to this host to be the link's
     // delay.
-    std::pair<int, Link*> pair = std::make_pair(
+    std::pair<double, Link*> pair = std::make_pair(
             link->getDelay(), link);
     (*this->routingTable_p)[host] = pair;
 }
 
 // Prints the routing table of this router to the terminal
 void Router::debugRoutingTable() {
-for (std::map<Node*, std::pair<int, Link* > >::iterator it
+for (std::map<Node*, std::pair<double, Link* > >::iterator it
             = this->routingTable_p->mapping.begin();
         it != this->routingTable_p->mapping.end();
         it++)

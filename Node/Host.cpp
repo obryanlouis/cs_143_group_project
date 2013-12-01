@@ -43,14 +43,9 @@ void Host::resetStats() {
 }
 
 void Host::handlePacket(Packet *packet){
-    std::cout << "Host " << this->nodeId << " is handling packet "
-        << "at time " << SYSTEM_CONTROLLER->getCurrentTime() << "\n";
+    /*std::cout << "Host " << this->nodeId << " is handling packet "
+        << "at time " << SYSTEM_CONTROLLER->getCurrentTime() << "\n";*/
     Node::handlePacket(packet);
-
-    // DEBUG
-    if (SYSTEM_CONTROLLER->numTotalPackets() == 19) {
-        std::cout << "break here\n";
-    }
 
     time_t time;     // to be used for handling data packets
     AckPacket *ack;     // to be used for handling data packets

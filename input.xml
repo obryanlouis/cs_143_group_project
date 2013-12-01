@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <Network>
-    <snapshotTime>50</snapshotTime>
+    <snapshotTime>100</snapshotTime>
     <routingTableUpdateTime>1000</routingTableUpdateTime>
     <networkHosts>
         <host id="1" />
@@ -14,7 +14,7 @@
         <router id="4" />
     </networkRouters>
     <networkLinks>
-        <link id="0" print="0">
+        <link id="0" print="1">
             <linkRate>12.5</linkRate>
             <linkDelay>10</linkDelay>
             <bufferSize>64</bufferSize>
@@ -61,10 +61,10 @@
         <flow id="1">
             <source>1</source>
             <destination>2</destination>
-            <flowSize>20</flowSize>
+            <flowSize>4</flowSize>
             <flowStartTime>0.5</flowStartTime>
                 <!-- Options: reno, vegas -->
-            <congestionAlgorithm>reno</congestionAlgorithm>
+            <congestionAlgorithmType>reno</congestionAlgorithmType>
         </flow>
     </networkFlows>
 </Network>

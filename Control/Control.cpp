@@ -95,11 +95,11 @@ void Controller::run() {
         exit(1);
     }
 
-    if (this -> flowsLeft == 0) {
+    /*if (this -> flowsLeft == 0) {
         for (int i = 0; i < END_PERIOD; i++){
             this->schedule_p->doNext();
         }
-    }
+    }*/
 
     makePlots();
 
@@ -233,12 +233,42 @@ void Controller::setRoutingUpdateTime(int t) {
     this->routingUpdateTime = t;
 }
 
+void outputRoutingTables(void * args) {
+    std::ofstream file;
+    file.open("routers.txt", std::ios::app);
+    for (std::list<Router* >::iterator iter = SYSTEM_CONTROLLER->routers.begin();
+            iter != SYSTEM_CONTROLLER->routers.end(); iter++)
+    {
+        file      << "Routing table print at time "
+                  << SYSTEM_CONTROLLER->getCurrentTime()
+                  << " " << (*iter)->infoString()
+                  << "\n";
+        std::map<Node*, std::pair<double, Link*> > mapping = 
+            (*iter)->routingTable_p->mapping;
+        for (std::map<Node*, std::pair<double, Link*> >::iterator it = mapping.begin();
+                it != mapping.end(); it++)
+        {
+            if (it->first != NULL && it->second.second != NULL) {
+                file << "Distance to Node " << it->first->infoString()
+                    << " is " << it->second.first << " via " 
+                    << it->second.second->infoString()
+                    << "\n";
+            }
+        }
+    }
+    file << "\n\n\n";
+    file.close();
+}
+
 void routerUpdate(void* args){
     SYSTEM_CONTROLLER->printRoutingTables();
     SYSTEM_CONTROLLER->updateMyRouters();
     void (*fp)(void*) = &routerUpdate;
     SYSTEM_CONTROLLER->add  \
         (new Event(SYSTEM_TIME + ROUTING_UPDATE_PERIOD, fp, 0));
+    // DEBUG
+    SYSTEM_CONTROLLER->add
+        (new Event(SYSTEM_TIME + 500, &outputRoutingTables, 0));
 }
 
 void printSystem(void* args){
@@ -259,6 +289,8 @@ void removeOldStatsFiles() {
     filenames.push_back(FLOW_WINDOW_FILE);
     filenames.push_back(HOST_SEND_FILE);
     filenames.push_back(HOST_RECEIVE_FILE);
+
+    filenames.push_back("routers.txt");
 
     for (std::list<std::string>::iterator it = filenames.begin();
         it != filenames.end(); it++)
@@ -342,16 +374,15 @@ void Controller::initSystem(){
     }
 
     // Update the routing tables so that there aren't any seg faults
-    this->initRoutingTables();
+    //this->initRoutingTables();
 
-    // Add the flows AFTER initializing the routing tables
     for (std::list<FlowInfo>::iterator it = flowInfos.begin();
          it != flowInfos.end(); it++)
     {
         Flow *f = new Flow(it->flowId, 1000000 * it->flowSize,
                 hostsById[it->sourceId], hostsById[it->destinationId],
-                it->congestionAlgorithm);
-        SYSTEM_CONTROLLER->addFlow(f, it->startTime);
+                it->congestionAlgorithmType);
+        SYSTEM_CONTROLLER->addFlow(f, 1000 * it->startTime);
     }
 
     // Init flows
@@ -380,7 +411,7 @@ void Controller::removePacket(Packet *p) {
     packets.erase(p);
 }
 void Controller::checkPackets() {
-    std::cout << "Total Packets in system: " << packets.size() << "\n";
+    //std::cout << "Total Packets in system: " << packets.size() << "\n";
     for (std::map<Packet *, bool>::iterator it = packets.begin();
         it != packets.end(); it++)
     {

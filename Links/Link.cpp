@@ -67,9 +67,9 @@ std::string Link::infoString(){
 }
 
 void Link::handlePacket(Packet* packet) {
-    std::cout << "T " << SYSTEM_CONTROLLER->getCurrentTime() << \
+    /*std::cout << "T " << SYSTEM_CONTROLLER->getCurrentTime() << \
         ":" << this->infoString() << " is handling "<< \
-        packet->infoString() << std::endl;
+        packet->infoString() << std::endl;*/
     int type = packet->getType();
     assert(type >= 0 && type <= 3);
     double size = packet->getSize();
@@ -83,15 +83,15 @@ void Link::handlePacket(Packet* packet) {
     if (!(size + buffer->capacityUsed > this->capacity)) {
         // Add the packet
         buffer->push(packet);
-        std::cout << "\t\t\t\t\t\t"
+        /*std::cout << "\t\t\t\t\t\t"
                   << this->infoString() 
                   << " added packet at " << packet
                   << " to buffer "
                   << buffer->infoString()
-                  << "\n";
+                  << "\n";*/
         buffer->capacityUsed += size;
-        std::cout << "Buffer capacity used: " << buffer->capacityUsed
-            << " out of " << this->capacity << "\n";
+        /*std::cout << "Buffer capacity used: " << buffer->capacityUsed
+            << " out of " << this->capacity << "\n";*/
         double time;
         double currentTime = SYSTEM_CONTROLLER->getCurrentTime();
         // Processing time in milliseconds
@@ -113,8 +113,8 @@ void Link::handlePacket(Packet* packet) {
     }
     else {
         // Otherwise, delete the packet
-        std::cout << "Link " << infoString() << " deleted packet "
-            << packet->infoString() << "\n";
+        /*std::cout << "Link " << infoString() << " deleted packet "
+            << packet->infoString() << "\n";*/
         delete packet;
         this->packetLoss += size;
     }
@@ -182,24 +182,24 @@ void sendAnotherPacket(void *arg) {
     // Pop the next packet
     Packet *packet = link->popPacket(end);
     
-    std::cout << "sendAnotherPacket -- start" << "\n";
+    /*std::cout << "sendAnotherPacket -- start" << "\n";
     std::cout << "\t\t\t\t\t\t"
         << "Address of packet sent by " << link->infoString() 
-        << ": " << packet << "is " << packet->infoString() << "\n";
+        << ": " << packet << "is " << packet->infoString() << "\n";*/
 
     // Get the next node, which is the opposite end from which the
     // packet came from.
     Node *nextNode;
     if (link->getEnd2() == packet->getPreviousNode()) {
-        std::cout << link->infoString() << " sending packet from "
+        /*std::cout << link->infoString() << " sending packet from "
         << link->getEnd2()->infoString() << " to "
-        << link->getEnd1()->infoString() << std::endl;
+        << link->getEnd1()->infoString() << std::endl;*/
         nextNode = link->getEnd1();
     }
     else {
-        std::cout << link->infoString() << " sending packet from "
+        /*std::cout << link->infoString() << " sending packet from "
         << link->getEnd1()->infoString() << " to "
-        << link->getEnd2()->infoString() << std::endl;
+        << link->getEnd2()->infoString() << std::endl;*/
         nextNode = link->getEnd2() ;
     }
     // Store the node and the packet as an argument for the callback
@@ -215,7 +215,7 @@ void sendAnotherPacket(void *arg) {
     Event *e = new Event(currentTime + propogationTime, fp, (void *)args);
     SYSTEM_CONTROLLER->add(e);
 
-    std::cout << "sendAnotherPacket end" << std::endl;
+    //std::cout << "sendAnotherPacket end" << std::endl;
 }
 
 double Link::getDelay() {

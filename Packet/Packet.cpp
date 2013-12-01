@@ -12,7 +12,7 @@ Packet::Packet(PacketType in_type, int in_size, Node *s, Node *de)
 }
 
 Packet::~Packet() { 
-    std::cout << "~Packet()" << std::endl;
+    //std::cout << "~Packet()" << std::endl;
     SYSTEM_CONTROLLER->removePacket(this);
 } 
 
@@ -47,7 +47,7 @@ RoutingPacket::RoutingPacket(Node *source, Node *destination,\
     ,link(in_link) 
 { }   
 
-RoutingPacket::~RoutingPacket() { std::cout << "    ~RoutingPacket"; }
+RoutingPacket::~RoutingPacket() { /*std::cout << "    ~RoutingPacket";*/ }
 
 Link* RoutingPacket::getLink(){
     return this->link;
@@ -72,7 +72,7 @@ RouterRoutingPacket::RouterRoutingPacket(Node *source, Node *destination,
 
 RouterRoutingPacket::~RouterRoutingPacket(){
     delete this->table;
-    std::cout << "    ~RouterRoutingPacket";
+    //std::cout << "    ~RouterRoutingPacket";
 }
 
 RoutingTable* RouterRoutingPacket::getRoutingTable() {
@@ -96,7 +96,7 @@ HostRoutingPacket::HostRoutingPacket(Node *source, Node *destination,
 }
 
 HostRoutingPacket::~HostRoutingPacket(){
-    std::cout << "  ~HostRoutingPacket()";
+    //std::cout << "  ~HostRoutingPacket()";
 }
 
 Host * HostRoutingPacket::getHost() {
@@ -130,7 +130,7 @@ DataPacket::DataPacket(DataPacket *old)
 }
 
 
-DataPacket::~DataPacket() {std::cout << "   ~DataPacket";}
+DataPacket::~DataPacket() {/*std::cout << "   ~DataPacket";*/}
 
 int DataPacket::getId(){
     return this->packetId;
@@ -163,7 +163,7 @@ AckPacket::AckPacket(DataPacket *old)
     delete old;
 }
 
-AckPacket::~AckPacket(){std::cout << "    ~AckPacket";}
+AckPacket::~AckPacket(){/*std::cout << "    ~AckPacket";*/}
 
 std::string AckPacket::infoString(){
     std::stringstream ss;

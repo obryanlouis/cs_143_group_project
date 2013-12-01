@@ -11,8 +11,8 @@ RoutingTable::RoutingTable()
 RoutingTable::RoutingTable(RoutingTable *old)
     :mapping(old->mapping)
 {   
-    std::cout << "old: " << &(old->mapping) << "size=" << old->mapping.size()<< \
-     "| new: " << &mapping<<std::endl << "size=" << mapping.size() << std::endl;
+    /*std::cout << "old: " << &(old->mapping) << "size=" << old->mapping.size()<< \
+     "| new: " << &mapping<<std::endl << "size=" << mapping.size() << std::endl;*/
 }
 
 RoutingTable::~RoutingTable() { }
@@ -38,7 +38,7 @@ bool RoutingTable::containsEntry(Node *node) {
 }
 
 void RoutingTable::print() {
-    for (std::map<Node*, std::pair<int, Link*> >::iterator it = mapping.begin();
+    for (std::map<Node*, std::pair<double, Link*> >::iterator it = mapping.begin();
             it != mapping.end(); it++)
     {
         if (it->first != NULL && it->second.second != NULL) {

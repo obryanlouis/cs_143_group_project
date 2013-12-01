@@ -12,11 +12,10 @@
 #include <queue>
 #include <stdio.h>
 
-#include "CommonHeader.h"
+#include "CongestionAlgorithm.h"
 #include "Flow.h"
 #include "Node.h"
 #include "Router.h"
-#include "Header.h"
 #include "InputParser.h"
 
 class Link;
@@ -150,6 +149,7 @@ public:
 
     // DEBUG: Other functions
     void printRoutingTables();
+    friend void outputRoutingTables(void *args);
 
     void run();
     void initRoutingTables();
