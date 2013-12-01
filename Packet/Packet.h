@@ -164,7 +164,7 @@ public:
         // Create an object of class AckPacket with the given specifications.
     ~AckPacket();
         // Destry this instance of AckPacket.
-    int getId();
+    int getAckId();
         // returns ack ID. Same as packet ID if no packets dropped.
         // otherwise, might be lower. 
     virtual std::string infoString();
