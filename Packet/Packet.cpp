@@ -177,7 +177,7 @@ AckPacket::AckPacket(DataPacket *old, int id)
     delete old;
 }
 
-int AckPacket::getId(){
+int AckPacket::getAckId(){
     return ackId;
 }
 

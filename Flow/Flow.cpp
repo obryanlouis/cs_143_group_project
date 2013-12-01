@@ -72,9 +72,10 @@ int Flow::getNextUnrecieved(){
 
 
 AckPacket* Flow::atDest(DataPacket *p){
+    std::cout << "In Flow:atDest " << std::endl;
     // let the flow know that the destination has recieved the data
     this->acks.erase(p->getId());
-    std::cout << "Tried to erase " << p->getId() << " new next unrecieved " << getNextUnrecieved() << std::endl;
+    std::cout << "\tTried to erase " << p->getId() << " new next unrecieved " << getNextUnrecieved() << std::endl;
     // let the congestion control algorithm make the ack packet
     AckPacket *ack = this->congestionAlgorithm_p->makeAckPacket(p);
  
@@ -83,7 +84,7 @@ AckPacket* Flow::atDest(DataPacket *p){
 
 void Flow::handlePacket(AckPacket *p) {
     SYSTEM_CONTROLLER->checkPackets();
-    std::cout << "Flow " << flowId << " has received an acknowledgement"
+    std::cout << "--Flow " << flowId << " has received an acknowledgement"
         << " packet for packet " << p->getId() <<
         "at time " << SYSTEM_CONTROLLER->getCurrentTime() << "\n";
     std::cout << p->getStartTime() << std::endl;
@@ -95,6 +96,7 @@ void Flow::handlePacket(AckPacket *p) {
         // done with that packet ID, so set its timeout to super long
         // so it'll never get sent
         this->packets[p->getId()] = DBL_MAX; 
+        std::cout << "changed to dbl_max";
     }  
 
     // update window size

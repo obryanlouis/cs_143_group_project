@@ -58,6 +58,7 @@ public:
     void scheduleFirstPacket(double startTime);
     void packetDropped(int id);
     void ackRecieved(AckPacket *p);
+    void sendPacket(int id, double startTime);
     AckPacket *makeAckPacket(DataPacket *p);
 };
 
