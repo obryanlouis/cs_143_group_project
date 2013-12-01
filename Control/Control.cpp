@@ -420,12 +420,12 @@ void Controller::checkPackets() {
                     dp->getId() << ")\n";
                 exit(1);
             }
-            if (dp->getId() > 10000) {
+/*            if (dp->getId() > 10000) {
                 std::cout << "Packet id ("
                           << dp->getId() 
                           << ") pretty large. It's probably wrong\n";
                 exit(1);
-            }
+            } */
         }
     }
 }
