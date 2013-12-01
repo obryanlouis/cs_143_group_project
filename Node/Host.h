@@ -47,10 +47,14 @@ public:
     void handlePacket(Packet *packet);
         // handle a received packet
     void setLink(Link *link);
+        // Set the link that the host is connected to
 
     double getStats(std::string stat, int period);
+        // Returns the stat requested by the stat string.
+        // Options: "send rate" and "receive rate"
 
     virtual std::string infoString();
+        // Returns a string formatted to describe the Host.
 
 };
 

@@ -14,19 +14,19 @@ class Flow;
 class Link;
 class Host;
 
-/* Abstract class that holds basics of a packet */
+// Abstract class that holds basics of a packet
 class Packet{
 
 public:
-    /* Enum for packet type */
     enum PacketType {
         ROUTERROUTE,
         HOSTROUTE,
         DATA,
         ACK
     };
+        // The types of packets that may exist
 
-    /* Constants for data size */
+    // Constants for data size
     const static int DATASIZE  = 1024;
     const static int ACKSIZE   = 64;
 
@@ -47,7 +47,7 @@ protected:
 public:
     Packet(PacketType in_type, int in_size, Node *s, Node *de);
         // Create an object of class Packet with the given specifications
-    ~Packet();
+    virtual ~Packet();
         // Destroy this instance of Packet
 
     int getSize();
@@ -67,29 +67,42 @@ public:
 
 };
 
-
+// Abstract packet class used for routing, either host or router
 class RoutingPacket : public Packet {
 protected:
     Link* link;
+        // The link the packet came on
 public:
     RoutingPacket(Node *source, Node *destination, 
         Link* in_link, PacketType in_type, int in_size = 1024);
+        // Create an object of class RoutingPacket with the given
+        // specifications.
     ~RoutingPacket();
+        // Destroy this instance of RoutingPacket
 
     Link* getLink();
+        // Returns the link the packet came on
     virtual std::string infoString() = 0;
+        // Returns a string formatted to describe the packet.
 };
 
-// The packet type that routers will send out
+// The router packet type that routers will send out for routing table
+// updates.
 class RouterRoutingPacket : public RoutingPacket {
 protected:
     RoutingTable *table; 
+        // The routing table stored in the packet
 public:
     RouterRoutingPacket(Node *source, Node *destination,
         Link *in_link, RoutingTable *in_table, int size = 1024);
+        // Create an object of class RouterRoutingPacket with the
+        // given specifications.
     ~RouterRoutingPacket();
+        // Destroy this instance of RouterRoutingPacket
     RoutingTable* getRoutingTable();
+        // Returns the routing table stored in the packet
     virtual std::string infoString();
+        // Returns a string formatted to describe the packet
 };
 
 // The packet type that hosts will send to routers to show them
@@ -97,15 +110,21 @@ public:
 class HostRoutingPacket : public RoutingPacket {
 protected:
     Host *host;
+        // THe host that is identifying itself
 public:
     HostRoutingPacket(Node *source, Node *destination, Link *in_link,
-            Host *in_host, int size = 1024);
+        Host *in_host, int size = 1024);
+        // Create an object of class HostRoutingPacket with the given
+        // specifications.
     ~HostRoutingPacket();
+        // Destroy this instance of HostRoutingPacket
     Host *getHost();
+        // Returns the host stored in the packet
     virtual std::string infoString();
-
+        // Returns a string formatted to describe the packet
 };
 
+// The packet type used to transport the data of a flow.
 class DataPacket : public Packet {
 protected:
     int packetId;
@@ -117,8 +136,11 @@ protected:
 
 public:
     DataPacket(int id, Flow *flow, double in_startTime);
+        // Create an object of class DataPacket with the given specifications.
     DataPacket(DataPacket *old);
+        // Copy a given DataPacket
     ~DataPacket();
+        // Destroy this instance of DataPacket
 
     int getId();
         // Returns the packet id
@@ -128,20 +150,26 @@ public:
         // Return the flow this packet is associated to.
     virtual std::string infoString();
         // Prints status information about this packet
-
 };
 
+// The packet type used to send back acknowledgements.
 class AckPacket : public DataPacket {
 private:
     int ackId;
+        // The id of the packet
 public:
     AckPacket(DataPacket* packet);
+        // Create an object of class AckPacket with the given specifications.
     AckPacket(DataPacket* packet, int id);
+        // Create an object of class AckPacket with the given specifications.
     ~AckPacket();
+        // Destry this instance of AckPacket.
     int getId();
         // returns ack ID. Same as packet ID if no packets dropped.
         // otherwise, might be lower. 
     virtual std::string infoString();
+        // Returns a string formatted to describe the packet
 };
 
 #endif
+

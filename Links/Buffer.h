@@ -15,6 +15,7 @@ public:
     double capacityUsed;
         // The capacity of the buffer that is used.
     double nextFree;
+        // Next free time the buffer will be able to send.
     void push(Packet *p);
         // Pushes a packet onto the buffer
     void pop();

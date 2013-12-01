@@ -1,6 +1,9 @@
+// Packet.cpp
+
 #include "Packet.h"
 #include <iostream>
 #include <sstream>
+
 /***************** Packet Functions ***************************/
 Packet::Packet(PacketType in_type, int in_size, Node *s, Node *de)
     : type(in_type)
@@ -177,7 +180,6 @@ AckPacket::AckPacket(DataPacket *old, int id)
 int AckPacket::getId(){
     return ackId;
 }
-<F3>
 
 AckPacket::~AckPacket(){/*std::cout << "    ~AckPacket";*/}
 
@@ -187,5 +189,4 @@ std::string AckPacket::infoString(){
         getFlow()->getId() << ")";
     return ss.str();
 }
-
 

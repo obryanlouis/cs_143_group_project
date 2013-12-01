@@ -124,3 +124,4 @@ std::string Host::infoString(){
     sstm << "(Host " << this->getId() << ")";
     return sstm.str();
 }
+
