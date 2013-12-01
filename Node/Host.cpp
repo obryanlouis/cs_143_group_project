@@ -6,6 +6,8 @@ Host::Host(int in_id)
     : dataSent(0)
     , dataReceived(0)
     , Node(in_id)
+    , flow_p(0)
+    , flow2_p(0)
 { }
 
 Host::~Host() {
@@ -25,8 +27,16 @@ void Host::setFlow(Flow *flow) {
     this->flow_p = flow;
 }
 
+void Host::setFlow2(Flow *flow){
+    this->flow2_p = flow;
+}
+
 Flow* Host::getFlow() {
     return flow_p;
+}
+
+Flow* Host::getFlow2() {
+    return flow2_p;
 }
 
 int Host::getDataSent() {
@@ -88,8 +98,8 @@ void Host::handlePacket(Packet *packet){
             // at the packet's flow and adjust that flow's receive rate
             dataReceived += packet->getSize();
 
-            // also needs to send back an acknowledgement packet
-            ack = new AckPacket((DataPacket *)packet);
+            // Need to send back an acknowledgement packet of proper ID
+            ack = packet->getFlow()->atDest((DataPacket *) packet);
             ack->setPreviousNode(this);
             // Send the packet back to the host
             this->links.front()->handlePacket(ack);

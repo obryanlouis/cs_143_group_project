@@ -22,6 +22,8 @@ class Host : public Node {
 
     Flow *flow_p;
         // the flow the host is associated with (as a source)
+    Flow *flow2_p;
+        // the flow the host is associated with (as a destination)
     int dataSent;
         // The amount of data sent in the last time interval (bytes)
     int dataReceived;
@@ -36,8 +38,10 @@ public:
     Link* getLink();
         // returns a pointer to the link the host is connected to
     void setFlow(Flow *flow);
+    void setFlow2(Flow *flow);
     Flow* getFlow();
         // returns a pointer to the flow the host is associated with
+    Flow* getFlow2();
     int getDataSent();
         // Returns the amount of data sent in the last time interval (bytes)
     int getDataReceived();
