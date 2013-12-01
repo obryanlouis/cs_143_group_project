@@ -52,6 +52,10 @@ void TCP_RENO_SeeIfPacketDropped(void *arg){
 
 void TCP_RENO::sendPacket(int id, double startTime){
 
+    if (id == 392){
+        std::cout << "";
+    }
+
     std::cout << "\tMaking Packet of id " << id << std::endl;
     void **args = (void **)malloc(2* sizeof (void *));
     args[0] = (void*) this;
@@ -168,7 +172,7 @@ std::cout << "\t Duplicate ACKS = 3 " << std::endl;
             this->sendNext = i; 
             return; // retransmitted packets, so break out early
         }
-            
+        return; 
     }        
 
     else {
