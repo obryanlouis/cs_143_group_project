@@ -2,7 +2,7 @@
 
 #include "InputParser.h"
 
-HostInfo::HostInfo(int id)
+HostInfo::HostInfo(int print, int id)
     : hostId(id)
 {}
 
@@ -23,7 +23,7 @@ LinkInfo::LinkInfo(int print, int id, double rate, int delay, int size,
     , node2Id(n2id)
 {}
 
-FlowInfo::FlowInfo(int id, int src, int dst, int size, double start,
+FlowInfo::FlowInfo(int print, int id, int src, int dst, int size, double start,
         CongestionAlgorithmType congestionAlgorithmType)
     : flowId(id)
     , sourceId(src)
@@ -91,7 +91,22 @@ void InputParser::run(int                   &snapshotTime,
         std::cout << "    " << host.name() << ": "
              << id.name() << "=" << id.value() << std::endl;
 
-        HostInfo info(id.as_int());
+        // print
+        pugi::xml_attribute print_att = host.attribute("print");
+        if (print_att.as_int()) {
+            std::cout << "Host "
+                      << id_att.as_int()
+                      << " set to print\n";
+        }
+        else {
+            std::cout << "Host "
+                      << id_att.as_int()
+                      << " not set to print\n";
+        }
+
+
+
+        HostInfo info(print_att.as_int(), id.as_int());
         hosts.push_back(info);
     }
 
@@ -192,6 +207,19 @@ void InputParser::run(int                   &snapshotTime,
         std::cout << "    " << flow.name() << ": "
              << id_att.name() << "=" << id_att.value() << std::endl;
 
+        // print
+        pugi::xml_attribute print_att = flow.attribute("print");
+        if (print_att.as_int()) {
+            std::cout << "Flow "
+                      << id_att.as_int()
+                      << " set to print\n";
+        }
+        else {
+            std::cout << "Flow "
+                      << id_att.as_int()
+                      << " not set to print\n";
+        }
+
         // congestion control algorithm
         pugi::xml_node congestion = flow.child("congestionAlgorithmType");
         CongestionAlgorithmType congestionAlgorithmType;
@@ -230,6 +258,7 @@ void InputParser::run(int                   &snapshotTime,
                   << "=" << time_node.child_value() << std::endl;
 
         FlowInfo info(
+                print_att.as_int(),
                 id_att.as_int(),
                 atoi(src_node.child_value()),
                 atoi(dst_node.child_value()),

@@ -13,9 +13,15 @@
 #include <cstdlib>
 #include <list>
 
+// The base class to store information
+class SystemInfo { 
+    int    print;
+        // Print this info?
+}
 
-// Some structs to store the object info for:
-struct HostInfo {
+// Some classes to store the object info for:
+class HostInfo : public SystemInfo {
+public:
     int hostId;
         // ID of the host
 
@@ -23,7 +29,8 @@ struct HostInfo {
         // create an instance of class HostInfo with the given specifications
 };
 
-struct RouterInfo {
+class RouterInfo : public SystemInfo {
+public:
     int routerId;
         // ID of the router
 
@@ -31,9 +38,8 @@ struct RouterInfo {
         // create an instance of class RouterInfo with the given specifications
 };
 
-struct LinkInfo {
-    int    print;
-        // Print this link?
+class LinkInfo : public SystemInfo {
+public:
     int    linkId;
         // ID of the link
     double linkRate;
@@ -58,7 +64,8 @@ struct LinkInfo {
         // create an instance of class LinkInfo with the given specifications
 };
 
-struct FlowInfo {
+class FlowInfo : public SystemInfo {
+public:
     int flowId;
         // ID of the flow
     int sourceId;
