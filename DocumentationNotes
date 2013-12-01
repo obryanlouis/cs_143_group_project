@@ -1,0 +1,6 @@
+
+
+We assume that there is at least 1 data packet per flow.
+
+Data received is amount of data from all Acks -- may include duplicates.
+Progress is accurate to only UNIQUE acks though

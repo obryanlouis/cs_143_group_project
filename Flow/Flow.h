@@ -9,6 +9,7 @@
 #include <queue>
 #include <algorithm>
 #include <string>
+#include <cfloat>
 
 #include "CongestionAlgorithm.h"
 #include "Control.h"
@@ -39,7 +40,10 @@ class Flow {
         // been successfully sent and received.
         // The key is the packet Id.
         // The value is 0 if the packet has not been sent and the 
-        // time of timeout otherwise.  
+        // time of timeout otherwise.      
+    std::set<int> acks;
+        // A set that keeps track of which data packets have been 
+        // recieved at the destination 
     int outstanding;
         // number of outstanding packets
     Host *source;
@@ -50,12 +54,7 @@ class Flow {
         // data sent in last time interval
     int dataReceived;
         // data received in last time interval
-    double timeout;
-        // the timeout for packets. if this has expired, then the
-        // flow should resend the packet
-    int windowSize;
     CongestionAlgorithm *congestionAlgorithm_p;
-    void maintain();
 
 public:
     Flow(int in_ID, int in_size, Host *in_source, Host *in_destination,
@@ -63,6 +62,22 @@ public:
         // Create an object of class Flow with the given specifications
     ~Flow();
         // Destroy this instance of Flow
+
+    void startFlow(double startTime);
+        // creates first event for this flow 
+    void sendNewPacket(DataPacket *p, double timeOut);
+        // takes packet created by flow and updates internals
+    
+        
+    double getPacketTime(int id);
+    int getNextUnrecieved();
+ 
+    void handlePacket(AckPacket *p);
+        // Handles an incoming packet acknowledgement 
+    AckPacket *atDest(DataPacket *p);
+        // generates an AckPacket based off of TCP congestion alg
+        // for when DataPacket recieved at Destination. 
+
 
     void resetStats();
         // Reset the stats in the last time interval.
@@ -72,13 +87,12 @@ public:
     void updateDataReceived(int bytes);
         // Update the data received in the last time interval by adding
         // bytes to the dataReceived field.
-    void handlePacket(AckPacket *p);
-        // Handles an incoming packet acknowledgement
     Host *getStart();
     Host *getDestination();
     int getId();
     std::string infoString();
     double getStats(std::string stat, int period);
+
 };
 
 
