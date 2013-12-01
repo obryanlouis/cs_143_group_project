@@ -56,15 +56,6 @@ double Controller::getCurrentTime() {
     return SYSTEM_TIME;
 }
 
-void Controller::initRoutingTables() {
-    void *args;
-    updateMyRouters();
-    while (this->packets.size() != 0) {
-        this->schedule_p->doNext();
-    }
-    this->schedule_p->setTime(0);
-}
-
 void Controller::setInputFile(std::string inputFile) {
     this->inputFile = inputFile;
 }
@@ -370,9 +361,6 @@ void Controller::initSystem() {
                 it->linkDelay, 1000000 * it->linkRate / 8);
         SYSTEM_CONTROLLER->addLink(l);
     }
-
-    // Update the routing tables so that there aren't any seg faults
-    //this->initRoutingTables();
 
     for (std::list<FlowInfo>::iterator it = flowInfos.begin();
          it != flowInfos.end(); it++)

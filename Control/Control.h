@@ -208,8 +208,6 @@ public:
         // network running.
         // Then, runs until there are no more flows left, or an error occurred.
         // Finishes by creating the plots from the stats collected.
-    void initRoutingTables();
-        // Initializes the routing tables.
     void initSystem();
         // Initializes the system.
         // First, it parses the input file to get the information necessary
@@ -217,6 +215,8 @@ public:
         // Then, it creates the objects as well as setting the snapshot
         // time and routing table update time.
         // Then, it initializes the flows, and finishes off by removing
+    void initRoutingTables();
+        // Initializes the routing tables.
         // old stats files.
 
 private:

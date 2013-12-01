@@ -65,13 +65,13 @@ struct FlowInfo {
         // the id of the source host of the flow
     int destinationId;
         // the id of the destination host of the flow
-    int flowSize;
+    double flowSize;
         // the size of the flow, in megabytes
     double startTime;
         // the start time of the flow, in seconds
     CongestionAlgorithmType congestionAlgorithmType;
 
-    FlowInfo(int id, int src, int dst, int size, double start, 
+    FlowInfo(int id, int src, int dst, double size, double start, 
             CongestionAlgorithmType congestionAlgorithmType);
         // create an instance of class FlowInfo with the given specifications
 };

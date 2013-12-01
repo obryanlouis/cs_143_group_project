@@ -23,7 +23,7 @@ LinkInfo::LinkInfo(int print, int id, double rate, int delay, int size,
     , node2Id(n2id)
 {}
 
-FlowInfo::FlowInfo(int id, int src, int dst, int size, double start,
+FlowInfo::FlowInfo(int id, int src, int dst, double size, double start,
         CongestionAlgorithmType congestionAlgorithmType)
     : flowId(id)
     , sourceId(src)

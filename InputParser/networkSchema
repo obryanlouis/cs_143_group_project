@@ -1,0 +1,109 @@
+This document describes how the input XML file should be formatted to
+create the network used in the simulator.
+
+The XML structure of the network is one large Network object.
+
+The Network contains the following fields: snapshotTime,
+routingTableUpdateTime, networkHosts, networkRouters, networkLinks,
+and networkFlows.
+
+snapshotTime is the time interval between collecting stats on the network
+activity, such as link buffer occupancy. It should be an integer number
+of milliseconds. This must be specified.
+
+routingTableUpdateTime is the time interval between updating the routing
+tables of the network. It should be an integer number of milliseconds.
+This must be specified.
+
+networkHosts is a vector of the hosts in the network. It has a host
+element that can be specified multiple times. The host element has
+one attribute, "id", which should be an integer identifying that
+host. The ids must be specified and should be distinct,
+or an error will be given. networkHosts must be specified. The simulator
+will run without giving it any hosts, but it will not be able to do
+anything.
+
+networkRouters is a vector of the routers in the network. It has a
+router element that can be specified multiple times. The router element
+has one attibute, "id", which must be specified and behaves exactly like
+the id of the host element above. networkRouters must be specified.
+The simulator will run without giving it any routers, but it will not
+be able to do anything.
+
+networkLinks is a vector of the links in the network. It has a link element
+that can be specified multiple times. The link element has 2 attributes,
+"id" and "print". The id is the same as those of hosts and routers. The
+print attribute determines whether or not stats for that link will be
+recorded. The link element also has 5 elements in it: linkRate, linkDelay,
+bufferSize, node1, and node2. Each of these elements must be specified.
+linkRate is the rate the link can process
+data in Mbps. linkDelay is the propagation delay of this link in
+milliseconds. bufferSize is the size of the link's buffer in KB.
+node1 is one end of the link and has one attribute,
+"type", which is 0 for host and 1 for router.
+The value of node1 is the id of the node, which should be one of the
+appropriate nodes as determined by type. If not, an error will occur.
+node2 is the other end of the link and is structured the same as link1.
+networkLinks must be specified. The simulator will run without giving
+it any links, but it will not be able to do anything.
+
+networkFlows is a vector of the flows in the network. It has a flow element
+that can be specified multiple time. The flow element has 1 attribute
+"id", which is the same as that of hosts, routers, and flows. The flow
+element also has 5 elements: source, destination, flowSize,
+flowSartTime, and congestionAlgorithmType. Each of these elements must be
+specified. source is the id of the source host of the flow. It must
+be one of the hosts given in networkHosts. destination is the destination
+host of the flow. It must be one of the hosts given in networkHosts.
+flowSize is a double the size of the flow in MB. flowStartTime is
+a double the number of seconds after starting the simulation to begin
+sending packets for the flow. congestionAlgorithmType is an enum
+defining which congestion control algorithm to use for this flow. The
+options are "reno" and "vegas". networkFlows must be specified. The
+simulator will run without giving it any flows, but it will not
+do anything (number of flows is the stopping condition of the simulation).
+
+-------------------------------------------------------------------------------
+
+So, the input XML file to use for the network simulator can look something
+like the following.
+
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<Network>
+    <snapshotTime>10</snapshotTime>
+    <routingTableUpdateTime>1000</routingTableUpdateTime>
+    <networkHosts>
+        <host id="1" />
+        <host id="2" />
+    </networkHosts>
+    <networkRouters>
+       <router id="1" />
+    </networkRouters>
+    <networkLinks>
+        <link id="0" print="0">
+            <linkRate>10</linkRate>
+            <linkDelay>10</linkDelay>
+            <bufferSize>64</bufferSize>
+            <node1 type="0">1</node1>
+            <node2 type="1">1</node2>
+        </link>
+        <link id="1" print="1">
+            <linkRate>10</linkRate>
+            <linkDelay>10</linkDelay>
+            <bufferSize>64</bufferSize>
+            <node1 type="1">1</node1>
+            <node2 type="0">2</node2>
+        </link>
+    </networkLinks>
+    <networkFlows>
+        <flow id="1">
+            <source>1</source>
+            <destination>2</destination>
+            <flowSize>1</flowSize>
+            <flowStartTime>0.5</flowStartTime>
+            <congestionAlgorithmType>reno</congestionAlgorithmType>
+        </flow>
+    </networkFlows>
+</Network>
+
