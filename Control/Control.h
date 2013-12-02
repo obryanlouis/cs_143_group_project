@@ -42,7 +42,6 @@ std::string FLOW_SEND_FILE = std::string("Output/FlowSend.txt");
 std::string FLOW_RECEIVE_FILE = std::string("Output/FlowReceive.txt");
 std::string FLOW_RTT_FILE = std::string("Output/FlowRTT.txt");
 std::string FLOW_WINDOW_FILE = std::string("Output/FlowWindow.txt");
-std::string FLOW_THRESH_FILE = std::string("Output/FlowThresh.txt");
 
 std::string HOST_SEND_FILE = std::string("Output/HostSend.txt");
 std::string HOST_RECEIVE_FILE = std::string("Output/HostReceive.txt");

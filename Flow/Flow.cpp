@@ -163,9 +163,6 @@ double Flow::getStats(std::string stat, int period) {
     else if (stat.compare("window") == 0) {
         return congestionAlgorithm_p->getWindowSize();
     }
-    else if (stat.compare("ssthresh") == 0) {
-        return congestionAlgorithm_p->getThresh();
-    }
 }
 
 
