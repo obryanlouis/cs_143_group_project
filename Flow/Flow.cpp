@@ -60,10 +60,9 @@ void Flow::startFlow(double startTime){
 }
 
 void Flow::sendNewPacket(DataPacket *p, double timeOut){
-
-    this->source->handlePacket(p);
     this->updateDataSent(p->getSize());
     this->packets[p->getId()] = timeOut;
+    this->source->handlePacket(p);
 }
     
 int Flow::getNextUnrecieved(){

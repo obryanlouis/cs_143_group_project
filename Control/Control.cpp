@@ -249,7 +249,6 @@ void outputRoutingTables(void * args) {
 }
 
 void routerUpdate(void* args) {
-    SYSTEM_CONTROLLER->printRoutingTables();
     SYSTEM_CONTROLLER->updateMyRouters();
     void (*fp)(void*) = &routerUpdate;
     SYSTEM_CONTROLLER->add  \

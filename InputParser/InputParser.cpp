@@ -269,7 +269,7 @@ void InputParser::run(int                   &snapshotTime,
                 id_att.as_int(),
                 atoi(src_node.child_value()),
                 atoi(dst_node.child_value()),
-                atoi(size_node.child_value()),
+                atof(size_node.child_value()),
                 atof(time_node.child_value()),
                 congestionAlgorithmType);
 
