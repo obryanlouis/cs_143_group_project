@@ -55,6 +55,10 @@ void TCP_RENO_SeeIfPacketDropped(void *arg){
 void TCP_RENO::sendPacket(int id, double startTime){
     this->incrementPacketsSent();
 
+    if (id == 392){
+        std::cout << "";
+    }
+
     std::cout << "\tMaking Packet of id " << id << std::endl;
     void **args = (void **)malloc(2* sizeof (void *));
     args[0] = (void*) this;
@@ -188,6 +192,7 @@ std::cout << "\t Duplicate ACKS recieved of id " << id << std::endl;
             this->recovery(id);
             return;
         }
+        return; 
     }        
     else if (inRecovery) {
         this->windowSize /= 2;

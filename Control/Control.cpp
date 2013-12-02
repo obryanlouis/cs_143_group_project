@@ -94,6 +94,10 @@ void Controller::run() {
 
 void Controller::updateMyRouters() {
     std::cout << "***Updating Router Info*** " << std::endl;
+    for (std::list<Link *>::iterator it = this->links.begin();
+         it != this->links.end(); it++) {
+        (*it)->setInstantaneousOccupancy();
+    }
 
     for (std::list<Router *>::iterator it = this->routers.begin();
          it != this->routers.end(); it++)
@@ -142,16 +146,19 @@ void Controller::printMySystem() {
     }
 
     //std::cout << "  Outputting Flow information." << std::endl;
-    std::ofstream flowSendFile, flowReceiveFile, flowRTTFile, flowWindowFile;
+    std::ofstream flowSendFile, flowReceiveFile, flowRTTFile, flowWindowFile,
+        flowThreshFile;
     flowSendFile.open(FLOW_SEND_FILE.data(), std::ios::app);
     flowReceiveFile.open(FLOW_RECEIVE_FILE.data(), std::ios::app);
     flowRTTFile.open(FLOW_RTT_FILE.data(), std::ios::app);
     flowWindowFile.open(FLOW_WINDOW_FILE.data(), std::ios::app);
+    flowThreshFile.open(FLOW_THRESH_FILE.data(), std::ios::app);
     files.clear();
     files["send rate"] = &flowSendFile;
     files["receive rate"] = &flowReceiveFile;
     files["rtt"] = &flowRTTFile;
     files["window"] = &flowWindowFile;
+    files["ssthresh"] = &flowThreshFile;
     for (std::map<std::string, std::ofstream*>::iterator i = files.begin();
          i != files.end(); i++)
     {
@@ -419,12 +426,12 @@ void Controller::checkPackets() {
                     dp->getId() << ")\n";
                 exit(1);
             }
-            if (dp->getId() > 10000) {
+/*            if (dp->getId() > 10000) {
                 std::cout << "Packet id ("
                           << dp->getId() 
                           << ") pretty large. It's probably wrong\n";
                 exit(1);
-            }
+            } */
         }
     }
 }

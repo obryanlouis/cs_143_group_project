@@ -48,6 +48,7 @@ private:
     Buffer * getBuffer(Node *end);
         // Gets the buffer of the link that goes to the given node. Fails
         // if the node is not one of the endpoints.
+    double instantaneousOccupancy;
 
 public:
     Link () { }
@@ -96,6 +97,8 @@ public:
         // Handles an incoming packet by either adding it to the buffer, or 
         // dropping it. Also schedules an event to execute that will simulate
         // the router processing THIS packet.
+    void setInstantaneousOccupancy();
+    double getInstantaneousOccupancy();
 
 };
 

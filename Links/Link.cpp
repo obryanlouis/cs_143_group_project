@@ -22,6 +22,7 @@ Link::Link(int in_ID, Node *in_end1, Node *in_end2, double in_capacity,
     , dataSent(0)
     , packetLoss(0)
     , rate(in_rate)
+    , instantaneousOccupancy(0)
 { 
     nextFree = SYSTEM_CONTROLLER->getCurrentTime();
     in_end1->addLink(this);
@@ -127,6 +128,14 @@ Packet* Link::popPacket(Node *end) {
     this->dataSent += packet->getSize();
     buffer->capacityUsed -= packet->getSize();
     return packet;
+}
+
+void Link::setInstantaneousOccupancy() {
+    this->instantaneousOccupancy = this->getOccupancy();
+}
+
+double Link::getInstantaneousOccupancy() {
+    return this->instantaneousOccupancy;
 }
 
 double Link::getOccupancy() {
