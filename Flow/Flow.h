@@ -44,6 +44,8 @@ class Flow {
     std::set<int> acks;
         // A set that keeps track of which data packets have been 
         // recieved at the destination 
+    int outstanding;
+        // number of outstanding packets
     Host *source;
         // The source host of this flow
     Host *destination;
@@ -67,7 +69,6 @@ public:
         // takes packet created by flow and updates internals
     
         
-    int getProgress();
     double getPacketTime(int id);
     int getNextUnrecieved();
  
@@ -75,9 +76,10 @@ public:
         // Handles an incoming packet acknowledgement 
     AckPacket *atDest(DataPacket *p);
         // generates an AckPacket based off of TCP congestion alg
-        // for when DataPacket recieved at Destination. 
-    int numOutstanding(int max);
-        // number of outstanding packets
+        // for when DataPacket recieved at Destination.
+    void resetPackets(int id); 
+        // make packets of >= id behave as though they have not been
+        // sent
 
 
     void resetStats();

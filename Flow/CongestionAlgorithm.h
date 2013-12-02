@@ -50,9 +50,6 @@ private:
     int lastAckRecieved;
     int duplicates;
 
-    bool inRecovery;
-    void recovery(int id);
-
 public: 
     TCP_RENO(Flow *in_flow);
 
@@ -63,7 +60,6 @@ public:
     void ackRecieved(AckPacket *p);
     void sendPacket(int id, double startTime);
     AckPacket *makeAckPacket(DataPacket *p);
-    void incrementPacketsSent();
 };
 
 /*
