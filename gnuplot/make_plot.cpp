@@ -53,10 +53,10 @@ void makePlots() {
                 "Flow_RTT.svg", "ms", FLOWSTAT));
     files.push_back(std::make_tuple(FLOW_WINDOW_FILE,
                 "Flow_Window.svg","Packets", FLOWSTAT));
-    files.push_back(std::make_tuple(FLOW_THRESH_FILE,
+    /*files.push_back(std::make_tuple(FLOW_THRESH_FILE,
                 "Flow_Thresh.svg","Packets", FLOWSTAT));
     files.push_back(std::make_tuple(FLOW_OUTSTANDING_FILE,
-                "Flow_Outstanding.svg","Packets", FLOWSTAT));
+                "Flow_Outstanding.svg","Packets", FLOWSTAT));*/
 
     files.push_back(std::make_tuple(LINK_OCCUPANCY_FILE,
                 "Link_Occupancy.svg", "Bytes", LINKSTAT));

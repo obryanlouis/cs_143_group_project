@@ -44,7 +44,7 @@ Flow::Flow(int in_ID, int in_size, Host *in_source, Host *in_destination,
 //            congestionAlgorithm_p = new TCP_RENO(this);
             break;
         case VEGAS:
-//            congestionAlgorithm_p = new TCP_Vegas(this);
+            congestionAlgorithm_p = new Vegas(this);
             break;
 
         default:
@@ -179,12 +179,12 @@ double Flow::getStats(std::string stat, int period) {
     else if (stat.compare("window") == 0) {
         return congestionAlgorithm_p->getWindowSize();
     }
-    else if (stat.compare("thresh") == 0) {
+    /*else if (stat.compare("thresh") == 0) {
         return congestionAlgorithm_p->getThresh();
     }
     else if (stat.compare("outstanding") == 0) {
         return congestionAlgorithm_p->getOutstanding();
-    }
+    }*/
 }
 
 

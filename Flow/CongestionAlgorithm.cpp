@@ -23,6 +23,13 @@ double CongestionAlgorithm::getWindowSize(){
     return this->windowSize;
 }
 
+AckPacket *CongestionAlgorithm::makeAckPacket(DataPacket *p){
+    // make sure the AckPacket is of the right ID
+    int id = this->flow->getNextUnrecieved();
+    std::cout << "making ackpacket of id" << id << std::endl;
+    return new AckPacket(p, id);
+}
+
 SLOW_START::SLOW_START(Flow *in_flow)
     : CongestionAlgorithm(in_flow)
     , ssthreash(DBL_MAX)
@@ -30,12 +37,9 @@ SLOW_START::SLOW_START(Flow *in_flow)
     , timeout(START_RTT)
     , alpha(DEFAULT_ALPHA)
     , sendNext(1)
-    , lastAckRecieved(-1)
-    , duplicates(0)
     , maxAck(0)
     , lastDroppedTime(0)
-    , lastDupTime(0)
-    , numResent(0)
+    , outstanding(1)
 {
 }
 
@@ -69,15 +73,15 @@ void SLOW_START::sendPacket(int id, double startTime){
     args[0] = (void*) this;
     args[1] = (void*) ((long)id);
 
-    double checkAt = SYSTEM_CONTROLLER->getCurrentTime() 
+    double checkAt = SYSTEM_CONTROLLER->getCurrentTime()
                             + this->getTimeOut();
 
     // make packet and send to flow to put into system
     DataPacket *p = new DataPacket (id, this->getFlow(), \
-                            SYSTEM_CONTROLLER->getCurrentTime());
+                            startTime);
     this->getFlow()->sendNewPacket(p, checkAt);
     
-    // make timeout event 
+    // make timeout event
     void (*fp)(void*) = &SLOW_START_SeeIfPacketDropped;
     Event *e = new Event (checkAt, fp, args);
     SYSTEM_CONTROLLER->add(e);
@@ -90,7 +94,7 @@ void SLOW_START_sendFirstPacket(void *arg){
 
     std::cout << "\tMaking Packet of id " << id << std::endl;
 
-    double checkAt = SYSTEM_CONTROLLER->getCurrentTime() 
+    double checkAt = SYSTEM_CONTROLLER->getCurrentTime()
                             + responsible->getTimeOut();
 
     // make packet and send to flow to put into system
@@ -98,14 +102,14 @@ void SLOW_START_sendFirstPacket(void *arg){
                             SYSTEM_CONTROLLER->getCurrentTime());
     responsible->getFlow()->sendNewPacket(p, checkAt);
     
-    // make timeout event 
+    // make timeout event
     void (*fp)(void*) = &SLOW_START_SeeIfPacketDropped;
     Event *e = new Event (checkAt, fp, theseArgs);
 
     // no cleanup needed since still using args
 }
 
-void SLOW_START::scheduleFirstPacket(double startTime){
+void CongestionAlgorithm::scheduleFirstPacket(double startTime){
     // make event to make first packet
     void (*fp)(void*) = &SLOW_START_sendFirstPacket;
     void **args = (void **)malloc(2* sizeof (void *));
@@ -141,23 +145,14 @@ std::cout << "\t Packet DID get dropped" << std::endl;
     this->sendPacket(id, SYSTEM_CONTROLLER->getCurrentTime());
 
     this->outstanding = 1;
-    this->sendNext = flow->getNextUnrecieved(); 
-
-    this->duplicates = 0;
-    this->lastAckRecieved = -1;
+    this->sendNext = flow->getNextUnrecieved();
 
     this->lastDroppedTime = SYSTEM_CONTROLLER->getCurrentTime();
 
 }
 
-void SLOW_START::ackRecieved(AckPacket *p){
-
-    if (p->getStartTime() < this->lastDroppedTime) return;
-
-std::cout << "In SLOW_START::ackRecieved " << std::endl;
-std::cout << "\t Outstanding = " << this->outstanding << std::endl;
-    // update RTT
-    double rtt = SYSTEM_CONTROLLER->getCurrentTime() - p->getStartTime();
+void SLOW_START::updateTimeout(double startTime){
+    double rtt = SYSTEM_CONTROLLER->getCurrentTime() - startTime;
     if (this->roundTripTime = START_RTT){
         this->roundTripTime = rtt;
         this->timeDeviation = rtt;
@@ -166,61 +161,17 @@ std::cout << "\t Outstanding = " << this->outstanding << std::endl;
         this->roundTripTime *= (1-alpha);
         this->roundTripTime += alpha * rtt;
 
-        this->timeDeviation = (1-alpha) * this->timeDeviation + alpha * 
+        this->timeDeviation = (1-alpha) * this->timeDeviation + alpha *
                             abs(rtt - this->roundTripTime);
     }
 
-    this->timeout = roundTripTime + timeDeviation + TIMEOUT_CONST; 
+    this->timeout = roundTripTime + 4*timeDeviation + TIMEOUT_CONST;
+}
 
-
-
-
-
-
-
-
-    double packetStart = p->getStartTime();
-    double currentTime = SYSTEM_CONTROLLER->getCurrentTime();
-    int id = p->getAckId(); 
-
-    if (id == lastAckRecieved) { 
-        if (flow->getPacketTime(id) == 0) return;
-        duplicates++;
-        if (duplicates == 3) {
-            outstanding = 0;
-            windowSize = windowSize / 2;
-            ssthreash = std::max((double)2, windowSize);
-            flow->resetPackets(id);
-            int limit = id + windowSize;
-            for (int i = id; i < limit; i++) {
-                sendPacket(i, currentTime);
-                outstanding++;
-            }
-            sendNext = limit;
-        }
-        else if (duplicates > 3) {
-            windowSize++;
-            outstanding--;
-            int limit = sendNext + windowSize - outstanding;
-            for (int i = sendNext; i < limit; i++) {
-                outstanding++;
-                sendPacket(i, currentTime);
-            }
-            sendNext = limit;
-        } 
-        return;
-    }
-
-    if (duplicates > 3) {
-        windowSize = ssthreash;
-    }
-
-    duplicates = 0;
-    lastAckRecieved = id;
-
-
-
-
+void SLOW_START::ackRecieved(AckPacket *p){
+std::cout << "In SLOW_START::ackRecieved " << std::endl;
+    this->updateTimeout(p->getStartTime());
+    
 
     if (this->windowSize < this->ssthreash) {
         std::cout << "\t in slow start \n";
@@ -231,23 +182,25 @@ std::cout << "\t Outstanding = " << this->outstanding << std::endl;
         this->windowSize += 1/this->windowSize;
     }
 
-
+    if (p->getStartTime() < this->lastDroppedTime) return;
 
     this->outstanding--;
    
+    int id = p->getAckId();
+
     // send new packets
-    int start = std::max(this->sendNext, id); 
+    int start = std::max(this->sendNext, id);
     int i = start;
-    for (i; 
+    for (i;
             i < start + this->windowSize - this->outstanding
-            && i < flow->getTotalPackets(); 
+            && i < flow->getTotalPackets();
             i++){
         this->sendPacket(i, SYSTEM_CONTROLLER->getCurrentTime()
                             + (i- start) *0.0001);
     }
 
     this->outstanding += i - start;
-    std::cout << "\tPackets outstanding" << outstanding << "window size" << windowSize <<  std::endl;
+    std::cout << "\tPackets outstanding" << outstanding << "window size" << windowSize << std::endl;
     
     this->sendNext = i;
 
@@ -258,42 +211,134 @@ std::cout << "\t Outstanding = " << this->outstanding << std::endl;
 
 }
 
-double SLOW_START::getThresh() {
-    return ssthreash;
-}
-
-double SLOW_START::getOutstanding() {
-    return outstanding;
-}
 
 
-AckPacket *SLOW_START::makeAckPacket(DataPacket *p){
-    // make sure the AckPacket is of the right ID
-    int id = this->flow->getNextUnrecieved();
-    std::cout << "making ackpacket of id" << id << std::endl;
-    return new AckPacket(p, id);
-}
-
-
-
-
-/*
-TCP_Vegas::TCP_Vegas(Flow* in_flow)
-    : CongestionAlgorithm(in_flow)
+TCP_TAHOE::TCP_TAHOE(Flow* in_flow)
+    : SLOW_START(in_flow)
+    , lastAckRecieved(-1)
+    , duplicates(0)
 {
 }
 
 
-void TCP_Vegas::packetDropped(){
+void TCP_TAHOE::ackRecieved(AckPacket *p){
+    // Fast retransmit
+std::cout << "In TCP_TAHOE::ackRecieved" << std::endl;
+    if (p->getStartTime() < lastDroppedTime) {
+        return;
+    }
 
+    int id = p->getAckId();
+
+    if (id == lastAckRecieved && this->ssthreash < this-> outstanding){
+        duplicates++;
+        SLOW_START::updateTimeout(p->getStartTime());
+std::cout << "\t duplicate of id " << id << std::endl;
+        if (duplicates == 3) {
+std::cout << "\tDuplicates == 3 \n";
+            this->ssthreash = outstanding/ 2;
+            this->windowSize = 1;
+            lastDroppedTime = SYSTEM_CONTROLLER->getCurrentTime();
+            SLOW_START::sendPacket(id, SYSTEM_CONTROLLER->getCurrentTime());
+            this->outstanding = 1;
+            this->sendNext = id + 1;
+            this->flow->resetPackets(id);
+            return;
+        }
+
+    }
+    else {
+        lastAckRecieved = id;
+        duplicates = 0;
+    }
+
+    SLOW_START::ackRecieved(p);
 
 }
 
-void TCP_Vegas::ackRecieved(AckPacket *p){
-
+void TCP_TAHOE::packetDropped(int id){
+    SLOW_START::packetDropped(id);
 }
 
-AckPacket *TCP_Vegas::makeAckPacket(DataPacket *p){
+/************************* TCP RENO *********************************/
+
+TCP_RENO::TCP_RENO(Flow* in_flow)
+    : TCP_TAHOE(in_flow)
+    , inRecovery(false)
+{
+}
+
+
+void TCP_RENO::packetDropped(int id){
+    TCP_TAHOE::packetDropped(id);
+    inRecovery = false;
+    lastAckRecieved = -1;
+    duplicates = 0;
+}
+
+void TCP_RENO::ackRecieved(AckPacket *p){
+    // Fast recovery
+std::cout << "In TCP_RENO::ackRecieved" << std::endl;
+std::cout << "\t threashold" << ssthreash << "\n";
+std::cout << "\tcurrent time " << SYSTEM_CONTROLLER->getCurrentTime() << " packet creation " << p->getStartTime() << "last dropped" << lastDroppedTime << "\n";
+std::cout << "\t Outstanding = " << this->outstanding << std::endl;
+std::cout << "\t Window Size = " << windowSize << std::endl;
+    if (p->getStartTime() < lastDroppedTime) {
+        return;
+    }
+
+    int id = p->getAckId();
+
+    if (id == lastAckRecieved && this->ssthreash < this-> outstanding){
+        outstanding--;
+        duplicates++;
+        SLOW_START::updateTimeout(p->getStartTime());
+std::cout << "\t duplicate of id " << id << std::endl;
+        if (duplicates == 3) {
+std::cout << "\tDuplicates == 3 \n";
+            this->ssthreash = outstanding/ 2;
+            this->windowSize = ssthreash + 3;
+            SLOW_START::sendPacket(id, SYSTEM_CONTROLLER->getCurrentTime());
+            this->outstanding++ ;
+
+        
+            this->inRecovery = true;
+            return;
+        }
+
+        if (inRecovery) {
+std::cout << "\t currently in recovery \n";
+            windowSize++;
+
+            int start = std::max(this->sendNext, id);
+            int i = start;
+            for (i;
+                    i < start + this->windowSize - this->outstanding
+                    && i < flow->getTotalPackets();
+                    i++){
+                this->sendPacket(i, SYSTEM_CONTROLLER->getCurrentTime()
+                                    + (i- start) *0.0001);
+            }
+
+            this->outstanding += i - start;
+            std::cout << "\tPackets outstanding" << outstanding << "window size" << windowSize << std::endl;
+            
+            this->sendNext = i;
+
+
+        }
+
+    }
+    else {
+        lastAckRecieved = id;
+        duplicates = 0;
+        if (inRecovery) {
+            inRecovery = false;
+            windowSize = ssthreash;
+        }
+    }
+
+    SLOW_START::ackRecieved(p);
+
 
 }
-*/

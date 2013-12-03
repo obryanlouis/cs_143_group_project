@@ -159,8 +159,8 @@ void Controller::printMySystem() {
     files["receive rate"] = &flowReceiveFile;
     files["rtt"] = &flowRTTFile;
     files["window"] = &flowWindowFile;
-    files["thresh"] = &flowThreshFile;
-    files["outstanding"] = &flowOutstandingFile;
+    /*files["thresh"] = &flowThreshFile;
+    files["outstanding"] = &flowOutstandingFile;*/
     for (std::map<std::string, std::ofstream*>::iterator i = files.begin();
          i != files.end(); i++)
     {
