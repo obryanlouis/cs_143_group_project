@@ -25,7 +25,7 @@ Flow::Flow(int in_ID, int in_size, Host *in_source, Host *in_destination,
         this->packets[i] = 0;
     }
 
-    for (int i = 0; i < totalPackets; i++){
+    for (int i = 1; i <= totalPackets; i++){
         this->acks.insert(i);
     }
 
@@ -34,8 +34,10 @@ Flow::Flow(int in_ID, int in_size, Host *in_source, Host *in_destination,
 
     // make congestion algorithm
     switch (algType) {
+        case SLOW:
+              congestionAlgorithm_p = new SLOW_START(this);
         case RENO:
-            congestionAlgorithm_p = new TCP_RENO(this);
+//            congestionAlgorithm_p = new TCP_RENO(this);
         break;
         case VEGAS:
 //            congestionAlgorithm_p = new TCP_Vegas(this);
@@ -84,10 +86,20 @@ AckPacket* Flow::atDest(DataPacket *p){
 void Flow::handlePacket(AckPacket *p) {
     SYSTEM_CONTROLLER->checkPackets();
     std::cout << "--Flow " << flowId << " has received an acknowledgement"
-        << " packet for packet " << p->getId() <<
+        << " packet for packet " << p->getAckId() <<
         "at time " << SYSTEM_CONTROLLER->getCurrentTime() << "\n";
     std::cout << p->getStartTime() << std::endl;
 
+    int id = p->getAckId();
+    this->progress = id;
+
+
+
+    for (id = id - 1; id >= 0; id--){
+        this->packets[id] = DBL_MAX;
+    }
+
+/*
     // see if packet recieved before
     if (this->packets[p->getId()] != DBL_MAX){
         // update progress
@@ -97,6 +109,7 @@ void Flow::handlePacket(AckPacket *p) {
         this->packets[p->getId()] = DBL_MAX; 
         std::cout << "changed to dbl_max";
     }  
+*/
 
     // update window size
     congestionAlgorithm_p->ackRecieved(p);
@@ -114,8 +127,8 @@ void Flow::handlePacket(AckPacket *p) {
 
 void Flow::resetPackets(int id){
     
-    for (id; id < this->totalPackets; id++){
-        this->packets[id] = 0;
+    for (id = 0; id < this->totalPackets; id++){
+        if (this->packets[id] != DBL_MAX) this->packets[id] = 0;
     }
 
 }

@@ -63,8 +63,8 @@
             <destination>2</destination>
             <flowSize>20</flowSize>
             <flowStartTime>0.5</flowStartTime>
-                <!-- Options: reno, vegas -->
-            <congestionAlgorithmType>reno</congestionAlgorithmType>
+                <!-- Options: reno, vegas, slow -->
+            <congestionAlgorithmType>slow</congestionAlgorithmType>
         </flow>
     </networkFlows>
 </Network>
