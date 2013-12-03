@@ -12,6 +12,7 @@ class DataPacket;
 class Flow;
 
 enum CongestionAlgorithmType {
+    SLOW,
     RENO,
     VEGAS
 };
@@ -37,7 +38,7 @@ public:
 
 };
 
-class TCP_RENO : public CongestionAlgorithm{
+class SLOW_START : public CongestionAlgorithm{
 private:
     double roundTripTime;
     double timeDeviation;
@@ -49,31 +50,19 @@ private:
 
     int lastAckRecieved;
     int duplicates;
+    int maxAck;
+    double lastDroppedTime;
 
 public: 
-    TCP_RENO(Flow *in_flow);
+    SLOW_START(Flow *in_flow);
 
     double getTimeOut();
 
     void scheduleFirstPacket(double startTime);
-    void packetDropped(int id);
-    void ackRecieved(AckPacket *p);
+    virtual void packetDropped(int id);
+    virtual void ackRecieved(AckPacket *p);
     void sendPacket(int id, double startTime);
     AckPacket *makeAckPacket(DataPacket *p);
 };
 
-/*
-class TCP_Vegas : public CongestionAlgorithm{
-public:
-    TCP_Vegas(Flow *in_flow);
-
-    void scheduleFirstPacket(double startTime);
- 
-    void packetDropped(int id);
-    void ackRecieved(AckPacket *p);
-    void sendMorePackets();
-    AckPacket *makeAckPacket(DataPacket *p);
-
-};
-*/ 
 #endif
