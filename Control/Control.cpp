@@ -179,7 +179,7 @@ void Controller::printMySystem() {
     files.clear();
     files["send rate"] = &flowSendFile;
     files["receive rate"] = &flowReceiveFile;
-    files["rtt"] = &flowRTTFile;
+    files["delay"] = &flowRTTFile;
     files["window"] = &flowWindowFile;
     /*files["thresh"] = &flowThreshFile;
     files["outstanding"] = &flowOutstandingFile;*/

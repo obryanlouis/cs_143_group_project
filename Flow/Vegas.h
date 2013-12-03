@@ -6,15 +6,16 @@
 
 class Vegas : public SLOW_START {
     private:
-        friend void fastWindowReset(void *arg);
         int lastAckRecieved;
         int duplicates;
 
         bool inRecovery;
         double rttmin;
         void sendAvailablePackets();
+
     public:
         void ackRecieved(AckPacket *p);
+        void packetDropped(int id);
         Vegas(Flow *f);
  
 };
