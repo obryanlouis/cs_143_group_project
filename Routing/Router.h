@@ -21,9 +21,6 @@ class Host;
 class Router : public Node {
     friend void outputRoutingTables(void *args);
 
-    static const int UPDATE_TOLERANCE = 5;
-        // only update the routing table if the distance would change by
-        // more than the tolerance
 	RoutingTable *routingTable_p;
         // the router's routing table
     void updateSingleNode(Host *host, Link *link);

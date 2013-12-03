@@ -140,9 +140,8 @@ bool Router::updateRoutingTable(RoutingTable *t, Link *l) {
         it != t->mapping.end(); ++it) {
         Node *r = it->first;
         if (r != this) {
-            // Get the link weight, which is measured in ms
             double linkWgt = l->getDelay() + 
-                ((((double)l->getOccupancy() / (double)l->getRate()) * 
+                ((((double)l->getInstantaneousOccupancy() / (double)l->getRate()) * 
                         (double)1000));
             bool noEntry = (routingTable_p->mapping.count(r) == 0);
             if (noEntry) {
@@ -150,22 +149,20 @@ bool Router::updateRoutingTable(RoutingTable *t, Link *l) {
             }
             else {
                 bool largerWeight = ((*routingTable_p)[r].first > 
-                    linkWgt + t->mapping[r].first + UPDATE_TOLERANCE);
-                bool smallerWeight = ((*routingTable_p)[r].first +
-                        UPDATE_TOLERANCE < linkWgt + t->mapping[r].first);
+                    linkWgt + t->mapping[r].first);
+                bool smallerWeight = ((*routingTable_p)[r].first < 
+                    linkWgt + t->mapping[r].first);
                 bool wouldNormallyPassL = (routingTable_p->nextLink(r) == l);
                 bool nextLinkNotThisLink = (t->nextLink(r) != l);
                 bool approxEqual = std::abs((*routingTable_p)[r].first -
-                    linkWgt + t->mapping[r].first) <= UPDATE_TOLERANCE;
-                if ((smallerWeight && wouldNormallyPassL) || 
-                    (largerWeight)) { 
+                    linkWgt + t->mapping[r].first) == 0;
+                if (smallerWeight && wouldNormallyPassL || largerWeight) {
                     update(t, linkWgt, changed, r, l);
                 }
             }
         }
     }
 
-    //std::cout << infoString() << std::endl;
     //debugRoutingTable();
     return changed;
 }

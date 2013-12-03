@@ -7,6 +7,8 @@
 
 const double START_RTT = 10000;
 const double DEFAULT_ALPHA = 0.75;
+const double TIMEOUT_CONST = 100;
+
 
 CongestionAlgorithm::CongestionAlgorithm(Flow *in_flow)
     :windowSize(1.0)
@@ -50,12 +52,33 @@ void TCP_RENO_SeeIfPacketDropped(void *arg){
 }
 
 
-void TCP_RENO_sendPacket(void *arg){
+void TCP_RENO::sendPacket(int id, double startTime){
+
+    std::cout << "\tMaking Packet of id " << id << std::endl;
+    void **args = (void **)malloc(2* sizeof (void *));
+    args[0] = (void*) this;
+    args[1] = (void*) ((long)id);
+
+    double checkAt = SYSTEM_CONTROLLER->getCurrentTime() 
+                            + this->getTimeOut();
+
+    // make packet and send to flow to put into system
+    DataPacket *p = new DataPacket (id, this->getFlow(), \
+                            SYSTEM_CONTROLLER->getCurrentTime());
+    this->getFlow()->sendNewPacket(p, checkAt);
+    
+    // make timeout event 
+    void (*fp)(void*) = &TCP_RENO_SeeIfPacketDropped;
+    Event *e = new Event (checkAt, fp, args);
+    SYSTEM_CONTROLLER->add(e);
+}
+
+void TCP_RENO_sendFirstPacket(void *arg){
     void **theseArgs = (void **) arg;
     TCP_RENO *responsible = (TCP_RENO *) theseArgs[0];
     int id = (int) ((long) theseArgs[1]);
 
-    std::cout << "Making Packet of id " << id << std::endl;
+    std::cout << "\tMaking Packet of id " << id << std::endl;
 
     double checkAt = SYSTEM_CONTROLLER->getCurrentTime() 
                             + responsible->getTimeOut();
@@ -74,7 +97,7 @@ void TCP_RENO_sendPacket(void *arg){
 
 void TCP_RENO::scheduleFirstPacket(double startTime){
     // make event to make first packet
-    void (*fp)(void*) = &TCP_RENO_sendPacket;
+    void (*fp)(void*) = &TCP_RENO_sendFirstPacket;
     void **args = (void **)malloc(2* sizeof (void *));
     args[0] = (void*) this;
     args[1] = (void*) 0;
@@ -85,37 +108,35 @@ void TCP_RENO::scheduleFirstPacket(double startTime){
 
 
 void TCP_RENO::packetDropped(int id){
+std::cout << "In TCP_RENO::packetDropped()" << std::endl;
     // see if packet not actually dropped
+std::cout << "\t Packet " << id << "has timeout "<< flow->getPacketTime(id) << std::endl;
     if (flow->getPacketTime(id) > SYSTEM_CONTROLLER->getCurrentTime()){
+std::cout << "\t Packet not actually dropped" << std::endl;
         return;
     }
+    
+    if (flow->getPacketTime(id) == 0) {
+std::cout << "\t Packet got reset by previous timeout " << std::endl;
+        return;
+    }
+
+std::cout << "\t Packet DID get dropped" << std::endl;
     // otherwise, update ssthreash and resend packets
     this->ssthreash = this->windowSize / 2;
     this->windowSize = 1;
+
+    this->flow->resetPackets(id);
     
-    int i = id; 
-    for (i; 
-            i < id + this->windowSize && i < flow->getTotalPackets(); 
-            ++i){
-        void (*fp)(void*) = &TCP_RENO_sendPacket;
-        void **args = (void **)malloc(2* sizeof (void *));
-        args[0] = (void*) this;
-        args[1] = (void*) ((long) i);
+    this->sendPacket(id, SYSTEM_CONTROLLER->getCurrentTime());
 
-        Event *e = new Event(SYSTEM_CONTROLLER->getCurrentTime(),
-                fp, (void *) args);
-        SYSTEM_CONTROLLER->add(e);
-    }
-
-    this->outstanding = i - id - 1; // might need to change.
-    this->sendNext = i; 
-
-
+    this->outstanding = 1;
+    this->sendNext = id + 1; 
 
 }
 
 void TCP_RENO::ackRecieved(AckPacket *p){
-
+std::cout << "In TCP_RENO::ackRecieved " << std::endl;
     // update RTT
     double rtt = SYSTEM_CONTROLLER->getCurrentTime() - p->getStartTime();
     if (this->roundTripTime = START_RTT){
@@ -130,37 +151,54 @@ void TCP_RENO::ackRecieved(AckPacket *p){
                             abs(rtt - this->roundTripTime);
     }
 
-    this->timeout = roundTripTime + 4 * timeDeviation; 
+    this->timeout = roundTripTime + 4 * timeDeviation + TIMEOUT_CONST; 
 
-    int id = p->getId();
+    int id = p->getAckId();
 
     // see if ack is duplicate. If so, update system and send packet.
     if (lastAckRecieved == id) {
+std::cout << "\t Duplicate ACKS recieved of id " << id << std::endl;
         duplicates++;
         if (duplicates == 3) {   
-            this->windowSize /= 2;
+std::cout << "\t Duplicate ACKS = 3 " << std::endl;
+            this->ssthreash = this->windowSize / 2;
+            this->windowSize = this->windowSize / 2 + 3;
             int i = id; 
             for (i; 
                     i < id + this->windowSize && i < flow->getTotalPackets(); 
                     ++i){
-                void (*fp)(void*) = &TCP_RENO_sendPacket;
-                void **args = (void **)malloc(2* sizeof (void *));
-                args[0] = (void*) this;
-                args[1] = (void*) ((long)i);
-
-                Event *e = new Event(SYSTEM_CONTROLLER->getCurrentTime(),
-                                    fp, (void *) args);
-                SYSTEM_CONTROLLER->add(e);
+                this->sendPacket(i, SYSTEM_CONTROLLER->getCurrentTime());
             }
 
-            this->outstanding = i - id - 1; // might need to change.
+            this->outstanding = i - id; // might need to change.
             this->sendNext = i; 
             return; // retransmitted packets, so break out early
         }
-            
+        
+        else if (duplicates > 3) {
+            this->outstanding--;
+            this->windowSize += 1;
+            int i = this->sendNext;
+            for (i; 
+                    i < sendNext + this->windowSize - this->outstanding 
+                    && i < flow->getTotalPackets(); 
+                    ++i){
+                this->sendPacket(i, SYSTEM_CONTROLLER->getCurrentTime());
+            }
+
+            this->outstanding += i - this->sendNext;
+            this->sendNext = i;
+            return;
+
+        }
+
     }        
 
     else {
+        if (duplicates >= 3) {
+            this->windowSize = this->ssthreash;
+        }
+
         lastAckRecieved = id;
         duplicates = 0;
     }
@@ -182,23 +220,17 @@ void TCP_RENO::ackRecieved(AckPacket *p){
             i < this->sendNext + this->windowSize - this->outstanding
             && i < flow->getTotalPackets(); 
             i++){
-    std::cout << "scheduling new packet of id" << i << std::endl;
-        void (*fp)(void*) = &TCP_RENO_sendPacket;
-        void **args = (void **)malloc(2* sizeof (void *));
-        args[0] = (void*) this;
-        args[1] = (void*) ((long) i);
-
-        Event *e = new Event(SYSTEM_CONTROLLER->getCurrentTime(),
-                            fp, (void *) args);
-        SYSTEM_CONTROLLER->add(e);
+        this->sendPacket(i, SYSTEM_CONTROLLER->getCurrentTime());
     }
 
-    std::cout << "CA's next packet will be" << i << std::endl;
 
-    this->outstanding = i - this->sendNext - 1;
-    std::cout << "Packets outstanding" << outstanding << "window size" << windowSize << std::endl;
+    std::cout << "\tCA's next packet will be" << i << std::endl;
+
+    this->outstanding += i - this->sendNext;
+    std::cout << "\tPackets outstanding" << outstanding << "window size" << windowSize <<  std::endl;
     
     this->sendNext = i;
+
 
 
 }

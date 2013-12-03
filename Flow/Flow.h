@@ -76,7 +76,10 @@ public:
         // Handles an incoming packet acknowledgement 
     AckPacket *atDest(DataPacket *p);
         // generates an AckPacket based off of TCP congestion alg
-        // for when DataPacket recieved at Destination. 
+        // for when DataPacket recieved at Destination.
+    void resetPackets(int id); 
+        // make packets of >= id behave as though they have not been
+        // sent
 
 
     void resetStats();

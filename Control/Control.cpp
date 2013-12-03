@@ -94,6 +94,10 @@ void Controller::run() {
 
 void Controller::updateMyRouters() {
     std::cout << "***Updating Router Info*** " << std::endl;
+    for (std::list<Link *>::iterator it = this->links.begin();
+         it != this->links.end(); it++) {
+        (*it)->setInstantaneousOccupancy();
+    }
 
     for (std::list<Router *>::iterator it = this->routers.begin();
          it != this->routers.end(); it++)
@@ -249,7 +253,6 @@ void outputRoutingTables(void * args) {
 }
 
 void routerUpdate(void* args) {
-    SYSTEM_CONTROLLER->printRoutingTables();
     SYSTEM_CONTROLLER->updateMyRouters();
     void (*fp)(void*) = &routerUpdate;
     SYSTEM_CONTROLLER->add  \
@@ -420,12 +423,12 @@ void Controller::checkPackets() {
                     dp->getId() << ")\n";
                 exit(1);
             }
-            if (dp->getId() > 10000) {
+/*            if (dp->getId() > 10000) {
                 std::cout << "Packet id ("
                           << dp->getId() 
                           << ") pretty large. It's probably wrong\n";
                 exit(1);
-            }
+            } */
         }
     }
 }

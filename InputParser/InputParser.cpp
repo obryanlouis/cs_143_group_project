@@ -2,17 +2,23 @@
 
 #include "InputParser.h"
 
-HostInfo::HostInfo(int id)
-    : hostId(id)
+SystemInfo::SystemInfo(int print)
+    : print(print)
+{}
+
+HostInfo::HostInfo(int print, int id)
+    : SystemInfo(print)
+    , hostId(id)
 {}
 
 RouterInfo::RouterInfo(int id)
-    : routerId(id)
+    : SystemInfo(0)
+    , routerId(id)
 {}
 
 LinkInfo::LinkInfo(int print, int id, double rate, int delay, int size,
         int n1t, int n1id, int n2t, int n2id)
-    : print(print)
+    : SystemInfo(print)
     , linkId(id)
     , linkRate(rate)
     , linkDelay(delay)
@@ -23,9 +29,10 @@ LinkInfo::LinkInfo(int print, int id, double rate, int delay, int size,
     , node2Id(n2id)
 {}
 
-FlowInfo::FlowInfo(int id, int src, int dst, double size, double start,
+FlowInfo::FlowInfo(int print, int id, int src, int dst, double size, double start,
         CongestionAlgorithmType congestionAlgorithmType)
-    : flowId(id)
+    : SystemInfo(print)
+    , flowId(id)
     , sourceId(src)
     , destinationId(dst)
     , flowSize(size)
@@ -91,7 +98,22 @@ void InputParser::run(int                   &snapshotTime,
         std::cout << "    " << host.name() << ": "
              << id.name() << "=" << id.value() << std::endl;
 
-        HostInfo info(id.as_int());
+        // print
+        pugi::xml_attribute print_att = host.attribute("print");
+        if (print_att.as_int()) {
+            std::cout << "Host "
+                      << id.as_int()
+                      << " set to print\n";
+        }
+        else {
+            std::cout << "Host "
+                      << id.as_int()
+                      << " not set to print\n";
+        }
+
+
+
+        HostInfo info(print_att.as_int(), id.as_int());
         hosts.push_back(info);
     }
 
@@ -192,6 +214,19 @@ void InputParser::run(int                   &snapshotTime,
         std::cout << "    " << flow.name() << ": "
              << id_att.name() << "=" << id_att.value() << std::endl;
 
+        // print
+        pugi::xml_attribute print_att = flow.attribute("print");
+        if (print_att.as_int()) {
+            std::cout << "Flow "
+                      << id_att.as_int()
+                      << " set to print\n";
+        }
+        else {
+            std::cout << "Flow "
+                      << id_att.as_int()
+                      << " not set to print\n";
+        }
+
         // congestion control algorithm
         pugi::xml_node congestion = flow.child("congestionAlgorithmType");
         CongestionAlgorithmType congestionAlgorithmType;
@@ -230,10 +265,11 @@ void InputParser::run(int                   &snapshotTime,
                   << "=" << time_node.child_value() << std::endl;
 
         FlowInfo info(
+                print_att.as_int(),
                 id_att.as_int(),
                 atoi(src_node.child_value()),
                 atoi(dst_node.child_value()),
-                atoi(size_node.child_value()),
+                atof(size_node.child_value()),
                 atof(time_node.child_value()),
                 congestionAlgorithmType);
 
@@ -249,3 +285,14 @@ void InputParser::run(int                   &snapshotTime,
               << std::endl << std::endl;
 }
 
+int HostInfo::getId() {
+    return hostId;
+}
+
+int FlowInfo::getId() {
+    return flowId;
+}
+
+int LinkInfo::getId() {
+    return linkId;
+}

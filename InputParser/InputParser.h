@@ -13,17 +13,29 @@
 #include <cstdlib>
 #include <list>
 
+// The base class to store information
+class SystemInfo { 
+public:
+    int    print;
+        // Print this info?
+    SystemInfo(int print);
+};
 
-// Some structs to store the object info for:
-struct HostInfo {
+// Some classes to store the object info for:
+class HostInfo : public SystemInfo {
+public:
     int hostId;
         // ID of the host
 
-    HostInfo(int id);
+    HostInfo(int print, int id);
         // create an instance of class HostInfo with the given specifications
+
+    int getId();
+        // get the ID of this host
 };
 
-struct RouterInfo {
+class RouterInfo : public SystemInfo {
+public:
     int routerId;
         // ID of the router
 
@@ -31,9 +43,8 @@ struct RouterInfo {
         // create an instance of class RouterInfo with the given specifications
 };
 
-struct LinkInfo {
-    int    print;
-        // Print this link?
+class LinkInfo : public SystemInfo {
+public:
     int    linkId;
         // ID of the link
     double linkRate;
@@ -56,9 +67,13 @@ struct LinkInfo {
     LinkInfo(int print, int id, double rate, int delay, int size, int n1t,
             int n1id, int n2t, int n2id);
         // create an instance of class LinkInfo with the given specifications
+
+    int getId();
+        // get the ID of this Link
 };
 
-struct FlowInfo {
+class FlowInfo : public SystemInfo {
+public:
     int flowId;
         // ID of the flow
     int sourceId;
@@ -71,9 +86,12 @@ struct FlowInfo {
         // the start time of the flow, in seconds
     CongestionAlgorithmType congestionAlgorithmType;
 
-    FlowInfo(int id, int src, int dst, double size, double start, 
+    FlowInfo(int print, int id, int src, int dst, double size, double start, 
             CongestionAlgorithmType congestionAlgorithmType);
         // create an instance of class FlowInfo with the given specifications
+
+    int getId();
+        // get the ID of this Host
 };
 
 class InputParser {
