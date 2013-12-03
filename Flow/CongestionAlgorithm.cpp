@@ -7,7 +7,7 @@
 
 const double START_RTT = 10000;
 const double DEFAULT_ALPHA = 0.75;
-const double TIMEOUT_CONST = 100;
+const double TIMEOUT_CONST = 1;
 
 
 CongestionAlgorithm::CongestionAlgorithm(Flow *in_flow)
@@ -32,6 +32,7 @@ TCP_RENO::TCP_RENO(Flow *in_flow)
     , sendNext(1)
     , lastAckRecieved(-1)
     , duplicates(0)
+    , inRecovery(false)
 {
 }
 
@@ -151,12 +152,31 @@ std::cout << "In TCP_RENO::ackRecieved " << std::endl;
                             abs(rtt - this->roundTripTime);
     }
 
-    this->timeout = roundTripTime + 4 * timeDeviation + TIMEOUT_CONST; 
+    //this->timeout = roundTripTime + 4 * timeDeviation + TIMEOUT_CONST; 
+    this->timeout = 500;
 
     int id = p->getAckId();
 
     // see if ack is duplicate. If so, update system and send packet.
     if (lastAckRecieved == id) {
+        if (!inRecovery) {
+            inRecovery = true;
+
+            this->ssthreash = std::max((double)2, this->windowSize / 2);
+            this->windowSize = 1;
+
+            this->flow->resetPackets(id);
+            
+            this->sendPacket(id, SYSTEM_CONTROLLER->getCurrentTime());
+
+            this->outstanding = 1;
+            this->sendNext = id + 1; 
+            return;
+        }
+        else {
+            return;
+        }
+/*
 std::cout << "\t Duplicate ACKS recieved of id " << id << std::endl;
         duplicates++;
         if (duplicates == 3) {   
@@ -190,9 +210,9 @@ std::cout << "\t Duplicate ACKS = 3 " << std::endl;
             this->sendNext = i;
             return;
 
-        }
+        }*/
 
-    }        
+    }
 
     else {
         if (duplicates >= 3) {
@@ -202,6 +222,8 @@ std::cout << "\t Duplicate ACKS = 3 " << std::endl;
         lastAckRecieved = id;
         duplicates = 0;
     }
+
+    inRecovery = false;
 
     this->outstanding--;
     if (this->outstanding < 0) this->outstanding = 0;
@@ -233,6 +255,14 @@ std::cout << "\t Duplicate ACKS = 3 " << std::endl;
 
 
 
+}
+
+double TCP_RENO::getThresh() {
+    return ssthreash;
+}
+
+double TCP_RENO::getOutstanding() {
+    return outstanding;
 }
 
 

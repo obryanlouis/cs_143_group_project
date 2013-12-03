@@ -32,6 +32,8 @@ public:
  
     virtual void ackRecieved(AckPacket *packet) = 0;
     virtual AckPacket* makeAckPacket(DataPacket *p) = 0;
+    virtual double getThresh() = 0;
+    virtual double getOutstanding() = 0;
     // when DataPacket recieved at destination host, determines
     // what AckPacket should be sent. 
 
@@ -49,6 +51,7 @@ private:
 
     int lastAckRecieved;
     int duplicates;
+    bool inRecovery;
 
 public: 
     TCP_RENO(Flow *in_flow);
@@ -60,6 +63,8 @@ public:
     void ackRecieved(AckPacket *p);
     void sendPacket(int id, double startTime);
     AckPacket *makeAckPacket(DataPacket *p);
+    double getThresh();
+    double getOutstanding();
 };
 
 /*
