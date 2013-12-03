@@ -189,7 +189,10 @@ public:
     // Output
     int numLinksToPrint();
         // Returns the number of links that will be printed out.
-
+    int numHostsToPrint();
+        // Returns the number of hosts that will be printed out.
+    int numFlowsToPrint();
+        // Returns the number of flows that will be printed out.
     // DEBUG: Allow other classes to add packets to the list of
     // all packets, and to remove them
     void assertPacketExists(Packet *p);

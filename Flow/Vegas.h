@@ -6,6 +6,7 @@
 
 class Vegas : public SLOW_START {
     private:
+        friend void fastWindowReset(void *arg);
         int lastAckRecieved;
         int duplicates;
 

@@ -61,7 +61,7 @@
         <flow id="1" print="1">
             <source>1</source>
             <destination>2</destination>
-            <flowSize>20</flowSize>
+            <flowSize>1</flowSize>
             <flowStartTime>0.5</flowStartTime>
                 <!-- Options: reno, vegas, slow -->
             <congestionAlgorithmType>vegas</congestionAlgorithmType>

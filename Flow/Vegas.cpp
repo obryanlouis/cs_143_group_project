@@ -4,9 +4,12 @@
 extern Controller *SYSTEM_CONTROLLER;
 const double START_RTT = 10000;
 const double TIMEOUT_CONST = 10;
+const double FAST_WINDOW_PERIOD = 1000;
 
-const double ALPHA = 10;
-const double BETA = 13;
+const double ALPHA = 1;
+const double BETA = 3;
+
+void fastWindowReset(void *arg);
 
 Vegas::Vegas(Flow *f)
     : inRecovery(false)
@@ -14,6 +17,8 @@ Vegas::Vegas(Flow *f)
     , SLOW_START(f)
 {
     outstanding = 1;
+    roundTripTime = DBL_MAX;
+    fastWindowReset((void *)this);
 }
 
 void Vegas::sendAvailablePackets() {
@@ -27,6 +32,16 @@ void Vegas::sendAvailablePackets() {
         }
         sendNext = limit;
     }
+}
+
+void fastWindowReset(void *arg) {
+    Vegas *v = (Vegas *)arg; 
+    // w = base rtt * window size / rtt + ALPHA
+    v->windowSize = v->rttmin * v->windowSize / v->roundTripTime + ALPHA;
+
+    Event *e = new Event(SYSTEM_CONTROLLER->getCurrentTime() + FAST_WINDOW_PERIOD, 
+            &fastWindowReset, (void *)v);
+    SYSTEM_CONTROLLER->add(e);
 }
 
 void Vegas::ackRecieved(AckPacket *p) {
