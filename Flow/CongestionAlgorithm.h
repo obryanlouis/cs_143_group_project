@@ -1,4 +1,3 @@
-
 // CongestionAlgorithm.h
 
 #ifndef CongestionAlgorithm_H
@@ -85,8 +84,8 @@ private:
 
 public:
     TCP_RENO(Flow *in_flow);
-    virtual void ackRecieved(AckPacket *p);
-    virtual void packetDropped(int id);
+    void ackRecieved(AckPacket *p);
+    void packetDropped(int id);
 
 };
 

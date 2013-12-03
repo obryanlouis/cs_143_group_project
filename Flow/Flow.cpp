@@ -1,8 +1,6 @@
 // Flow.cpp
 
 #include "Flow.h"
-#include <sstream>
-#include <climits>
 
 extern Controller *SYSTEM_CONTROLLER; 
 
@@ -33,6 +31,7 @@ Flow::Flow(int in_ID, int in_size, Host *in_source, Host *in_destination,
     in_destination->setFlow2(this);
 
     // make congestion algorithm
+    // TODO:
     switch (algType) {
         case SLOW:
             congestionAlgorithm_p = new SLOW_START(this);
@@ -41,7 +40,7 @@ Flow::Flow(int in_ID, int in_size, Host *in_source, Host *in_destination,
             congestionAlgorithm_p = new TCP_TAHOE(this);
             break;
         case RENO:
-//            congestionAlgorithm_p = new TCP_RENO(this);
+            congestionAlgorithm_p = new TCP_RENO(this);
             break;
         case VEGAS:
             congestionAlgorithm_p = new Vegas(this);
@@ -75,6 +74,14 @@ int Flow::getNextUnrecieved(){
     return *(acks.begin());
 }
 
+int Flow::nextHostPacket(){
+    for (int i = 0; i < totalPackets; i++){
+        if (packets[i] != DBL_MAX) return i;
+    }
+    std::cout<< "uhhh. no lowest packet? (Flow::nextHostPacket)\n" << std::endl;
+
+    exit(1);
+}
 
 AckPacket* Flow::atDest(DataPacket *p){
     std::cout << "In Flow:atDest " << std::endl;
@@ -96,7 +103,6 @@ void Flow::handlePacket(AckPacket *p) {
 
     int id = p->getAckId();
     this->progress = id;
-
 
 
     for (id = id - 1; id >= 0; id--){
@@ -211,3 +217,4 @@ std::string Flow::infoString(){
 int Flow::getTotalPackets(){
     return totalPackets;
 }
+

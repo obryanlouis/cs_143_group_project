@@ -10,6 +10,8 @@
 #include <algorithm>
 #include <string>
 #include <cfloat>
+#include <sstream>
+#include <climits>
 
 #include "CongestionAlgorithm.h"
 #include "Vegas.h"
@@ -24,7 +26,7 @@ class Host;
 static int FLOW_END = -1;
 static int FLOW_MAINTENANCE_PERIOD = 1;
 
-/* Class that controls packet flow between hosts. */
+// Class that controls packet flow between hosts.
 class Flow {
     friend void makeAndSendPacket(int id, Flow *flow);
     friend void maintainFlowCallback(void *arg);
@@ -71,7 +73,9 @@ public:
     
         
     double getPacketTime(int id);
+        // Returns the packets with the given id's start time
     int getNextUnrecieved();
+        // Returns the id of the next unreceived packet
  
     void handlePacket(AckPacket *p);
         // Handles an incoming packet acknowledgement 
@@ -81,6 +85,7 @@ public:
     void resetPackets(int id); 
         // make packets of >= id behave as though they have not been
         // sent
+    int nextHostPacket();
 
 
     void resetStats();
@@ -92,13 +97,22 @@ public:
         // Update the data received in the last time interval by adding
         // bytes to the dataReceived field.
     Host *getStart();
+        // Returns the source host of the flow
     Host *getDestination();
+        // Returns the destination host of the flow
     int getId();
+        // Returns the id of the flow
     std::string infoString();
+        // Returns a string formatted to describe the flow
     double getStats(std::string stat, int period);
+        // Returns the stat requested by the stat string
+        // Options: "send rate", "receive rate", "rtt", "window",
+        //          "thresh", "outstanding"
     int getTotalPackets();
+        // Returns the total number of packets in this flow
 
 };
 
 
 #endif
+

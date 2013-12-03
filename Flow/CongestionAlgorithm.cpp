@@ -39,7 +39,6 @@ SLOW_START::SLOW_START(Flow *in_flow)
     , sendNext(1)
     , maxAck(0)
     , lastDroppedTime(0)
-    , outstanding(1)
 {
 }
 
@@ -78,7 +77,7 @@ void SLOW_START::sendPacket(int id, double startTime){
 
     // make packet and send to flow to put into system
     DataPacket *p = new DataPacket (id, this->getFlow(), \
-                            startTime);
+                            SYSTEM_CONTROLLER->getCurrentTime());
     this->getFlow()->sendNewPacket(p, checkAt);
     
     // make timeout event
@@ -170,7 +169,7 @@ void SLOW_START::updateTimeout(double startTime){
 
 void SLOW_START::ackRecieved(AckPacket *p){
 std::cout << "In SLOW_START::ackRecieved " << std::endl;
-    this->updateTimeout(p->getStartTime());
+   this->updateTimeout(p->getStartTime());
     
 
     if (this->windowSize < this->ssthreash) {
