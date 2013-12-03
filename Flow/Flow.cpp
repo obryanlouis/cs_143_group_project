@@ -35,13 +35,17 @@ Flow::Flow(int in_ID, int in_size, Host *in_source, Host *in_destination,
     // make congestion algorithm
     switch (algType) {
         case SLOW:
-              congestionAlgorithm_p = new SLOW_START(this);
+            congestionAlgorithm_p = new SLOW_START(this);
+            break;
+        case TAHOE:
+            congestionAlgorithm_p = new TCP_TAHOE(this);
+            break;
         case RENO:
 //            congestionAlgorithm_p = new TCP_RENO(this);
-        break;
+            break;
         case VEGAS:
 //            congestionAlgorithm_p = new TCP_Vegas(this);
-        break;
+            break;
 
         default:
             std::cout << "Invalid routing type" << std::endl;
