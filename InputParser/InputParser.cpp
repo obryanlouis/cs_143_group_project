@@ -234,6 +234,9 @@ void InputParser::run(int                   &snapshotTime,
         if (ctext.compare("slow") == 0) {
             congestionAlgorithmType = SLOW;
         }
+        else if (ctext.compare("tahoe") == 0) {
+            congestionAlgorithmType = TAHOE;
+        }
         else if (ctext.compare("reno") == 0) {
             congestionAlgorithmType = RENO;
         }
