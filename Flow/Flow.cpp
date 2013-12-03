@@ -13,6 +13,8 @@ Flow::Flow(int in_ID, int in_size, Host *in_source, Host *in_destination,
     , progress(0)
     , dataSent(0)
     , dataReceived(0)
+    , totalRtt(0)
+    , packetsReceived(0)
 {
     // Calculate the number of packets we need based on size of flow 
     this->totalPackets = (in_size + (Packet::DATASIZE - 1)) / Packet::DATASIZE;
@@ -129,6 +131,11 @@ void Flow::handlePacket(AckPacket *p) {
         " out of " << totalPackets << " received\n";
     this->dataReceived += p->getSize();
 
+    // update RTT stats: totalRtt, packetsReceived
+    this->totalRtt +=
+        (SYSTEM_CONTROLLER->getCurrentTime() - p->getStartTime());
+    this->packetsReceived++;
+
     if (progress == totalPackets) SYSTEM_CONTROLLER->decrementFlowsLeft();
 
 
@@ -179,8 +186,7 @@ double Flow::getStats(std::string stat, int period) {
     }
     // TODO:
     else if (stat.compare("rtt") == 0) {
-        return (double)this->outstanding * (double)period /
-            (double)this->dataReceived;
+        return totalRtt / packetsReceived;
     }
     else if (stat.compare("window") == 0) {
         return congestionAlgorithm_p->getWindowSize();
@@ -197,6 +203,8 @@ double Flow::getStats(std::string stat, int period) {
 void Flow::resetStats() {
     dataSent = 0;
     dataReceived = 0;
+    totalRtt = 0;
+    packetsReceived = 0;
 }
 
 void Flow::updateDataSent(int bytes) {
@@ -206,6 +214,12 @@ void Flow::updateDataSent(int bytes) {
 void Flow::updateDataReceived(int bytes) {
     dataReceived += bytes;
 }
+
+void Flow::updateTotalRtt(double rtt) {
+    totalRtt += rtt;
+    packetsReceived++;
+}
+
 
 std::string Flow::infoString(){
     std::stringstream ss;

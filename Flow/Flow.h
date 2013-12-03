@@ -57,6 +57,10 @@ class Flow {
         // data sent in last time interval
     int dataReceived;
         // data received in last time interval
+    double totalRtt;
+        // The total sum of the RTTs of packets received in last time interval
+    int packetsReceived;
+        // The number of packets received in the last time interval
     CongestionAlgorithm *congestionAlgorithm_p;
 
 public:
@@ -96,6 +100,10 @@ public:
     void updateDataReceived(int bytes);
         // Update the data received in the last time interval by adding
         // bytes to the dataReceived field.
+    void updateTotalRtt(double rtt);
+        // Update the total RTT in the last time interval by adding
+        // the RTT of the last received packet. Also updates the number
+        // of packets received
     Host *getStart();
         // Returns the source host of the flow
     Host *getDestination();
