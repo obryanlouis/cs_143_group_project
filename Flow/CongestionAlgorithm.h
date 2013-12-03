@@ -13,6 +13,7 @@ class Flow;
 
 enum CongestionAlgorithmType {
     SLOW,
+    TAHOE,
     RENO,
     VEGAS
 };
@@ -29,17 +30,17 @@ public:
     Flow* getFlow();
     double getWindowSize();
 
-    virtual void scheduleFirstPacket(double startTime) = 0;
+    void scheduleFirstPacket(double startTime);
  
     virtual void ackRecieved(AckPacket *packet) = 0;
-    virtual AckPacket* makeAckPacket(DataPacket *p) = 0;
+    AckPacket* makeAckPacket(DataPacket *p);
     // when DataPacket recieved at destination host, determines
     // what AckPacket should be sent. 
 
 };
 
 class SLOW_START : public CongestionAlgorithm{
-private:
+protected:
     double roundTripTime;
     double timeDeviation;
     double timeout;
@@ -48,8 +49,6 @@ private:
     double outstanding; 
     int sendNext;
 
-    int lastAckRecieved;
-    int duplicates;
     int maxAck;
     double lastDroppedTime;
 
@@ -62,7 +61,34 @@ public:
     virtual void packetDropped(int id);
     virtual void ackRecieved(AckPacket *p);
     void sendPacket(int id, double startTime);
+    void updateTimeout(double time);
     AckPacket *makeAckPacket(DataPacket *p);
 };
+
+
+class TCP_TAHOE : public SLOW_START{
+protected:
+    int lastAckRecieved;
+    int duplicates;
+
+public:
+    TCP_TAHOE(Flow *in_flow);
+    
+    virtual void ackRecieved(AckPacket *p);
+    virtual void packetDropped(int id);
+};
+
+
+class TCP_RENO : public TCP_TAHOE {
+private:
+    bool inRecovery;
+
+public:
+    TCP_RENO(Flow *in_flow);
+    void ackRecieved(AckPacket *p);
+    void packetDropped(int id);
+
+};
+
 
 #endif
