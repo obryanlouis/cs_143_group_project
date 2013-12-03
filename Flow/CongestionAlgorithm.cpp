@@ -34,6 +34,8 @@ SLOW_START::SLOW_START(Flow *in_flow)
     , duplicates(0)
     , maxAck(0)
     , lastDroppedTime(0)
+    , lastDupTime(0)
+    , numResent(0)
 {
 }
 
@@ -149,6 +151,9 @@ std::cout << "\t Packet DID get dropped" << std::endl;
 }
 
 void SLOW_START::ackRecieved(AckPacket *p){
+
+    if (p->getStartTime() < this->lastDroppedTime) return;
+
 std::cout << "In SLOW_START::ackRecieved " << std::endl;
 std::cout << "\t Outstanding = " << this->outstanding << std::endl;
     // update RTT
@@ -168,6 +173,55 @@ std::cout << "\t Outstanding = " << this->outstanding << std::endl;
     this->timeout = roundTripTime + timeDeviation + TIMEOUT_CONST; 
 
 
+
+
+
+
+
+
+    double packetStart = p->getStartTime();
+    double currentTime = SYSTEM_CONTROLLER->getCurrentTime();
+    int id = p->getAckId(); 
+
+    if (id == lastAckRecieved) { 
+        if (flow->getPacketTime(id) == 0) return;
+        duplicates++;
+        if (duplicates == 3) {
+            outstanding = 0;
+            windowSize = windowSize / 2;
+            ssthreash = std::max((double)2, windowSize);
+            flow->resetPackets(id);
+            int limit = id + windowSize;
+            for (int i = id; i < limit; i++) {
+                sendPacket(i, currentTime);
+                outstanding++;
+            }
+            sendNext = limit;
+        }
+        else if (duplicates > 3) {
+            windowSize++;
+            outstanding--;
+            int limit = sendNext + windowSize - outstanding;
+            for (int i = sendNext; i < limit; i++) {
+                outstanding++;
+                sendPacket(i, currentTime);
+            }
+            sendNext = limit;
+        } 
+        return;
+    }
+
+    if (duplicates > 3) {
+        windowSize = ssthreash;
+    }
+
+    duplicates = 0;
+    lastAckRecieved = id;
+
+
+
+
+
     if (this->windowSize < this->ssthreash) {
         std::cout << "\t in slow start \n";
         this->windowSize += 1;
@@ -177,12 +231,10 @@ std::cout << "\t Outstanding = " << this->outstanding << std::endl;
         this->windowSize += 1/this->windowSize;
     }
 
-    if (p->getStartTime() < this->lastDroppedTime) return;
+
 
     this->outstanding--;
    
-    int id = p->getAckId();
-
     // send new packets
     int start = std::max(this->sendNext, id); 
     int i = start;
@@ -204,6 +256,14 @@ std::cout << "\t Outstanding = " << this->outstanding << std::endl;
 
 
 
+}
+
+double SLOW_START::getThresh() {
+    return ssthreash;
+}
+
+double SLOW_START::getOutstanding() {
+    return outstanding;
 }
 
 

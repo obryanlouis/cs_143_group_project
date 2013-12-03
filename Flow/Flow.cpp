@@ -135,6 +135,11 @@ void Flow::resetPackets(int id){
 
 
 double Flow::getPacketTime(int id){
+    std::map<int, double>::iterator it = packets.find(id);
+    if (it == packets.end()) {
+        std::cout << "Packet id not stored\n";
+        exit(1);
+    }
     return packets[id];
 }
 
@@ -169,6 +174,12 @@ double Flow::getStats(std::string stat, int period) {
     }
     else if (stat.compare("window") == 0) {
         return congestionAlgorithm_p->getWindowSize();
+    }
+    else if (stat.compare("thresh") == 0) {
+        return congestionAlgorithm_p->getThresh();
+    }
+    else if (stat.compare("outstanding") == 0) {
+        return congestionAlgorithm_p->getOutstanding();
     }
 }
 

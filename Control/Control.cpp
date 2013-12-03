@@ -146,16 +146,21 @@ void Controller::printMySystem() {
     }
 
     //std::cout << "  Outputting Flow information." << std::endl;
-    std::ofstream flowSendFile, flowReceiveFile, flowRTTFile, flowWindowFile;
+    std::ofstream flowSendFile, flowReceiveFile, flowRTTFile, flowWindowFile,
+        flowThreshFile, flowOutstandingFile;
     flowSendFile.open(FLOW_SEND_FILE.data(), std::ios::app);
     flowReceiveFile.open(FLOW_RECEIVE_FILE.data(), std::ios::app);
     flowRTTFile.open(FLOW_RTT_FILE.data(), std::ios::app);
     flowWindowFile.open(FLOW_WINDOW_FILE.data(), std::ios::app);
+    flowThreshFile.open(FLOW_THRESH_FILE.data(), std::ios::app);
+    flowOutstandingFile.open(FLOW_OUTSTANDING_FILE.data(), std::ios::app);
     files.clear();
     files["send rate"] = &flowSendFile;
     files["receive rate"] = &flowReceiveFile;
     files["rtt"] = &flowRTTFile;
     files["window"] = &flowWindowFile;
+    files["thresh"] = &flowThreshFile;
+    files["outstanding"] = &flowOutstandingFile;
     for (std::map<std::string, std::ofstream*>::iterator i = files.begin();
          i != files.end(); i++)
     {
@@ -280,6 +285,8 @@ void removeOldStatsFiles() {
     filenames.push_back(FLOW_WINDOW_FILE);
     filenames.push_back(HOST_SEND_FILE);
     filenames.push_back(HOST_RECEIVE_FILE);
+    filenames.push_back(FLOW_THRESH_FILE);
+    filenames.push_back(FLOW_OUTSTANDING_FILE);
 
     filenames.push_back("routers.txt");
 
