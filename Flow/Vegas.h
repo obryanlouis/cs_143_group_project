@@ -4,8 +4,11 @@
 #include "CongestionAlgorithm.h"
 #include <cmath>
 
-class Vegas : public TCP_RENO {
+class Vegas : public SLOW_START {
     private:
+        int lastAckRecieved;
+        int duplicates;
+
         bool inRecovery;
         double rttmin;
         void sendAvailablePackets();

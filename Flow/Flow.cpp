@@ -89,7 +89,7 @@ AckPacket* Flow::atDest(DataPacket *p){
     std::cout << "In Flow:atDest " << std::endl;
     // let the flow know that the destination has recieved the data
     if (*(acks.begin()) == p->getId()) this->acks.erase(p->getId());
-    std::cout << "\tTried to erase " << p->getId() << " new next unrecieved " << getNextUnrecieved() << std::endl;
+    /*std::cout << "\tTried to erase " << p->getId() << " new next unrecieved " << getNextUnrecieved() << std::endl;*/
     // let the congestion control algorithm make the ack packet
     AckPacket *ack = this->congestionAlgorithm_p->makeAckPacket(p);
  
@@ -232,3 +232,36 @@ int Flow::getTotalPackets(){
     return totalPackets;
 }
 
+int Flow::getProgress() {
+    return progress;
+}
+
+void Flow::checkAllRecieved(int sendNext) {
+    for (int i = 0; i < sendNext; i++) {
+        std::map<int, double>::iterator it = packets.find(i);
+        if (it == packets.end()) {
+            std::cout << "Packet at index " << i << " never sent.\n";
+            exit(1);
+        }
+        if (packets[i] != DBL_MAX) {
+            std::cout << "Packet at index " << i << " was never recieved.\n";
+            exit(1);
+        }
+    }
+}
+
+void Flow::printRemainingPacketIds() {
+    std::ofstream file;
+    file.open("flow.txt");
+    for (std::map<int, double>::iterator it = packets.begin();
+            it != packets.end(); it++)
+    {
+        int i = it->first;
+        double time = it->second;
+        if (time == 0) {
+            file << i << "\n";
+        }        
+    }
+    file << "\n\n\n";
+    file.close();
+}
