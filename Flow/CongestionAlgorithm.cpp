@@ -138,10 +138,11 @@ std::cout << "\t Packet DID get dropped" << std::endl;
 
     this->flow->resetPackets(id);
     
-    this->sendPacket(id, SYSTEM_CONTROLLER->getCurrentTime());
+    this->sendPacket(flow->nextHostPacket(), SYSTEM_CONTROLLER->getCurrentTime());
 
     this->outstanding = 1;
-    this->sendNext = flow->getNextUnrecieved(); 
+    this->sendNext = flow->nextHostPacket() + 1; 
+ std::cout << "\t Sendnext at " << sendNext << "\n";
 
     this->duplicates = 0;
     this->lastAckRecieved = -1;
@@ -221,7 +222,10 @@ std::cout << "\t Outstanding = " << this->outstanding << std::endl;
 
 
 
-
+void SLOW_START::ackRecieved(AckPacket *p){
+std::cout << "In SLOW_START::ackRecieved " << std::endl;
+   this->updateTimeout(p->getStartTime());
+    
     if (this->windowSize < this->ssthreash) {
         std::cout << "\t in slow start \n";
         this->windowSize += 1;
@@ -266,6 +270,41 @@ double SLOW_START::getOutstanding() {
     return outstanding;
 }
 
+<<<<<<< HEAD
+=======
+void TCP_TAHOE::ackRecieved(AckPacket *p){
+    // Fast retransmit
+std::cout << "In TCP_TAHOE::ackRecieved" << std::endl;
+    if (p->getStartTime() < lastDroppedTime) {
+        return;
+    }
+
+    int id = p->getAckId();
+
+    if (id == lastAckRecieved && this->ssthreash < this-> outstanding){
+        duplicates++;
+        SLOW_START::updateTimeout(p->getStartTime());
+std::cout << "\t duplicate of id " << id << std::endl;
+        if (duplicates == 3) {
+std::cout << "\tDuplicates == 3 \n";
+            this->ssthreash = outstanding/ 2;
+            this->windowSize = 1;
+            lastDroppedTime = SYSTEM_CONTROLLER->getCurrentTime();
+            SLOW_START::sendPacket(id, SYSTEM_CONTROLLER->getCurrentTime());
+            this->outstanding = 1;
+            this->sendNext = id + 1;
+            this->flow->resetPackets(id);
+            return;
+        }
+
+    }
+    else {
+        lastAckRecieved = id;
+        duplicates = 0;
+    }
+
+    SLOW_START::ackRecieved(p);
+>>>>>>> 8de42295223a5ac57fe2b68f11cb3a65a2bf6b00
 
 AckPacket *SLOW_START::makeAckPacket(DataPacket *p){
     // make sure the AckPacket is of the right ID
@@ -275,25 +314,96 @@ AckPacket *SLOW_START::makeAckPacket(DataPacket *p){
 }
 
 
+/************************* TCP RENO *********************************/
 
-
-/*
-TCP_Vegas::TCP_Vegas(Flow* in_flow)
-    : CongestionAlgorithm(in_flow)
+TCP_RENO::TCP_RENO(Flow* in_flow)
+    : TCP_TAHOE(in_flow)
+    , inRecovery(false)
 {
 }
 
 
-void TCP_Vegas::packetDropped(){
+void TCP_RENO::packetDropped(int id){
+    TCP_TAHOE::packetDropped(id);
+    inRecovery = false;
+    lastAckRecieved = -1;
+    duplicates = 0;
+}
+
+void TCP_RENO::ackRecieved(AckPacket *p){
+    // Fast recovery
+std::cout << "In TCP_RENO::ackRecieved" << std::endl;
+std::cout << "\t threashold" << ssthreash << "\n";    
+std::cout << "\tcurrent time " << SYSTEM_CONTROLLER->getCurrentTime() << " packet creation " << p->getStartTime() << "last dropped" << lastDroppedTime << "\n";
+std::cout << "\t Outstanding = " << this->outstanding << std::endl;
+std::cout << "\t Window Size = " << windowSize << std::endl;
+std::cout << "\t sendNext = " << sendNext << std::endl;
+    if (p->getAckId() > sendNext) {
+        sendNext = p->getAckId();
+        if (outstanding - windowSize <= 1) {
+std::cout << "\t in that weird ass fringe case \n";
+            SLOW_START::sendPacket(p->getAckId(), 0);
+            
+        }
+    }
+
+    if (p->getStartTime() < lastDroppedTime) {
+        return;
+    }
+
+    int id = p->getAckId();
+
+
+    if (id == lastAckRecieved && this->ssthreash < this-> outstanding){
+        outstanding--; 
+        duplicates++;
+        SLOW_START::updateTimeout(p->getStartTime());
+std::cout << "\t duplicate of id " << id << std::endl;
+        if (duplicates == 3) {
+std::cout << "\tDuplicates == 3 \n";
+            this->ssthreash = outstanding/ 2;
+            this->windowSize = ssthreash + 3;
+            SLOW_START::sendPacket(id, SYSTEM_CONTROLLER->getCurrentTime());
+            this->outstanding++ ;
+        
+            this->inRecovery = true;
+            return;
+        }
+
+        if (inRecovery) {
+std::cout << "\t currently in recovery \n";
+            windowSize++;
+
+            int start = std::max(this->sendNext, id); 
+            int i = start;
+            for (i; 
+                    i < start + this->windowSize - this->outstanding
+                    && i < flow->getTotalPackets(); 
+                    i++){
+                this->sendPacket(i, SYSTEM_CONTROLLER->getCurrentTime()
+                                    + (i- start) *0.0001);
+            }
+
+            this->outstanding += i - start;
+            std::cout << "\tPackets outstanding" << outstanding << "window size" << windowSize <<  std::endl;
+            
+            this->sendNext = i;
+
+
+        }
+
+    }
+    else {
+        lastAckRecieved = id;
+        duplicates = 0;
+        if (inRecovery) {
+            inRecovery = false;
+            windowSize = ssthreash;
+        }
+    }
+
+    SLOW_START::ackRecieved(p);
 
 
 }
 
-void TCP_Vegas::ackRecieved(AckPacket *p){
-
-}
-
-AckPacket *TCP_Vegas::makeAckPacket(DataPacket *p){
-
-}
-*/
