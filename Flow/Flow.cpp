@@ -41,7 +41,7 @@ Flow::Flow(int in_ID, int in_size, Host *in_source, Host *in_destination,
             congestionAlgorithm_p = new TCP_TAHOE(this);
             break;
         case RENO:
-//            congestionAlgorithm_p = new TCP_RENO(this);
+            congestionAlgorithm_p = new TCP_RENO(this);
             break;
         case VEGAS:
 //            congestionAlgorithm_p = new TCP_Vegas(this);
@@ -75,6 +75,14 @@ int Flow::getNextUnrecieved(){
     return *(acks.begin());
 }
 
+int Flow::nextHostPacket(){
+    for (int i = 0; i < totalPackets; i++){
+        if (packets[i] != DBL_MAX) return i;
+    }
+    std::cout<< "uhhh. no lowest packet? (Flow::nextHostPacket)\n" << std::endl;
+
+    exit(1);
+}
 
 AckPacket* Flow::atDest(DataPacket *p){
     std::cout << "In Flow:atDest " << std::endl;

@@ -141,10 +141,11 @@ std::cout << "\t Packet DID get dropped" << std::endl;
 
     this->flow->resetPackets(id);
     
-    this->sendPacket(id, SYSTEM_CONTROLLER->getCurrentTime());
+    this->sendPacket(flow->nextHostPacket(), SYSTEM_CONTROLLER->getCurrentTime());
 
     this->outstanding = 1;
-    this->sendNext = flow->getNextUnrecieved(); 
+    this->sendNext = flow->nextHostPacket() + 1; 
+ std::cout << "\t Sendnext at " << sendNext << "\n";
 
     this->lastDroppedTime = SYSTEM_CONTROLLER->getCurrentTime();
 
@@ -282,11 +283,22 @@ std::cout << "\t threashold" << ssthreash << "\n";
 std::cout << "\tcurrent time " << SYSTEM_CONTROLLER->getCurrentTime() << " packet creation " << p->getStartTime() << "last dropped" << lastDroppedTime << "\n";
 std::cout << "\t Outstanding = " << this->outstanding << std::endl;
 std::cout << "\t Window Size = " << windowSize << std::endl;
+std::cout << "\t sendNext = " << sendNext << std::endl;
+    if (p->getAckId() > sendNext) {
+        sendNext = p->getAckId();
+        if (outstanding - windowSize <= 1) {
+std::cout << "\t in that weird ass fringe case \n";
+            SLOW_START::sendPacket(p->getAckId(), 0);
+            
+        }
+    }
+
     if (p->getStartTime() < lastDroppedTime) {
         return;
     }
 
     int id = p->getAckId();
+
 
     if (id == lastAckRecieved && this->ssthreash < this-> outstanding){
         outstanding--; 
@@ -299,7 +311,6 @@ std::cout << "\tDuplicates == 3 \n";
             this->windowSize = ssthreash + 3;
             SLOW_START::sendPacket(id, SYSTEM_CONTROLLER->getCurrentTime());
             this->outstanding++ ;
-
         
             this->inRecovery = true;
             return;
