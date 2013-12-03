@@ -85,8 +85,8 @@ private:
 
 public:
     TCP_RENO(Flow *in_flow);
-    void ackRecieved(AckPacket *p);
-    void packetDropped(int id);
+    virtual void ackRecieved(AckPacket *p);
+    virtual void packetDropped(int id);
 
 };
 
