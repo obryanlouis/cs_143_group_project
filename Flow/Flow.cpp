@@ -1,8 +1,6 @@
 // Flow.cpp
 
 #include "Flow.h"
-#include <sstream>
-#include <climits>
 
 extern Controller *SYSTEM_CONTROLLER; 
 
@@ -33,6 +31,7 @@ Flow::Flow(int in_ID, int in_size, Host *in_source, Host *in_destination,
     in_destination->setFlow2(this);
 
     // make congestion algorithm
+    // TODO:
     switch (algType) {
         case SLOW:
             congestionAlgorithm_p = new SLOW_START(this);
@@ -96,7 +95,6 @@ void Flow::handlePacket(AckPacket *p) {
 
     int id = p->getAckId();
     this->progress = id;
-
 
 
     for (id = id - 1; id >= 0; id--){
@@ -211,3 +209,4 @@ std::string Flow::infoString(){
 int Flow::getTotalPackets(){
     return totalPackets;
 }
+
