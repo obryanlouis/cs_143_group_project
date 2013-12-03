@@ -1,3 +1,4 @@
+
 // Flow.h
 
 #ifndef FLOW_H
@@ -42,11 +43,11 @@ class Flow {
         // A map that will keep track of whether or not packets have
         // been successfully sent and received.
         // The key is the packet Id.
-        // The value is 0 if the packet has not been sent and the 
-        // time of timeout otherwise.      
+        // The value is 0 if the packet has not been sent and the
+        // time of timeout otherwise.
     std::set<int> acks;
-        // A set that keeps track of which data packets have been 
-        // recieved at the destination 
+        // A set that keeps track of which data packets have been
+        // recieved at the destination
     int outstanding;
         // number of outstanding packets
     Host *source;
@@ -71,7 +72,7 @@ public:
         // Destroy this instance of Flow
 
     void startFlow(double startTime);
-        // creates first event for this flow 
+        // creates first event for this flow
     void sendNewPacket(DataPacket *p, double timeOut);
         // takes packet created by flow and updates internals
     
@@ -82,11 +83,11 @@ public:
         // Returns the id of the next unreceived packet
  
     void handlePacket(AckPacket *p);
-        // Handles an incoming packet acknowledgement 
+        // Handles an incoming packet acknowledgement
     AckPacket *atDest(DataPacket *p);
         // generates an AckPacket based off of TCP congestion alg
         // for when DataPacket recieved at Destination.
-    void resetPackets(int id); 
+    void resetPackets(int id);
         // make packets of >= id behave as though they have not been
         // sent
     int nextHostPacket();
@@ -115,12 +116,11 @@ public:
     double getStats(std::string stat, int period);
         // Returns the stat requested by the stat string
         // Options: "send rate", "receive rate", "rtt", "window",
-        //          "thresh", "outstanding"
+        // "thresh", "outstanding"
     int getTotalPackets();
         // Returns the total number of packets in this flow
 
 };
 
 
-#endif
-
+#endif 

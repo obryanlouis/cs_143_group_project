@@ -1,3 +1,4 @@
+
 // CongestionAlgorithm.h
 
 #ifndef CongestionAlgorithm_H
@@ -34,7 +35,7 @@ public:
     virtual void ackRecieved(AckPacket *packet) = 0;
     AckPacket* makeAckPacket(DataPacket *p);
     // when DataPacket recieved at destination host, determines
-    // what AckPacket should be sent.
+    // what AckPacket should be sent. 
 
 };
 
@@ -45,13 +46,13 @@ protected:
     double timeout;
     double ssthreash;
     double alpha; // weighting for RTT updates
-    double outstanding;
+    double outstanding; 
     int sendNext;
 
     int maxAck;
     double lastDroppedTime;
 
-public:
+public: 
     SLOW_START(Flow *in_flow);
 
     double getTimeOut();
@@ -84,8 +85,8 @@ private:
 
 public:
     TCP_RENO(Flow *in_flow);
-    void ackRecieved(AckPacket *p);
-    void packetDropped(int id);
+    virtual void ackRecieved(AckPacket *p);
+    virtual void packetDropped(int id);
 
 };
 

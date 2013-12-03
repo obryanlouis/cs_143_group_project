@@ -88,7 +88,7 @@ int Flow::nextHostPacket(){
 AckPacket* Flow::atDest(DataPacket *p){
     std::cout << "In Flow:atDest " << std::endl;
     // let the flow know that the destination has recieved the data
-    this->acks.erase(p->getId());
+    if (*(acks.begin()) == p->getId()) this->acks.erase(p->getId());
     std::cout << "\tTried to erase " << p->getId() << " new next unrecieved " << getNextUnrecieved() << std::endl;
     // let the congestion control algorithm make the ack packet
     AckPacket *ack = this->congestionAlgorithm_p->makeAckPacket(p);
