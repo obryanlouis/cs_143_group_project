@@ -25,6 +25,7 @@ int main(int argc, char **argv) {
 
     // DEBUG: use a default file input.xml
     string input = "input.xml";
+    ///string input = "testcase2.xml";
 
     // Initialize the System Controller
     SYSTEM_CONTROLLER = new Controller();

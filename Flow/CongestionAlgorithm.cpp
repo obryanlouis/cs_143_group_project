@@ -77,7 +77,7 @@ void SLOW_START::sendPacket(int id, double startTime){
 
     // make packet and send to flow to put into system
     DataPacket *p = new DataPacket (id, this->getFlow(), \
-                            SYSTEM_CONTROLLER->getCurrentTime());
+                            startTime);
     this->getFlow()->sendNewPacket(p, checkAt);
     
     // make timeout event 
@@ -121,7 +121,9 @@ void CongestionAlgorithm::scheduleFirstPacket(double startTime){
 
 
 void SLOW_START::packetDropped(int id){
-std::cout << "In SLOW_START::packetDropped()" << std::endl;
+    std::cout << "Flow progress: " << flow->getProgress() 
+        << " out of " << flow->getTotalPackets() <<  std::endl;
+
     // see if packet not actually dropped
 std::cout << "\t Packet " << id << "has timeout "<< flow->getPacketTime(id) << std::endl;
     if (flow->getPacketTime(id) > SYSTEM_CONTROLLER->getCurrentTime()){
@@ -149,6 +151,9 @@ std::cout << "\t Packet DID get dropped" << std::endl;
 
     this->lastDroppedTime = SYSTEM_CONTROLLER->getCurrentTime();
 
+    // DEBUG: check that all packets before sendNext have actually been
+    // recieved by the flow
+    flow->checkAllRecieved(sendNext - 1);
 }
 
 void SLOW_START::updateTimeout(double startTime){

@@ -71,6 +71,7 @@ public:
     ~Flow();
         // Destroy this instance of Flow
 
+    int getProgress();
     void startFlow(double startTime);
         // creates first event for this flow
     void sendNewPacket(DataPacket *p, double timeOut);
@@ -119,6 +120,10 @@ public:
         //          "thresh", "outstanding"
     int getTotalPackets();
         // Returns the total number of packets in this flow
+
+    // DEBUG
+    void checkAllRecieved(int sendNext);
+    void printRemainingPacketIds();
 
 };
 

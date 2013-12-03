@@ -52,6 +52,28 @@ int Controller::numLinksToPrint() {
     return num;
 }
 
+int Controller::numHostsToPrint() {
+    int num = 0;
+    for (std::list<HostInfo>::iterator it = hostInfos.begin();
+         it != hostInfos.end(); it++)
+    {
+        if (it->print)
+            num++;
+    }
+    return num;
+}
+
+int Controller::numFlowsToPrint() {
+    int num = 0;
+    for (std::list<FlowInfo>::iterator it = flowInfos.begin();
+         it != flowInfos.end(); it++)
+    {
+        if (it->print)
+            num++;
+    }
+    return num;
+}
+
 double Controller::getCurrentTime() {
     return SYSTEM_TIME;
 }
@@ -157,7 +179,7 @@ void Controller::printMySystem() {
     files.clear();
     files["send rate"] = &flowSendFile;
     files["receive rate"] = &flowReceiveFile;
-    files["delay"] = &flowRTTFile;
+    files["rtt"] = &flowRTTFile;
     files["window"] = &flowWindowFile;
     /*files["thresh"] = &flowThreshFile;
     files["outstanding"] = &flowOutstandingFile;*/

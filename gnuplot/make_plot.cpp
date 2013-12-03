@@ -80,6 +80,7 @@ void makePlots() {
         std::string dataFile = std::get<0>(*iter);
         // Retrieve the y axis label
         std::string ylabel = std::get<2>(*iter);
+        StatType t = std::get<3>(*iter);
         FILE * fp = popen("gnuplot ", "w");    
 
         // Execute gnuplot commands common for each stat file
@@ -89,7 +90,15 @@ void makePlots() {
         commands.push_back("set object 1 rectangle from screen 0,0 to screen 1,1 fillcolor rgb\"white\" behind");
         std::stringstream multiplotCommand;
         multiplotCommand << "set multiplot layout ";
-        multiplotCommand << SYSTEM_CONTROLLER->numLinksToPrint() << ",1";
+        if (t == FLOWSTAT) {
+            multiplotCommand << SYSTEM_CONTROLLER->numFlowsToPrint() << ",1";
+        }
+        else if (t == HOSTSTAT) {
+            multiplotCommand << SYSTEM_CONTROLLER->numHostsToPrint() << ",1";
+        }
+        else if (t == LINKSTAT) {
+            multiplotCommand << SYSTEM_CONTROLLER->numLinksToPrint() << ",1";
+        }
         commands.push_back(multiplotCommand.str());
         commands.push_back("set xlabel \"Time (s)\"");
         commands.push_back("set ylabel \"" + ylabel + "\"");
@@ -103,7 +112,6 @@ void makePlots() {
 
         // Depending on the statistic type being graphed, graph all
         // flows / links / hosts for the given statistic 
-        StatType t = std::get<3>(*iter);
         std::list<SystemInfo>::iterator it;
         std::list<SystemInfo>::iterator end;
         if (t == FLOWSTAT) {
