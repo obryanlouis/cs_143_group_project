@@ -13,7 +13,7 @@ Flow::Flow(int in_ID, int in_size, Host *in_source, Host *in_destination,
     , progress(0)
     , dataSent(0)
     , dataReceived(0)
-    , totalRtt(0)
+    , totalPacketDelay(0)
     , packetsReceived(0)
 {
     // Calculate the number of packets we need based on size of flow 
@@ -92,8 +92,13 @@ AckPacket* Flow::atDest(DataPacket *p){
     std::cout << "\tTried to erase " << p->getId() << " new next unrecieved " << getNextUnrecieved() << std::endl;
     // let the congestion control algorithm make the ack packet
     AckPacket *ack = this->congestionAlgorithm_p->makeAckPacket(p);
- 
-   return ack;
+
+    // update packet delay stats: totalPacketDelay, packetsReceived
+    this->totalPacketDelay +=
+        (SYSTEM_CONTROLLER->getCurrentTime() - p->getStartTime());
+    this->packetsReceived++;
+
+    return ack;
 }
 
 void Flow::handlePacket(AckPacket *p) {
@@ -133,11 +138,6 @@ void Flow::handlePacket(AckPacket *p) {
     std::cout << "Flow " << flowId << " progress: " << progress <<
         " out of " << totalPackets << " received\n";
     this->dataReceived += p->getSize();
-
-    // update RTT stats: totalRtt, packetsReceived
-    this->totalRtt +=
-        (SYSTEM_CONTROLLER->getCurrentTime() - p->getStartTime());
-    this->packetsReceived++;
 
     if (progress == totalPackets) SYSTEM_CONTROLLER->decrementFlowsLeft();
 
@@ -188,8 +188,8 @@ double Flow::getStats(std::string stat, int period) {
             ((double) 8/ (double) 1000);
     }
     // TODO:
-    else if (stat.compare("rtt") == 0) {
-        return totalRtt / packetsReceived;
+    else if (stat.compare("delay") == 0) {
+        return totalPacketDelay / packetsReceived;
     }
     else if (stat.compare("window") == 0) {
         return congestionAlgorithm_p->getWindowSize();
@@ -206,7 +206,7 @@ double Flow::getStats(std::string stat, int period) {
 void Flow::resetStats() {
     dataSent = 0;
     dataReceived = 0;
-    totalRtt = 0;
+    totalPacketDelay = 0;
     packetsReceived = 0;
 }
 
@@ -218,8 +218,8 @@ void Flow::updateDataReceived(int bytes) {
     dataReceived += bytes;
 }
 
-void Flow::updateTotalRtt(double rtt) {
-    totalRtt += rtt;
+void Flow::updateTotalPacketDelay(double delay) {
+    totalPacketDelay += delay;
     packetsReceived++;
 }
 
