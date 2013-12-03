@@ -23,6 +23,13 @@ double CongestionAlgorithm::getWindowSize(){
     return this->windowSize;
 }
 
+AckPacket *CongestionAlgorithm::makeAckPacket(DataPacket *p){
+    // make sure the AckPacket is of the right ID
+    int id = this->flow->getNextUnrecieved();
+    std::cout << "making ackpacket of id" << id << std::endl;
+    return new AckPacket(p, id);
+}
+
 SLOW_START::SLOW_START(Flow *in_flow)
     : CongestionAlgorithm(in_flow)
     , ssthreash(DBL_MAX)
@@ -30,8 +37,6 @@ SLOW_START::SLOW_START(Flow *in_flow)
     , timeout(START_RTT)
     , alpha(DEFAULT_ALPHA)
     , sendNext(1)
-    , lastAckRecieved(-1)
-    , duplicates(0)
     , maxAck(0)
     , lastDroppedTime(0)
 {
@@ -103,7 +108,7 @@ void SLOW_START_sendFirstPacket(void *arg){
     // no cleanup needed since still using args
 }
 
-void SLOW_START::scheduleFirstPacket(double startTime){
+void CongestionAlgorithm::scheduleFirstPacket(double startTime){
     // make event to make first packet
     void (*fp)(void*) = &SLOW_START_sendFirstPacket;
     void **args = (void **)malloc(2* sizeof (void *));
@@ -141,18 +146,12 @@ std::cout << "\t Packet DID get dropped" << std::endl;
     this->outstanding = 1;
     this->sendNext = flow->getNextUnrecieved(); 
 
-    this->duplicates = 0;
-    this->lastAckRecieved = -1;
-
     this->lastDroppedTime = SYSTEM_CONTROLLER->getCurrentTime();
 
 }
 
-void SLOW_START::ackRecieved(AckPacket *p){
-std::cout << "In SLOW_START::ackRecieved " << std::endl;
-std::cout << "\t Outstanding = " << this->outstanding << std::endl;
-    // update RTT
-    double rtt = SYSTEM_CONTROLLER->getCurrentTime() - p->getStartTime();
+void SLOW_START::updateTimeout(double startTime){
+    double rtt = SYSTEM_CONTROLLER->getCurrentTime() - startTime;
     if (this->roundTripTime = START_RTT){
         this->roundTripTime = rtt;
         this->timeDeviation = rtt;
@@ -165,8 +164,14 @@ std::cout << "\t Outstanding = " << this->outstanding << std::endl;
                             abs(rtt - this->roundTripTime);
     }
 
-    this->timeout = roundTripTime + timeDeviation + TIMEOUT_CONST; 
+    this->timeout = roundTripTime + 4*timeDeviation + TIMEOUT_CONST; 
+}
 
+void SLOW_START::ackRecieved(AckPacket *p){
+std::cout << "In SLOW_START::ackRecieved " << std::endl;
+std::cout << "\t Outstanding = " << this->outstanding << std::endl;
+    this->updateTimeout(p->getStartTime());
+    
 
     if (this->windowSize < this->ssthreash) {
         std::cout << "\t in slow start \n";
@@ -207,13 +212,55 @@ std::cout << "\t Outstanding = " << this->outstanding << std::endl;
 }
 
 
-AckPacket *SLOW_START::makeAckPacket(DataPacket *p){
-    // make sure the AckPacket is of the right ID
-    int id = this->flow->getNextUnrecieved();
-    std::cout << "making ackpacket of id" << id << std::endl;
-    return new AckPacket(p, id);
+
+TCP_TAHOE::TCP_TAHOE(Flow* in_flow)
+    : SLOW_START(in_flow)
+    , lastAckRecieved(-1)
+    , duplicates(0)
+{ 
 }
 
+
+void TCP_TAHOE::ackRecieved(AckPacket *p){
+    // Fast retransmit
+std::cout << "In TCP_TAHOE::ackRecieved" << std::endl;
+std::cout << "\t threashold" << ssthreash << "\n";    
+std::cout << "\tcurrent time " << SYSTEM_CONTROLLER->getCurrentTime() << " packet creation " << p->getStartTime() << "last dropped" << lastDroppedTime << "\n";
+    if (p->getStartTime() < lastDroppedTime) {
+        return;
+    }
+
+    int id = p->getAckId();
+
+    if (id == lastAckRecieved && this->ssthreash < this-> outstanding){
+        duplicates++;
+        SLOW_START::updateTimeout(p->getStartTime());
+std::cout << "\t duplicate of id " << id << std::endl;
+        if (duplicates == 3) {
+std::cout << "\tDuplicates == 3 \n";
+            this->ssthreash = outstanding/ 2;
+            this->windowSize = 1;
+            lastDroppedTime = SYSTEM_CONTROLLER->getCurrentTime();
+            SLOW_START::sendPacket(id, SYSTEM_CONTROLLER->getCurrentTime());
+            this->outstanding = 1;
+            this->sendNext = id + 1;
+            this->flow->resetPackets(id);
+            return;
+        }
+
+    }
+    else {
+        lastAckRecieved = id;
+        duplicates = 0;
+    }
+
+    SLOW_START::ackRecieved(p);
+
+}
+
+void TCP_TAHOE::packetDropped(int id){
+    SLOW_START::packetDropped(id);
+}
 
 
 
