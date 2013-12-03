@@ -231,7 +231,10 @@ void InputParser::run(int                   &snapshotTime,
         pugi::xml_node congestion = flow.child("congestionAlgorithmType");
         CongestionAlgorithmType congestionAlgorithmType;
         std::string ctext(congestion.text().get());
-        if (ctext.compare("reno") == 0) {
+        if (ctext.compare("slow") == 0) {
+            congestionAlgorithmType = SLOW;
+        }
+        else if (ctext.compare("reno") == 0) {
             congestionAlgorithmType = RENO;
         }
         else if (ctext.compare("vegas") == 0) {
