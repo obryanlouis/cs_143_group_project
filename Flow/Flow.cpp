@@ -106,10 +106,13 @@ void Flow::handlePacket(AckPacket *p) {
     int id = p->getAckId();
     this->progress = id;
 
+    id--;
 
-    for (id = id - 1; id >= 0; id--){
+    for (id; id >= 0; id--){
         this->packets[id] = DBL_MAX;
     }
+
+    
 
 /*
     // see if packet recieved before
