@@ -84,6 +84,7 @@ public:
     void resetPackets(int id); 
         // make packets of >= id behave as though they have not been
         // sent
+    int nextHostPacket();
 
 
     void resetStats();
