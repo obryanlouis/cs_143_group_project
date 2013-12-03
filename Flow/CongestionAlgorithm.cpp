@@ -77,7 +77,7 @@ void SLOW_START::sendPacket(int id, double startTime){
 
     // make packet and send to flow to put into system
     DataPacket *p = new DataPacket (id, this->getFlow(), \
-                            startTime);
+                            SYSTEM_CONTROLLER->getCurrentTime());
     this->getFlow()->sendNewPacket(p, checkAt);
     
     // make timeout event 
@@ -121,9 +121,7 @@ void CongestionAlgorithm::scheduleFirstPacket(double startTime){
 
 
 void SLOW_START::packetDropped(int id){
-    std::cout << "Flow progress: " << flow->getProgress() 
-        << " out of " << flow->getTotalPackets() <<  std::endl;
-
+std::cout << "In SLOW_START::packetDropped()" << std::endl;
     // see if packet not actually dropped
 std::cout << "\t Packet " << id << "has timeout "<< flow->getPacketTime(id) << std::endl;
     if (flow->getPacketTime(id) > SYSTEM_CONTROLLER->getCurrentTime()){
@@ -151,9 +149,6 @@ std::cout << "\t Packet DID get dropped" << std::endl;
 
     this->lastDroppedTime = SYSTEM_CONTROLLER->getCurrentTime();
 
-    // DEBUG: check that all packets before sendNext have actually been
-    // recieved by the flow
-    flow->checkAllRecieved(sendNext - 1);
 }
 
 void SLOW_START::updateTimeout(double startTime){
@@ -323,6 +318,9 @@ std::cout << "\tcurrent time " << SYSTEM_CONTROLLER->getCurrentTime() << " packe
 std::cout << "\t Outstanding = " << this->outstanding << std::endl;
 std::cout << "\t Window Size = " << windowSize << std::endl;
 std::cout << "\t sendNext = " << sendNext << std::endl;
+
+    int id = p->getAckId();
+/*
     if (p->getAckId() > sendNext) {
         sendNext = p->getAckId();
         if (outstanding - windowSize <= 1) {
@@ -331,31 +329,12 @@ std::cout << "\t in that weird ass fringe case \n";
             
         }
     }
-
+*/
     if (p->getStartTime() < lastDroppedTime) {
         return;
     }
 
-    int id = p->getAckId();
-
-
-    if (id == lastAckRecieved && this->ssthreash < this-> outstanding){
-        outstanding--; 
-        duplicates++;
-        SLOW_START::updateTimeout(p->getStartTime());
-std::cout << "\t duplicate of id " << id << std::endl;
-        if (duplicates == 3) {
-std::cout << "\tDuplicates == 3 \n";
-            this->ssthreash = outstanding/ 2;
-            this->windowSize = ssthreash + 3;
-            SLOW_START::sendPacket(id, SYSTEM_CONTROLLER->getCurrentTime());
-            this->outstanding++ ;
-        
-            this->inRecovery = true;
-            return;
-        }
-
-        if (inRecovery) {
+        if (inRecovery && lastAckRecieved == p->getAckId()) {
 std::cout << "\t currently in recovery \n";
             windowSize++;
 
@@ -373,8 +352,27 @@ std::cout << "\t currently in recovery \n";
             std::cout << "\tPackets outstanding" << outstanding << "window size" << windowSize <<  std::endl;
             
             this->sendNext = i;
+            return; // makes code run for twice as long, but eh. 
+
+        }
 
 
+
+    if (id == lastAckRecieved && this->ssthreash < this-> outstanding){
+        outstanding--; 
+        duplicates++;
+        SLOW_START::updateTimeout(p->getStartTime());
+std::cout << "\t duplicate of id " << id << std::endl;
+        if (duplicates == 3) {
+std::cout << "\tDuplicates == 3 \n";
+            this->ssthreash = outstanding/ 2;
+            this->windowSize = ssthreash + 3;
+            SLOW_START::sendPacket(id, SYSTEM_CONTROLLER->getCurrentTime());
+            this->outstanding++ ;
+            this->sendNext = id + 1; 
+
+            this->inRecovery = true;
+            return;
         }
 
     }
@@ -387,7 +385,38 @@ std::cout << "\t currently in recovery \n";
         }
     }
 
-    SLOW_START::ackRecieved(p);
+    this->updateTimeout(p->getStartTime());
+    
+
+    if (this->windowSize < this->ssthreash) {
+        std::cout << "\t in slow start \n";
+        this->windowSize += 1;
+    }
+    else {
+        std::cout << "\t in linear growth \n";
+        this->windowSize += 1/this->windowSize;
+    }
+
+    this->outstanding--;
+   
+    // send new packets
+    int start = std::max(this->sendNext, id); 
+    int i = start;
+    for (i; 
+            i < start + this->windowSize - this->outstanding
+            && i < flow->getTotalPackets(); 
+            i++){
+        this->sendPacket(i, SYSTEM_CONTROLLER->getCurrentTime()
+                            + (i- start) *0.0001);
+    }
+
+    this->outstanding += i - start;
+    std::cout << "\tPackets outstanding" << outstanding << "window size" << windowSize << "threashold" << ssthreash <<  std::endl;
+    
+    this->sendNext = i;
+
+
+    std::cout << "\tCA's next packet will be" << sendNext << std::endl;
 
 
 }
