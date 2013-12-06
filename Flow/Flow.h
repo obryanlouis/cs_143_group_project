@@ -63,6 +63,9 @@ class Flow {
     int packetsReceived;
         // The number of packets received in the last time interval
     CongestionAlgorithm *congestionAlgorithm_p;
+    std::list<double> rtts;
+    double totalLinkLoss;
+    int totalPacketsRecieved;
 
 public:
     Flow(int in_ID, int in_size, Host *in_source, Host *in_destination,
@@ -124,6 +127,8 @@ public:
     // DEBUG
     void checkAllRecieved(int sendNext);
     void printRemainingPacketIds();
+    double getRTT();
+    void updateRTT(double rtt);
 
 };
 

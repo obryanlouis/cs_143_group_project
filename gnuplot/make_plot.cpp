@@ -53,6 +53,8 @@ void makePlots() {
                 "Flow_RTT.svg", "ms", FLOWSTAT));
     files.push_back(std::make_tuple(FLOW_WINDOW_FILE,
                 "Flow_Window.svg","Packets", FLOWSTAT));
+    files.push_back(std::make_tuple("Output/renodata.txt",
+                "reno.svg","bytes", FLOWSTAT));
     /*files.push_back(std::make_tuple(FLOW_THRESH_FILE,
                 "Flow_Thresh.svg","Packets", FLOWSTAT));
     files.push_back(std::make_tuple(FLOW_OUTSTANDING_FILE,

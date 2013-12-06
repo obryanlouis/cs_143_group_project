@@ -15,6 +15,7 @@ Flow::Flow(int in_ID, int in_size, Host *in_source, Host *in_destination,
     , dataReceived(0)
     , totalPacketDelay(0)
     , packetsReceived(0)
+    , totalLinkLoss(0)
 {
     // Calculate the number of packets we need based on size of flow 
     this->totalPackets = (in_size + (Packet::DATASIZE - 1)) / Packet::DATASIZE;
@@ -97,6 +98,7 @@ AckPacket* Flow::atDest(DataPacket *p){
     this->totalPacketDelay +=
         (SYSTEM_CONTROLLER->getCurrentTime() - p->getStartTime());
     this->packetsReceived++;
+    totalPacketsRecieved++;
 
     return ack;
 }
@@ -111,10 +113,15 @@ void Flow::handlePacket(AckPacket *p) {
     int id = p->getAckId();
     this->progress = id;
 
+    id--;
 
-    for (id = id - 1; id >= 0; id--){
+    for (id; id >= 0; id--){
         this->packets[id] = DBL_MAX;
     }
+
+    double rtt = SYSTEM_CONTROLLER->getCurrentTime() - p->getStartTime();
+    updateRTT(rtt);
+    
 
 /*
     // see if packet recieved before
@@ -191,6 +198,10 @@ double Flow::getStats(std::string stat, int period) {
     else if (stat.compare("window") == 0) {
         return congestionAlgorithm_p->getWindowSize();
     }
+    else if (stat.compare("reno") == 0) {
+        return SYSTEM_CONTROLLER->getThroughput() * getRTT() *
+            std::sqrt(SYSTEM_CONTROLLER->getLinkLoss(totalLinkLoss)/totalPacketsRecieved) -1.22;
+    }
     /*else if (stat.compare("thresh") == 0) {
         return congestionAlgorithm_p->getThresh();
     }
@@ -205,6 +216,7 @@ void Flow::resetStats() {
     dataReceived = 0;
     totalPacketDelay = 0;
     packetsReceived = 0;
+    rtts.clear();
 }
 
 void Flow::updateDataSent(int bytes) {
@@ -215,9 +227,23 @@ void Flow::updateDataReceived(int bytes) {
     dataReceived += bytes;
 }
 
+double Flow::getRTT() {
+    double avg = 0;
+    for (std::list<double>::iterator it = rtts.begin(); it != rtts.end(); it++)
+    {
+        avg += *it;
+    }
+    return avg / rtts.size();
+}
+
+void Flow::updateRTT(double rtt) {
+    rtts.push_back(rtt);
+}
+
 void Flow::updateTotalPacketDelay(double delay) {
     totalPacketDelay += delay;
     packetsReceived++;
+    totalPacketsRecieved++;
 }
 
 

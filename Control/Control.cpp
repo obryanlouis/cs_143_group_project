@@ -133,6 +133,8 @@ void Controller::decrementFlowsLeft() {
 }
 
 void Controller::printMySystem() {
+
+
     //std::cout << "***Printing System***" <<std::endl;
     double currentTime = this->schedule_p->getCurrentTime();
     std::map<std::string, std::ofstream*> files;
@@ -169,18 +171,20 @@ void Controller::printMySystem() {
 
     //std::cout << "  Outputting Flow information." << std::endl;
     std::ofstream flowSendFile, flowReceiveFile, flowRTTFile, flowWindowFile,
-        flowThreshFile, flowOutstandingFile;
+        flowThreshFile, flowOutstandingFile, flowRenoFile;
     flowSendFile.open(FLOW_SEND_FILE.data(), std::ios::app);
     flowReceiveFile.open(FLOW_RECEIVE_FILE.data(), std::ios::app);
     flowRTTFile.open(FLOW_RTT_FILE.data(), std::ios::app);
     flowWindowFile.open(FLOW_WINDOW_FILE.data(), std::ios::app);
     flowThreshFile.open(FLOW_THRESH_FILE.data(), std::ios::app);
     flowOutstandingFile.open(FLOW_OUTSTANDING_FILE.data(), std::ios::app);
+    flowRenoFile.open("Output/renodata.txt", std::ios::app);
     files.clear();
     files["send rate"] = &flowSendFile;
     files["receive rate"] = &flowReceiveFile;
     files["delay"] = &flowRTTFile;
     files["window"] = &flowWindowFile;
+    files["reno"] = &flowRenoFile;
     /*files["thresh"] = &flowThreshFile;
     files["outstanding"] = &flowOutstandingFile;*/
     for (std::map<std::string, std::ofstream*>::iterator i = files.begin();
@@ -544,3 +548,23 @@ void Event::execute() {
     this->fp(this->arg);
 }
 
+
+double Controller::getThroughput() {
+    double t = 0;
+    for (std::list<Link *>::iterator it = links.begin(); it != links.end();
+            it++)
+    {
+        t += (*it)->getDataSent();
+    }
+    return t;
+
+}
+
+double Controller::getLinkLoss(double loss) {
+    for (std::list<Link *>::iterator it = links.begin(); it != links.end();
+            it++)
+    {
+        loss += (*it)->getPacketLoss();
+    }
+    return loss;
+}

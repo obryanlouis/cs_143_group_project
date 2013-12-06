@@ -14,9 +14,35 @@ Vegas::Vegas(Flow *f)
     , rttmin(DBL_MAX)
     , SLOW_START(f)
 {
-    outstanding = 1;
+    windowSize = 2;
+    outstanding = 0;
     roundTripTime = DBL_MAX;
-    //fastWindowReset((void *)this);
+    maintain(); 
+}
+
+void maintainVegas(void *arg) {
+    ((Vegas*)arg)->maintain();
+}
+
+void Vegas::maintain() {
+    sendAvailablePackets();
+    double avgrtt = 0;
+    if (rtts.size() != 0) {
+        for (std::list<double>::iterator it = rtts.begin(); it != rtts.end();
+                it++)
+        {
+            avgrtt += *it;
+        }
+        avgrtt /= rtts.size();
+        rtts.clear();
+    }
+    else {
+        avgrtt = 150;
+    }
+    
+    Event *e = new Event(SYSTEM_CONTROLLER->getCurrentTime() + avgrtt,
+        &maintainVegas, (void *)this);
+    SYSTEM_CONTROLLER->add(e);
 }
 
 void Vegas::sendAvailablePackets() {
@@ -41,12 +67,13 @@ void Vegas::ackRecieved(AckPacket *p) {
     int id = p->getAckId(); 
 
     outstanding--;
-    SLOW_START::updateTimeout(p->getStartTime());
-    assert(roundTripTime > 0);
+    roundTripTime = SYSTEM_CONTROLLER->getCurrentTime() - p->getStartTime();
 
     // set the rttmin
     if (rttmin > roundTripTime)
         rttmin = roundTripTime;
+
+    rtts.push_back(roundTripTime);
 
     // for every ack
     if (lastAckRecieved != id) {
@@ -58,15 +85,14 @@ void Vegas::ackRecieved(AckPacket *p) {
         double difference = min - notmin;
         if (difference < ALPHA) {
             std::cout << "\t\t\t\twindowSize++ in CA: " << windowSize << "\n";
-            windowSize += 1 / roundTripTime;
+            windowSize += 1 ;
         }
         if (difference > BETA) {
             std::cout << "\t\t\t\twindowSize-- in CA: " << windowSize << "\n";
-            windowSize -= 1 / roundTripTime;
+            windowSize -= 1 ;
         }
         if (windowSize < 1)
-            windowSize = 1;
-        sendAvailablePackets();
+            windowSize /= 1;
     }
     
 }
@@ -79,3 +105,6 @@ void Vegas::packetDropped(int id) {
     SLOW_START::sendPacket(id, SYSTEM_CONTROLLER->getCurrentTime());
     sendNext = id + 1;
 }
+
+
+

@@ -187,6 +187,9 @@ public:
         // Sets the input file to use.
 
     // Output
+    double getThroughput();
+    double getDataSent();
+    double getLinkLoss(double loss);
     int numLinksToPrint();
         // Returns the number of links that will be printed out.
     int numHostsToPrint();
