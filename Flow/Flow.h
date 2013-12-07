@@ -66,6 +66,7 @@ class Flow {
     std::list<double> rtts;
     double totalLinkLoss;
     int totalPacketsRecieved;
+    double start;
 
 public:
     Flow(int in_ID, int in_size, Host *in_source, Host *in_destination,
@@ -74,6 +75,7 @@ public:
     ~Flow();
         // Destroy this instance of Flow
 
+    double getStartTime();
     int getProgress();
     void startFlow(double startTime);
         // creates first event for this flow

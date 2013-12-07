@@ -20,73 +20,75 @@ enum CongestionAlgorithmType {
 
 
 class CongestionAlgorithm{
-protected:
-    double windowSize;
-    Flow *flow;
+    protected:
+        double cwnd;
+        Flow *flow;
 
-public:
-    CongestionAlgorithm(Flow *in_flow);
+    public:
+        CongestionAlgorithm(Flow *in_flow);
 
-    Flow* getFlow();
-    double getWindowSize();
+        Flow* getFlow();
+        double getWindowSize();
 
-    void scheduleFirstPacket(double startTime);
- 
-    virtual void ackRecieved(AckPacket *packet) = 0;
-    AckPacket* makeAckPacket(DataPacket *p);
-    // when DataPacket recieved at destination host, determines
-    // what AckPacket should be sent. 
+        virtual void scheduleFirstPacket(double startTime);
+
+        virtual void ackRecieved(AckPacket *packet) = 0;
+        AckPacket* makeAckPacket(DataPacket *p);
+        // when DataPacket recieved at destination host, determines
+        // what AckPacket should be sent. 
 
 };
 
 class SLOW_START : public CongestionAlgorithm{
-protected:
-    double roundTripTime;
-    double timeDeviation;
-    double timeout;
-    double ssthreash;
-    double alpha; // weighting for RTT updates
-    double outstanding; 
-    int sendNext;
+    protected:
+        double roundTripTime;
+        double timeDeviation;
+        double timeout;
+        double ssthresh;
+        double alpha; // weighting for RTT updates
+        double outstanding; 
+        int sendNext;
 
-    int maxAck;
-    double lastDroppedTime;
+        int maxAck;
+        double lastDroppedTime;
 
-public: 
-    SLOW_START(Flow *in_flow);
+    public: 
+        SLOW_START(Flow *in_flow);
 
-    double getTimeOut();
+        double getTimeOut();
 
-    void scheduleFirstPacket(double startTime);
-    virtual void packetDropped(int id);
-    virtual void ackRecieved(AckPacket *p);
-    void sendPacket(int id, double startTime);
-    void updateTimeout(double time);
-    AckPacket *makeAckPacket(DataPacket *p);
+        virtual void scheduleFirstPacket(double startTime);
+        virtual void packetDropped(int id, bool &wasDropped);
+        virtual void ackRecieved(AckPacket *p);
+        void sendPacket(int id, double startTime);
+        void updateTimeout(double time);
+        AckPacket *makeAckPacket(DataPacket *p);
 };
 
 
 class TCP_TAHOE : public SLOW_START{
-protected:
-    int lastAckRecieved;
-    int duplicates;
+    protected:
+        int lastAckRecieved;
+        int duplicates;
 
-public:
-    TCP_TAHOE(Flow *in_flow);
-    
-    virtual void ackRecieved(AckPacket *p);
-    virtual void packetDropped(int id);
+    public:
+        TCP_TAHOE(Flow *in_flow);
+
+        virtual void ackRecieved(AckPacket *p);
+        virtual void packetDropped(int id, bool &wasDropped);
+        virtual void scheduleFirstPacket(double startTime);
 };
 
 
 class TCP_RENO : public TCP_TAHOE {
-private:
-    bool inRecovery;
+    protected:
+        bool inRecovery;
 
-public:
-    TCP_RENO(Flow *in_flow);
-    virtual void ackRecieved(AckPacket *p);
-    virtual void packetDropped(int id);
+    public:
+        TCP_RENO(Flow *in_flow);
+        virtual void ackRecieved(AckPacket *p);
+        virtual void packetDropped(int id, bool &wasDropped);
+        virtual void scheduleFirstPacket(double startTime);
 
 };
 

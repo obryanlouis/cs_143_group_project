@@ -64,7 +64,12 @@ Flow::~Flow()
 
 
 void Flow::startFlow(double startTime){
+    this->start = startTime;
     this->congestionAlgorithm_p->scheduleFirstPacket(startTime);
+}
+
+double Flow::getStartTime() {
+    return start;
 }
 
 void Flow::sendNewPacket(DataPacket *p, double timeOut){

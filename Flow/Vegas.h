@@ -5,20 +5,36 @@
 #include <cmath>
 #include <list>
 
-class Vegas : public SLOW_START {
-    private:
-        int lastAckRecieved;
-        int duplicates;
 
-        bool inRecovery;
+class Vegas : public TCP_RENO {
+    private:
+        enum Mode {
+            SLOWSTART,
+            CONGESTIONAVOIDANCE
+        };
+        Mode mode;
+        int status;
+        double incr;
+        double maxincr;
+        double lastincr;
+            // The last increment of cwnd
+        int packetNumberAfterRetransmission;
+            // used for the first two packets after retransmission
+
         double rttmin;
+        double rttcurrent;
+        bool rttSetFirstTime;
         void sendAvailablePackets();
-        std::list<double> rtts;
 
     public:
         void maintain();
         void ackRecieved(AckPacket *p);
-        void packetDropped(int id);
+        void packetDropped(int id, bool &wasDropped);
+        void congestionAvoidance();
+        void retransmissionTimeout(int id);
+        void conditionalRetransmit(int id);
+        void slowStart();
+        void scheduleFirstPacket(double startTime);
         Vegas(Flow *f);
  
 };
