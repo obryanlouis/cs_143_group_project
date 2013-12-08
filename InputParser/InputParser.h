@@ -4,7 +4,8 @@
 #define INPUTPARSER_H
 
 // Class and helpers to parse the given network description xml file and store
-// the input in some objects.
+// the input in some objects. The parsing is done with the open source
+// C++ XML processing library pugixml (http://pugixml.org).
 
 #include "CongestionAlgorithm.h"
 #include "pugixml.hpp"
