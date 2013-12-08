@@ -15,7 +15,8 @@ enum CongestionAlgorithmType {
     SLOW,
     TAHOE,
     RENO,
-    VEGAS
+    VEGAS,
+    CUBIC
 };
 
 
