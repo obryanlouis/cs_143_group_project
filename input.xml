@@ -3,7 +3,7 @@
 <Network>
     <snapshotTime>100</snapshotTime>
     <routingTableUpdateTime>5000</routingTableUpdateTime>
-    <networkHosts>
+    <networkHosts separateGraphs="0">
         <host id="1" print="1" />
         <host id="2" print="1" />
     </networkHosts>
@@ -13,8 +13,13 @@
         <router id="3" />
         <router id="4" />
     </networkRouters>
-    <networkLinks>
-        <link id="0" print="1">
+    <!-- The "separateGraphs" option will make separate graphs for each
+         link/flow/host if it is 1, or it will put them all on the same
+         graph if it is 0 -->
+    <networkLinks separateGraphs="1">
+        <!-- The "print" attribute tells the parser whether or not to include
+             this link/flow/host in the graphs -->
+        <link id="0" print="0">
             <linkRate>12.5</linkRate>
             <linkDelay>10</linkDelay>
             <bufferSize>64</bufferSize>
@@ -57,13 +62,13 @@
             <node2 type="0">2</node2>
         </link>
     </networkLinks>
-    <networkFlows>
-        <flow id="1" print="1">
+    <networkFlows separateGraphs="0">
+        <flow id="1" print="1" >
             <source>1</source>
             <destination>2</destination>
             <flowSize>20</flowSize>
             <flowStartTime>0.5</flowStartTime>
-                <!-- Options: reno, vegas, slow, (maybe) tahoe -->
+            <!-- Options: reno, vegas, slow, (maybe) tahoe -->
             <congestionAlgorithmType>vegas</congestionAlgorithmType>
         </flow>
     </networkFlows>

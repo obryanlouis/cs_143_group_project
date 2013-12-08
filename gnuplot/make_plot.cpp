@@ -18,27 +18,63 @@ enum StatType {
 
 template <typename Iterator>
 void graphAll(Iterator first, Iterator second, std::string dataFile,
-        FILE *fp) {
-    int k = 2;
-    std::stringstream command;
-    command << "plot ";
-    for (Iterator it = first ; it != second; it++)
-    {
-        if (it->print) {
-            command << "\""
-                << dataFile
-                << "\""
-                << " using 1:" << k++ << " with points pointtype 7 pointsize 0.5 title \""
-                << it->getId()
-                << "\", ";
+        FILE *fp, StatType t, bool separateGraphs) {
+    if (!separateGraphs) {
+        int k = 2;
+        std::stringstream command;
+        command << "plot ";
+        for (Iterator it = first ; it != second; it++)
+        {
+            if (it->print) {
+                command << "\""
+                    << dataFile
+                    << "\""
+                    << " using 1:" << k++ << " with points pointtype 7 pointsize 0.5 title \""
+                    << it->getId()
+                    << "\", ";
+            }
         }
+        std::string strcommand = command.str();
+        strcommand = strcommand.substr(0, strcommand.length() - 2);
+        fputs(strcommand.data(), fp);
     }
-    std::string strcommand = command.str();
-    strcommand = strcommand.substr(0, strcommand.length() - 2);
-    fputs(strcommand.data(), fp);
+    else {
+        std::stringstream multiplotCommand;
+        multiplotCommand << "set multiplot layout ";
+        if (t == FLOWSTAT) {
+            multiplotCommand << SYSTEM_CONTROLLER->numFlowsToPrint() << ",1";
+        }
+        else if (t == HOSTSTAT) {
+            multiplotCommand << SYSTEM_CONTROLLER->numHostsToPrint() << ",1";
+        }
+        else if (t == LINKSTAT) {
+            multiplotCommand << SYSTEM_CONTROLLER->numLinksToPrint() << ",1";
+        }
+        multiplotCommand << "\n";
+        fputs(multiplotCommand.str().data(), fp);
+        int k = 2;
+        std::stringstream command;
+        for (Iterator it = first ; it != second; it++)
+        {
+            if (it->print) {
+                if (k == 3)
+                    command << "unset object 1\n";
+                command << "plot "
+                    << "\""
+                    << dataFile
+                    << "\""
+                    << " using 1:" << k++ << " with points pointtype 7 pointsize 0.5 title \""
+                    << it->getId()
+                    << "\"\n";
+            }
+        }
+        std::string strcommand = command.str();
+        strcommand = strcommand.substr(0, strcommand.length() - 2);
+        fputs(strcommand.data(), fp);
+    }
 }
 
-void makePlots() {
+void makePlots(PlotOptions *plotOptions) {
 
     std::cout << "Making plots...\n";
 
@@ -54,14 +90,12 @@ void makePlots() {
                 "Flow Send Rates"));
     files.push_back(std::make_tuple(FLOW_RTT_FILE,
                 "Flow_RTT.svg", "ms", FLOWSTAT, "Flow Round Trip Times"));
+    files.push_back(std::make_tuple(FLOW_OUTSTANDING_FILE,
+                "Flow_Outstanding_Packets.svg", "Packets", FLOWSTAT, "Flow Outstanding Packets"));
     files.push_back(std::make_tuple(FLOW_WINDOW_FILE,
                 "Flow_Window.svg","Packets", FLOWSTAT, "Flow Window Size"));
-    /*files.push_back(std::make_tuple("Output/renodata.txt",
-      "reno.svg","bytes", FLOWSTAT, "Reno Data..."));*/
-    /*files.push_back(std::make_tuple(FLOW_THRESH_FILE,
-      "Flow_Thresh.svg","Packets", FLOWSTAT));
-      files.push_back(std::make_tuple(FLOW_OUTSTANDING_FILE,
-      "Flow_Outstanding.svg","Packets", FLOWSTAT));*/
+    files.push_back(std::make_tuple(FLOW_VEGAS_FILE,
+                "Vegas_Diff.svg","Packets / ms", FLOWSTAT, "Vegas Diff Parameter = cwnd * (1 / rttmin - 1 / rttcurrent)"));
 
     files.push_back(std::make_tuple(LINK_OCCUPANCY_FILE,
                 "Link_Occupancy.svg", "Bytes", LINKSTAT, "Link Occupancy"));
@@ -105,17 +139,17 @@ void makePlots() {
         commands.push_back("set output \"" + saveAs + "\"");
         commands.push_back("set object 1 rectangle from screen 0,0 to screen 1,1 fillcolor rgb\"white\" behind");
         /*std::stringstream multiplotCommand;
-        multiplotCommand << "set multiplot layout ";
-        if (t == FLOWSTAT) {
-            multiplotCommand << SYSTEM_CONTROLLER->numFlowsToPrint() << ",1";
-        }
-        else if (t == HOSTSTAT) {
-            multiplotCommand << SYSTEM_CONTROLLER->numHostsToPrint() << ",1";
-        }
-        else if (t == LINKSTAT) {
-            multiplotCommand << SYSTEM_CONTROLLER->numLinksToPrint() << ",1";
-        }
-        commands.push_back(multiplotCommand.str());*/
+          multiplotCommand << "set multiplot layout ";
+          if (t == FLOWSTAT) {
+          multiplotCommand << SYSTEM_CONTROLLER->numFlowsToPrint() << ",1";
+          }
+          else if (t == HOSTSTAT) {
+          multiplotCommand << SYSTEM_CONTROLLER->numHostsToPrint() << ",1";
+          }
+          else if (t == LINKSTAT) {
+          multiplotCommand << SYSTEM_CONTROLLER->numLinksToPrint() << ",1";
+          }
+          commands.push_back(multiplotCommand.str());*/
         commands.push_back("set xlabel \"Time (s)\"");
         commands.push_back("set ylabel \"" + ylabel + "\"");
         int i = 1;
@@ -133,17 +167,17 @@ void makePlots() {
         if (t == FLOWSTAT) {
             graphAll(SYSTEM_CONTROLLER->flowInfos.begin(),
                     SYSTEM_CONTROLLER->flowInfos.end(),
-                    dataFile, fp);
+                    dataFile, fp, t, plotOptions->separateFlowGraphs);
         }
         else if (t == HOSTSTAT) {
             graphAll(SYSTEM_CONTROLLER->hostInfos.begin(),
                     SYSTEM_CONTROLLER->hostInfos.end(),
-                    dataFile, fp);
+                    dataFile, fp, t, plotOptions->separateHostGraphs);
         }
         else if (t == LINKSTAT) {
             graphAll(SYSTEM_CONTROLLER->linkInfos.begin(),
                     SYSTEM_CONTROLLER->linkInfos.end(),
-                    dataFile, fp);
+                    dataFile, fp, t, plotOptions->separateLinkGraphs);
         }
 
         pclose(fp);

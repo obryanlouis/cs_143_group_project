@@ -5,7 +5,7 @@
 #include "Control.h" // include this here since header doesn't need
 #include "Packet.h"
 
-const double START_RTT = 10000;
+const double START_RTT = 100000;
 const double DEFAULT_ALPHA = 0.75;
 const double TIMEOUT_CONST = 100;
 const int SEND_LIMIT = 10; 
@@ -442,3 +442,16 @@ void TCP_TAHOE::scheduleFirstPacket(double startTime) {
 void TCP_RENO::scheduleFirstPacket(double startTime) {
     TCP_TAHOE::scheduleFirstPacket(startTime);
 }
+
+double CongestionAlgorithm::getDiff() { return 0; }
+
+double SLOW_START::getDiff() { return 0; }
+
+double TCP_RENO::getDiff() { return 0; }
+
+double TCP_TAHOE::getDiff() { return 0; }
+
+double CongestionAlgorithm::numOutstanding() { return 0; }
+
+double SLOW_START::numOutstanding() { return outstanding; }
+

@@ -53,7 +53,8 @@ void InputParser::run(int                   &snapshotTime,
                       std::list<HostInfo>   &hosts,
                       std::list<RouterInfo> &routers,
                       std::list<LinkInfo>   &links,
-                      std::list<FlowInfo>   &flows)
+                      std::list<FlowInfo>   &flows,
+                      PlotOptions           &plotOptions)
 {
     pugi::xml_document doc;
         // create an xml_document to load the file
@@ -91,6 +92,10 @@ void InputParser::run(int                   &snapshotTime,
     // network hosts
     std::cout << "network hosts: " << std::endl;
     pugi::xml_node networkHosts = network.child("networkHosts");
+
+    pugi::xml_attribute separateHostGraphs = networkHosts.attribute("separateGraphs");
+    plotOptions.separateHostGraphs = separateHostGraphs.as_bool();
+
     for (pugi::xml_node host = networkHosts.first_child();
          host; host = host.next_sibling())
     {
@@ -134,6 +139,10 @@ void InputParser::run(int                   &snapshotTime,
     // network links
     std::cout << "network links: " << std::endl;
     pugi::xml_node networkLinks = network.child("networkLinks");
+
+    pugi::xml_attribute separateLinkGraphs = networkLinks.attribute("separateGraphs");
+    plotOptions.separateLinkGraphs = separateLinkGraphs.as_bool();
+
     for (pugi::xml_node link = networkLinks.first_child();
          link; link = link.next_sibling())
     {
@@ -206,6 +215,10 @@ void InputParser::run(int                   &snapshotTime,
     // network flows
     std::cout << "network flows: " << std::endl;
     pugi::xml_node networkFlows = network.child("networkFlows");
+
+    pugi::xml_attribute separateFlowGraphs = networkFlows.attribute("separateGraphs");
+    plotOptions.separateFlowGraphs = separateFlowGraphs.as_bool();
+
     for (pugi::xml_node flow = networkFlows.first_child();
          flow; flow = flow.next_sibling())
     {

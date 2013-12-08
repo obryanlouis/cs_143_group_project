@@ -13,6 +13,8 @@
 #include <cstdlib>
 #include <list>
 
+class PlotOptions;
+
 // The base class to store information
 class SystemInfo { 
 public:
@@ -112,9 +114,17 @@ public:
              std::list<HostInfo>   &hosts,
              std::list<RouterInfo> &routers,
              std::list<LinkInfo>   &links,
-             std::list<FlowInfo>   &flows);
+             std::list<FlowInfo>   &flows,
+             PlotOptions           &plotOptions);
         // Run the parser on the network XML file. Stores the data into
         // the provided arguments
+};
+
+class PlotOptions {
+    public:
+        bool separateLinkGraphs;
+        bool separateHostGraphs;
+        bool separateFlowGraphs;
 };
 
 #endif

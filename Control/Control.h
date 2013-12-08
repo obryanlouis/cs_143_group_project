@@ -44,6 +44,8 @@ std::string FLOW_RTT_FILE = std::string("Output/FlowRTT.txt");
 std::string FLOW_WINDOW_FILE = std::string("Output/FlowWindow.txt");
 std::string FLOW_THRESH_FILE = std::string("Output/FlowThresh.txt");
 std::string FLOW_OUTSTANDING_FILE = std::string("Output/FlowOutstanding.txt");
+std::string FLOW_RENO_FILE = std::string("Output/renodata.txt");
+std::string FLOW_VEGAS_FILE = std::string("Output/vegasDiff.txt");
 
 std::string HOST_SEND_FILE = std::string("Output/HostSend.txt");
 std::string HOST_RECEIVE_FILE = std::string("Output/HostReceive.txt");
@@ -146,8 +148,9 @@ private:
         // Map from the router id to the actual router pointer.
     std::string             inputFile;
         // The filename of the input XML file.
+    PlotOptions             plotOptions;
 
-    friend void makePlots();
+    friend void makePlots(PlotOptions *options);
 
     // DEBUG: Keep track of all packets
     std::map<Packet *, bool> packets;
@@ -185,6 +188,7 @@ public:
         // Sets the routing table update time of the controller.
     void setInputFile(std::string inputFile);
         // Sets the input file to use.
+    double routerBufferSize();
 
     // Output
     double getThroughput();
@@ -205,7 +209,9 @@ public:
     void removePacket(Packet *p);
     void checkPackets();
 
+
     // DEBUG: Other functions
+    int numberOfPacketsInSystem();
     void printRoutingTables();
     friend void outputRoutingTables(void *args);
 

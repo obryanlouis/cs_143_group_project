@@ -27,6 +27,7 @@ class CongestionAlgorithm{
     public:
         CongestionAlgorithm(Flow *in_flow);
 
+        virtual double getDiff();
         Flow* getFlow();
         double getWindowSize();
 
@@ -36,6 +37,7 @@ class CongestionAlgorithm{
         AckPacket* makeAckPacket(DataPacket *p);
         // when DataPacket recieved at destination host, determines
         // what AckPacket should be sent. 
+        virtual double numOutstanding();
 
 };
 
@@ -63,6 +65,8 @@ class SLOW_START : public CongestionAlgorithm{
         void sendPacket(int id, double startTime);
         void updateTimeout(double time);
         AckPacket *makeAckPacket(DataPacket *p);
+        virtual double getDiff();
+        virtual double numOutstanding();
 };
 
 
@@ -77,6 +81,7 @@ class TCP_TAHOE : public SLOW_START{
         virtual void ackRecieved(AckPacket *p);
         virtual void packetDropped(int id, bool &wasDropped);
         virtual void scheduleFirstPacket(double startTime);
+        virtual double getDiff();
 };
 
 
@@ -89,6 +94,7 @@ class TCP_RENO : public TCP_TAHOE {
         virtual void ackRecieved(AckPacket *p);
         virtual void packetDropped(int id, bool &wasDropped);
         virtual void scheduleFirstPacket(double startTime);
+        virtual double getDiff();
 
 };
 

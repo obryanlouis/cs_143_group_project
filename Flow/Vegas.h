@@ -26,16 +26,18 @@ class Vegas : public TCP_RENO {
         bool rttSetFirstTime;
         void sendAvailablePackets();
 
+        double GAMMA;
+
     public:
         void maintain();
         void ackRecieved(AckPacket *p);
         void packetDropped(int id, bool &wasDropped);
         void congestionAvoidance();
         void retransmissionTimeout(int id);
-        void conditionalRetransmit(int id);
         void slowStart();
         void scheduleFirstPacket(double startTime);
         Vegas(Flow *f);
+        double getDiff();
  
 };
 

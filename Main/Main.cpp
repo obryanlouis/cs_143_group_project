@@ -17,11 +17,11 @@ int main(int argc, char **argv) {
     // specific location.
 
     /*if (argc != 2) {
-        cout << "usage: read_input inputFile" << endl;
-        exit(1);
-    }
+      cout << "usage: read_input inputFile" << endl;
+      exit(1);
+      }
 
-    char* input = argv[1];*/
+      char* input = argv[1];*/
 
     // DEBUG: use a default file input.xml
     string input = "input.xml";
@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
     SYSTEM_CONTROLLER->setInputFile(input);
 
     SYSTEM_CONTROLLER->run();
-              
+
     return 0;
 }
 

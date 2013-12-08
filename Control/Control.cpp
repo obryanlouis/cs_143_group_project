@@ -7,7 +7,7 @@
 // This can't be static...
 Controller *SYSTEM_CONTROLLER;
 
-extern void makePlots(); 
+extern void makePlots(PlotOptions *options); 
 void routerUpdate(void* args);
 void printSystem(void* args);
 
@@ -44,7 +44,7 @@ void Controller::addFlow(Flow *flow, double startTime) {
 int Controller::numLinksToPrint() {
     int num = 0;
     for (std::list<LinkInfo>::iterator it = linkInfos.begin();
-         it != linkInfos.end(); it++)
+            it != linkInfos.end(); it++)
     {
         if (it->print)
             num++;
@@ -55,7 +55,7 @@ int Controller::numLinksToPrint() {
 int Controller::numHostsToPrint() {
     int num = 0;
     for (std::list<HostInfo>::iterator it = hostInfos.begin();
-         it != hostInfos.end(); it++)
+            it != hostInfos.end(); it++)
     {
         if (it->print)
             num++;
@@ -66,7 +66,7 @@ int Controller::numHostsToPrint() {
 int Controller::numFlowsToPrint() {
     int num = 0;
     for (std::list<FlowInfo>::iterator it = flowInfos.begin();
-         it != flowInfos.end(); it++)
+            it != flowInfos.end(); it++)
     {
         if (it->print)
             num++;
@@ -104,12 +104,12 @@ void Controller::run() {
     }
 
     /*if (this -> flowsLeft == 0) {
-        for (int i = 0; i < END_PERIOD; i++) {
-            this->schedule_p->doNext();
-        }
-    }*/
+      for (int i = 0; i < END_PERIOD; i++) {
+      this->schedule_p->doNext();
+      }
+      }*/
 
-    makePlots();
+    makePlots(&this->plotOptions);
 
     std::cout << "Network simulated successfully. YAY!" << std::endl;
 }
@@ -117,12 +117,12 @@ void Controller::run() {
 void Controller::updateMyRouters() {
     std::cout << "***Updating Router Info*** " << std::endl;
     for (std::list<Link *>::iterator it = this->links.begin();
-         it != this->links.end(); it++) {
+            it != this->links.end(); it++) {
         (*it)->setInstantaneousOccupancy();
     }
 
     for (std::list<Router *>::iterator it = this->routers.begin();
-         it != this->routers.end(); it++)
+            it != this->routers.end(); it++)
     {
         (*it)->broadcastRoutingTable();
     }
@@ -148,56 +148,59 @@ void Controller::printMySystem() {
     files["loss"] = &lossFile;
     files["data sent"] = &rateFile;
     for (std::map<std::string, std::ofstream*>::iterator i = files.begin();
-         i != files.end(); i++)
+            i != files.end(); i++)
     {
         std::ofstream *file = i->second;
         std::string stat = i->first;
         (*file) << (double)currentTime / 1000;
         for (std::list<Link*>::iterator it = this->links.begin();
-             it != this->links.end(); it++)
+                it != this->links.end(); it++)
         {
-               Link *link = *it;
-               (*file) << " " << link->getStat(stat, SNAPSHOT_PERIOD);
+            Link *link = *it;
+            (*file) << " " << link->getStat(stat, SNAPSHOT_PERIOD);
         }
         (*file) << "\n";
         file->close();
     }
     //  Reset the stats
     for (std::list<Link*>::iterator it = this->links.begin();
-         it != this->links.end(); it++)
+            it != this->links.end(); it++)
     {
-           (*it)->resetStats();
+        (*it)->resetStats();
     }
 
     //std::cout << "  Outputting Flow information." << std::endl;
     std::ofstream flowSendFile, flowReceiveFile, flowRTTFile, flowWindowFile,
-        flowThreshFile, flowOutstandingFile, flowRenoFile;
+        flowThreshFile, flowOutstandingFile, flowRenoFile, flowVegasFile;
     flowSendFile.open(FLOW_SEND_FILE.data(), std::ios::app);
     flowReceiveFile.open(FLOW_RECEIVE_FILE.data(), std::ios::app);
     flowRTTFile.open(FLOW_RTT_FILE.data(), std::ios::app);
     flowWindowFile.open(FLOW_WINDOW_FILE.data(), std::ios::app);
     flowThreshFile.open(FLOW_THRESH_FILE.data(), std::ios::app);
     flowOutstandingFile.open(FLOW_OUTSTANDING_FILE.data(), std::ios::app);
-    flowRenoFile.open("Output/renodata.txt", std::ios::app);
+    flowRenoFile.open(FLOW_RENO_FILE, std::ios::app);
+    flowVegasFile.open(FLOW_VEGAS_FILE, std::ios::app);
     files.clear();
     files["send rate"] = &flowSendFile;
     files["receive rate"] = &flowReceiveFile;
     files["delay"] = &flowRTTFile;
     files["window"] = &flowWindowFile;
     files["reno"] = &flowRenoFile;
+    files["vegas"] = &flowVegasFile;
+    files["outstanding packets"] = &flowOutstandingFile;
     /*files["thresh"] = &flowThreshFile;
-    files["outstanding"] = &flowOutstandingFile;*/
+      files["outstanding"] = &flowOutstandingFile;*/
     for (std::map<std::string, std::ofstream*>::iterator i = files.begin();
-         i != files.end(); i++)
+            i != files.end(); i++)
     {
         std::ofstream *file = i->second;
         std::string stat = i->first;
         (*file) << (double)currentTime / 1000;
         for (std::list<Flow*>::iterator it = this->flows.begin();
-             it != this->flows.end(); it++)
+                it != this->flows.end(); it++)
         {
-               Flow *flow = *it;
-               (*file) << " " << flow->getStats(stat, SNAPSHOT_PERIOD);
+            Flow *flow = *it;
+            (*file) << " " << flow->getStats(stat, SNAPSHOT_PERIOD);
         }
         (*file) << "\n";
         file->close();
@@ -205,9 +208,9 @@ void Controller::printMySystem() {
 
     //  Reset the stats
     for (std::list<Flow*>::iterator it = this->flows.begin();
-         it != this->flows.end(); it++)
+            it != this->flows.end(); it++)
     {
-           (*it)->resetStats();
+        (*it)->resetStats();
     }
 
     //std::cout << "Outputting Host information." << "\n";
@@ -218,25 +221,25 @@ void Controller::printMySystem() {
     files["send rate"] = &hostSendFile;
     files["receive rate"] = &hostReceiveFile;
     for (std::map<std::string, std::ofstream*>::iterator i = files.begin();
-         i != files.end(); i++)
+            i != files.end(); i++)
     {
         std::ofstream *file = i->second;
         std::string stat = i->first;
         (*file) << (double)currentTime / 1000;
         for (std::list<Host*>::iterator it = this->hosts.begin();
-             it != this->hosts.end(); it++)
+                it != this->hosts.end(); it++)
         {
-               Host *host = *it;
-               (*file) << " " << host->getStats(stat, SNAPSHOT_PERIOD);
+            Host *host = *it;
+            (*file) << " " << host->getStats(stat, SNAPSHOT_PERIOD);
         }
         (*file) << "\n";
         file->close();
     }
     //  Reset the stats
     for (std::list<Host*>::iterator it = this->hosts.begin();
-         it != this->hosts.end(); it++)
+            it != this->hosts.end(); it++)
     {
-           (*it)->resetStats();
+        (*it)->resetStats();
     }
 
     //std::cout << "--Done printing system." << std::endl;
@@ -259,17 +262,17 @@ void outputRoutingTables(void * args) {
     file.open("routers.txt", std::ios::app);
     for (std::list<Router* >::iterator iter =
             SYSTEM_CONTROLLER->routers.begin();
-         iter != SYSTEM_CONTROLLER->routers.end(); iter++)
+            iter != SYSTEM_CONTROLLER->routers.end(); iter++)
     {
         file      << "Routing table print at time "
-                  << SYSTEM_CONTROLLER->getCurrentTime()
-                  << " " << (*iter)->infoString()
-                  << "\n";
+            << SYSTEM_CONTROLLER->getCurrentTime()
+            << " " << (*iter)->infoString()
+            << "\n";
         std::map<Node*, std::pair<double, Link*> > mapping = 
             (*iter)->routingTable_p->mapping;
         for (std::map<Node*, std::pair<double, Link*> >::iterator it =
                 mapping.begin();
-             it != mapping.end(); it++)
+                it != mapping.end(); it++)
         {
             if (it->first != NULL && it->second.second != NULL) {
                 file << "Distance to Node " << it->first->infoString()
@@ -317,7 +320,7 @@ void removeOldStatsFiles() {
     filenames.push_back("routers.txt");
 
     for (std::list<std::string>::iterator it = filenames.begin();
-        it != filenames.end(); it++)
+            it != filenames.end(); it++)
     {
         std::ifstream ifile(it->data());
         // If the file exists, delete it
@@ -364,22 +367,23 @@ void Controller::initSystem() {
             this->hostInfos,
             this->routerInfos,
             this->linkInfos,
-            this->flowInfos);
+            this->flowInfos,
+            this->plotOptions);
 
     ROUTING_UPDATE_PERIOD = this->routingUpdateTime;
     SNAPSHOT_PERIOD       = this->snapshotTime;
 
     // Create the objects
     for (std::list<HostInfo>::iterator it = hostInfos.begin();
-         it != hostInfos.end(); it++)
+            it != hostInfos.end(); it++)
     {
         Host *h = new Host(it->hostId);
         hostsById[it->hostId] = h;
         SYSTEM_CONTROLLER->addHost(h);
     }
- 
+
     for (std::list<RouterInfo>::iterator it = routerInfos.begin();
-         it != routerInfos.end(); it++)
+            it != routerInfos.end(); it++)
     {
         Router *r = new Router(it->routerId);
         routersById[it->routerId] = r;
@@ -387,7 +391,7 @@ void Controller::initSystem() {
     }
 
     for (std::list<LinkInfo>::iterator it = linkInfos.begin();
-         it != linkInfos.end(); it++)
+            it != linkInfos.end(); it++)
     {
         Node *n1 = getNode(it->node1Type, it->node1Id,
                 hostsById, routersById);
@@ -399,7 +403,7 @@ void Controller::initSystem() {
     }
 
     for (std::list<FlowInfo>::iterator it = flowInfos.begin();
-         it != flowInfos.end(); it++)
+            it != flowInfos.end(); it++)
     {
         Flow *f = new Flow(it->flowId, 1000000 * it->flowSize,
                 hostsById[it->sourceId], hostsById[it->destinationId],
@@ -432,10 +436,20 @@ void Controller::addPacket(Packet *p) {
 void Controller::removePacket(Packet *p) {
     packets.erase(p);
 }
+
+int Controller::numberOfPacketsInSystem() {
+    return packets.size();
+}
+
+double Controller::routerBufferSize() {
+    LinkInfo l = linkInfos.front();
+    return l.linkRate * 1000 / (double) Packet::DATASIZE;
+}
+
 void Controller::checkPackets() {
     //std::cout << "Total Packets in system: " << packets.size() << "\n";
     for (std::map<Packet *, bool>::iterator it = packets.begin();
-        it != packets.end(); it++)
+            it != packets.end(); it++)
     {
         Packet *packet = it->first;
         if (packet == NULL) {
@@ -456,12 +470,12 @@ void Controller::checkPackets() {
                     dp->getId() << ")\n";
                 exit(1);
             }
-/*            if (dp->getId() > 10000) {
-                std::cout << "Packet id ("
+            /*            if (dp->getId() > 10000) {
+                          std::cout << "Packet id ("
                           << dp->getId() 
                           << ") pretty large. It's probably wrong\n";
-                exit(1);
-            } */
+                          exit(1);
+                          } */
         }
     }
 }
@@ -475,7 +489,7 @@ void Controller::assertPacketExists(Packet *p) {
 
 void Controller::assertNodeExists(Node *n) {
     if (std::find(hosts.begin(), hosts.end(), n) == hosts.end() &&
-        std::find(routers.begin(), routers.end(), n) == routers.end())
+            std::find(routers.begin(), routers.end(), n) == routers.end())
     {
         std::cout << "Node does not exist.\n";
         exit(1);
@@ -487,8 +501,8 @@ void Controller::printRoutingTables() {
             it != routers.end(); it++)
     {
         std::cout << "Routing table print at time "
-                  << SYSTEM_CONTROLLER->getCurrentTime()
-                  << "\n";
+            << SYSTEM_CONTROLLER->getCurrentTime()
+            << "\n";
         (*it)->print(); 
     }
 }

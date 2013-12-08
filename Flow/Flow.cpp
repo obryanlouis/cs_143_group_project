@@ -207,6 +207,12 @@ double Flow::getStats(std::string stat, int period) {
         return SYSTEM_CONTROLLER->getThroughput() * getRTT() *
             std::sqrt(SYSTEM_CONTROLLER->getLinkLoss(totalLinkLoss)/totalPacketsRecieved) -1.22;
     }
+    else if (stat.compare("vegas") == 0) {
+        return congestionAlgorithm_p->getDiff();
+    }
+    else if (stat.compare("outstanding packets") == 0) {
+        return congestionAlgorithm_p->numOutstanding();
+    }
     /*else if (stat.compare("thresh") == 0) {
         return congestionAlgorithm_p->getThresh();
     }
