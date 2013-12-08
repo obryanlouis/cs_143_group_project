@@ -26,6 +26,9 @@ class Vegas : public TCP_RENO {
         double rttcurrent;
         bool rttSetFirstTime;
         void sendAvailablePackets();
+        double GAMMA;
+
+        friend void sendVegasCallback(void *arg);
 
     public:
         void maintain();

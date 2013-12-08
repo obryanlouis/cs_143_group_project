@@ -7,8 +7,7 @@ const double TIMEOUT_CONST = 10;
 const double FAST_WINDOW_PERIOD = 1000;
 
 const double ALPHA = 0.2;
-const double BETA = ALPHA;
-const double GAMMA = ALPHA;
+const double BETA = 0.25;
 
 void maintainVegas(void *arg);
 
@@ -26,6 +25,8 @@ void maintainVegas(void *arg);
     packetNumberAfterRetransmission = 3;
     rttcurrent = DBL_MAX;
     rttSetFirstTime = false;
+    //GAMMA = SYSTEM_CONTROLLER->caRate(this);
+    GAMMA = ALPHA;
 }
 
 void Vegas::scheduleFirstPacket(double startTime) {
@@ -38,16 +39,11 @@ void maintainVegas(void *arg) {
 }
 
 void Vegas::slowStart() {
-    // DEBUG
-    if (cwnd > 120) {
-        std::cout << "";
-    }
-
     // A modification of vegas called "gallop vegas"
     // see http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=6182775
     double maxincr = cwnd;
-    double diff = cwnd * (1 / rttmin - 1 / rttcurrent);
-    if (diff > GAMMA) {
+    double actualRate = cwnd * (1 / rttcurrent);
+    if (actualRate > GAMMA) {
         mode = CONGESTIONAVOIDANCE;
         status = 2;
         /*if (diff >= BETA) {
@@ -115,7 +111,10 @@ void Vegas::maintain() {
     else if (mode == CONGESTIONAVOIDANCE)
         congestionAvoidance();
 
-    sendAvailablePackets();
+    if (!rttSetFirstTime) {
+        sendAvailablePackets();
+    }
+
     // the first time this executes, rttcurrent is DBL_MAX
     if (rttSetFirstTime) {
         Event *e = new Event(SYSTEM_CONTROLLER->getCurrentTime() + rttcurrent,
@@ -134,30 +133,35 @@ void Vegas::sendAvailablePackets() {
     std::cout << "Number of outstanding packets: " << outstanding << "\n";
     std::cout << "Number of packets in system: " 
         << SYSTEM_CONTROLLER->numberOfPacketsInSystem() << "\n";
-    /*if (outstanding > SYSTEM_CONTROLLER->numberOfPacketsInSystem()) {
-      std::cout << "Number of outstanding packets is less than the "
-      << "number of packets in the system\n";
-      exit(1);
-      }*/
-    if (outstanding < 0) {
-        std::cout << "Number of outstanding packets is < 0\n";
-        exit(1);
-    }
 
 
 
     int limit = sendNext + cwnd - outstanding;
     // if there are packets left to send
     if (limit > sendNext) {
+        std::cout << "Sending " << limit - sendNext 
+            << " packets "<< std::endl;
+        if (limit - sendNext > 63) {
+            std::cout << "sending too many!\n";
+            exit(1);
+        }
         for (int i = sendNext; i < limit; i++) {
             SLOW_START::sendPacket(i, SYSTEM_CONTROLLER->getCurrentTime()
                     + (double)(i - sendNext) / 1000);
             outstanding++;
         }
-        std::cout << "packets sent: " << limit - sendNext << std::endl;
         sendNext = limit;
     }
 }
+
+/*void sendVegasCallback(void * arg) {
+    Vegas *v = (Vegas *) arg;
+    v->sendAvailablePackets();
+
+    Event *e = new Event(SYSTEM_CONTROLLER->getCurrentTime() + 2,
+        &sendVegasCallback, arg);
+    SYSTEM_CONTROLLER->add(e);
+}*/
 
 void Vegas::ackRecieved(AckPacket *p) {
     outstanding--;
@@ -180,6 +184,7 @@ void Vegas::ackRecieved(AckPacket *p) {
     if (!rttSetFirstTime) {
         rttSetFirstTime = true;
         maintain();
+        //sendVegasCallback((void *)this);
     }
 
     if (mode == CONGESTIONAVOIDANCE) { 
@@ -218,6 +223,8 @@ void Vegas::ackRecieved(AckPacket *p) {
             else {
                 duplicates++;
                 if (duplicates == 3) {
+
+                    // DEBUG
                     std::cout << "duplicates == 3\n";
                     std::cout << "cwnd: " << cwnd << std::endl;
                     std::cout << "outstanding: " << outstanding << std::endl;
@@ -226,6 +233,7 @@ void Vegas::ackRecieved(AckPacket *p) {
                     std::cout << "rttcurrent: " << rttcurrent << std::endl;
                     SYSTEM_CONTROLLER->makeDebugPlots(); 
                     exit(1);
+
                     packetNumberAfterRetransmission = 0;
                     this->ssthresh = outstanding / 2;
                     this->cwnd = ssthresh + 3;
@@ -238,13 +246,13 @@ void Vegas::ackRecieved(AckPacket *p) {
 
                 else if (duplicates > 3) {
                     cwnd++;
-                    sendAvailablePackets();
                 }
             }
         }
     }
 
     lastAckRecieved = id;
+    sendAvailablePackets();
 }
 
 // checks for a timeout to my understanding

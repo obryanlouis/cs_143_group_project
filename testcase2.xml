@@ -108,7 +108,7 @@
             <flowSize>35</flowSize>
             <flowStartTime>0.5</flowStartTime>
                 <!-- Options: reno, vegas -->
-            <congestionAlgorithmType>reno</congestionAlgorithmType>
+            <congestionAlgorithmType>vegas</congestionAlgorithmType>
         </flow>
             <!-- F1 -->
         <flow id="2" print="1">
@@ -117,7 +117,7 @@
             <flowSize>15</flowSize>
             <flowStartTime>10</flowStartTime>
                 <!-- Options: reno, vegas -->
-            <congestionAlgorithmType>reno</congestionAlgorithmType>
+            <congestionAlgorithmType>vegas</congestionAlgorithmType>
         </flow>
             <!-- F2 -->
         <flow id="3" print="1">
@@ -126,7 +126,7 @@
             <flowSize>30</flowSize>
             <flowStartTime>20</flowStartTime>
                 <!-- Options: reno, vegas -->
-            <congestionAlgorithmType>tahoe</congestionAlgorithmType>
+            <congestionAlgorithmType>vegas</congestionAlgorithmType>
         </flow>
             <!-- F3 -->
     </networkFlows>
