@@ -5,7 +5,7 @@
 #include "Control.h" // include this here since header doesn't need
 #include "Packet.h"
 
-const double START_RTT = 100000;
+const double START_RTT = 10000;
 const double DEFAULT_ALPHA = 0.75;
 const double TIMEOUT_CONST = 100;
 const int SEND_LIMIT = 10; 
@@ -34,7 +34,7 @@ AckPacket *CongestionAlgorithm::makeAckPacket(DataPacket *p){
     : CongestionAlgorithm(in_flow)
     , ssthresh(DBL_MAX)
     , roundTripTime(START_RTT)
-    , timeout(START_RTT)
+    , timeout(500)
     , alpha(DEFAULT_ALPHA)
     , sendNext(1)
     , maxAck(0)

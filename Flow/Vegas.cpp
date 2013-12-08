@@ -7,7 +7,8 @@ const double TIMEOUT_CONST = 10;
 const double FAST_WINDOW_PERIOD = 1000;
 
 const double ALPHA = 0.2;
-const double BETA = 0.6;
+const double BETA = ALPHA;
+const double GAMMA = ALPHA;
 
 void maintainVegas(void *arg);
 
@@ -20,12 +21,11 @@ void maintainVegas(void *arg);
     status = 0;
     mode = SLOWSTART; 
     cwnd = 1;
+    parity = 0;
     outstanding = 0;
     packetNumberAfterRetransmission = 3;
     rttcurrent = DBL_MAX;
     rttSetFirstTime = false;
-    //GAMMA = SYSTEM_CONTROLLER->routerBufferSize();
-    GAMMA = 0.2;
 }
 
 void Vegas::scheduleFirstPacket(double startTime) {
@@ -75,10 +75,15 @@ void Vegas::slowStart() {
         }*/
     }
     else {
-        cwnd += incr;
-        if (incr < maxincr)
-            incr += 1;
-        status = 0;
+        if (parity == 0) {
+            cwnd += incr;
+            if (incr < maxincr)
+                incr += 1;
+            status = 0;
+        }
+        else {
+            parity = 1;
+        }
     }
 }
 
@@ -130,10 +135,10 @@ void Vegas::sendAvailablePackets() {
     std::cout << "Number of packets in system: " 
         << SYSTEM_CONTROLLER->numberOfPacketsInSystem() << "\n";
     /*if (outstanding > SYSTEM_CONTROLLER->numberOfPacketsInSystem()) {
-        std::cout << "Number of outstanding packets is less than the "
-            << "number of packets in the system\n";
-        exit(1);
-    }*/
+      std::cout << "Number of outstanding packets is less than the "
+      << "number of packets in the system\n";
+      exit(1);
+      }*/
     if (outstanding < 0) {
         std::cout << "Number of outstanding packets is < 0\n";
         exit(1);
@@ -156,6 +161,8 @@ void Vegas::sendAvailablePackets() {
 
 void Vegas::ackRecieved(AckPacket *p) {
     outstanding--;
+    if (outstanding < 0)
+        outstanding = 0;
 
     if (p->getStartTime() < lastDroppedTime) {
         return;
@@ -178,12 +185,12 @@ void Vegas::ackRecieved(AckPacket *p) {
     if (mode == CONGESTIONAVOIDANCE) { 
         // normal vegas case
         if (id != lastAckRecieved) {
-
+            // if in recovery previously, not in recovery anymore
+            // set cwnd to ssthresh
             if (inRecovery) {
                 inRecovery = false;
                 cwnd = ssthresh;
             }
-
 
             packetNumberAfterRetransmission++;
             duplicates = 0;
@@ -193,7 +200,7 @@ void Vegas::ackRecieved(AckPacket *p) {
                     outstanding++;
                 }
             }
-            double diff = cwnd * (1 / rttmin - 1 / rttcurrent);
+            double diff = getDiff();
             std::cout << "Diff in Vegas CA: " << diff << std::endl;
             if (diff < ALPHA)
                 cwnd++;
@@ -211,9 +218,18 @@ void Vegas::ackRecieved(AckPacket *p) {
             else {
                 duplicates++;
                 if (duplicates == 3) {
+                    std::cout << "duplicates == 3\n";
+                    std::cout << "cwnd: " << cwnd << std::endl;
+                    std::cout << "outstanding: " << outstanding << std::endl;
+                    std::cout << "diff: " << getDiff()
+                        << std::endl;
+                    std::cout << "rttcurrent: " << rttcurrent << std::endl;
+                    SYSTEM_CONTROLLER->makeDebugPlots(); 
+                    exit(1);
                     packetNumberAfterRetransmission = 0;
                     this->ssthresh = outstanding / 2;
                     this->cwnd = ssthresh + 3;
+                    this->outstanding = cwnd;
                     SLOW_START::sendPacket(id, SYSTEM_CONTROLLER->getCurrentTime());
                     this->outstanding++;
                     this->sendNext = id + 1; 
@@ -240,14 +256,6 @@ void Vegas::packetDropped(int id, bool &wasDropped) {
         retransmissionTimeout(id);
     }
 }
-
-
-
-
-
-
-
-
 
 
 double Vegas::getDiff() {

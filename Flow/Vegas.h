@@ -14,6 +14,7 @@ class Vegas : public TCP_RENO {
         };
         Mode mode;
         int status;
+        int parity;
         double incr;
         double maxincr;
         double lastincr;
@@ -25,8 +26,6 @@ class Vegas : public TCP_RENO {
         double rttcurrent;
         bool rttSetFirstTime;
         void sendAvailablePackets();
-
-        double GAMMA;
 
     public:
         void maintain();

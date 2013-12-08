@@ -582,3 +582,7 @@ double Controller::getLinkLoss(double loss) {
     }
     return loss;
 }
+
+void Controller::makeDebugPlots() {
+    makePlots(&plotOptions); 
+}

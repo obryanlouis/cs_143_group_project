@@ -89,7 +89,7 @@ void makePlots(PlotOptions *plotOptions) {
                 "Flow_Send_Rates.svg", "Mbps", FLOWSTAT,
                 "Flow Send Rates"));
     files.push_back(std::make_tuple(FLOW_RTT_FILE,
-                "Flow_RTT.svg", "ms", FLOWSTAT, "Flow Round Trip Times"));
+                "Flow_RTT.svg", "ms", FLOWSTAT, "Flow Packet Delays"));
     files.push_back(std::make_tuple(FLOW_OUTSTANDING_FILE,
                 "Flow_Outstanding_Packets.svg", "Packets", FLOWSTAT, "Flow Outstanding Packets"));
     files.push_back(std::make_tuple(FLOW_WINDOW_FILE,

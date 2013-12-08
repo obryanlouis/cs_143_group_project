@@ -211,6 +211,7 @@ public:
 
 
     // DEBUG: Other functions
+    void makeDebugPlots();
     int numberOfPacketsInSystem();
     void printRoutingTables();
     friend void outputRoutingTables(void *args);
