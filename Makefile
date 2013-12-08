@@ -5,7 +5,7 @@ SOURCES=Routing/Router.cpp Routing/RoutingTable.cpp Links/Link.cpp Main/Main.cpp
  Flow/Flow.cpp Packet/Packet.cpp Control/Control.cpp Node/Node.cpp\
  Node/Host.cpp gnuplot/make_plot.cpp InputParser/InputParser.cpp\
  InputParser/pugixml.cpp Links/Buffer.cpp Flow/CongestionAlgorithm.cpp\
- Flow/Vegas.cpp
+ Flow/Vegas.cpp Flow/Cubic.cpp
 PLOTSOURCES=gnuplot/make_plot.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=test

@@ -48,7 +48,9 @@ Flow::Flow(int in_ID, int in_size, Host *in_source, Host *in_destination,
         case VEGAS:
             congestionAlgorithm_p = new Vegas(this);
             break;
-
+        case CUBIC:
+            congestionAlgorithm_p = new Cubic(this);
+            break;
         default:
             std::cout << "Invalid routing type" << std::endl;
             exit(1);

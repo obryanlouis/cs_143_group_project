@@ -16,6 +16,7 @@
 
 #include "CongestionAlgorithm.h"
 #include "Vegas.h"
+#include "Cubic.h"
 #include "Control.h"
 #include "Packet.h"
 #include "Host.h"
