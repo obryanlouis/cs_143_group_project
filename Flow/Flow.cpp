@@ -16,6 +16,7 @@ Flow::Flow(int in_ID, int in_size, Host *in_source, Host *in_destination,
     , totalPacketDelay(0)
     , packetsReceived(0)
     , totalLinkLoss(0)
+      , done(false)
 {
     // Calculate the number of packets we need based on size of flow 
     this->totalPackets = (in_size + (Packet::DATASIZE - 1)) / Packet::DATASIZE;
@@ -55,7 +56,7 @@ Flow::Flow(int in_ID, int in_size, Host *in_source, Host *in_destination,
             std::cout << "Invalid routing type" << std::endl;
             exit(1);
     } 
-    
+
 
 }
 
@@ -75,11 +76,13 @@ double Flow::getStartTime() {
 }
 
 void Flow::sendNewPacket(DataPacket *p, double timeOut){
-    this->updateDataSent(p->getSize());
-    this->packets[p->getId()] = timeOut;
-    this->source->handlePacket(p);
+    if (!done) {
+        this->updateDataSent(p->getSize());
+        this->packets[p->getId()] = timeOut;
+        this->source->handlePacket(p);
+    }
 }
-    
+
 int Flow::getNextUnrecieved(){
     return *(acks.begin());
 }
@@ -88,9 +91,7 @@ int Flow::nextHostPacket(){
     for (int i = 0; i < totalPackets; i++){
         if (packets[i] != DBL_MAX) return i;
     }
-    std::cout<< "uhhh. no lowest packet? (Flow::nextHostPacket)\n" << std::endl;
-
-    exit(1);
+    return -1;
 }
 
 AckPacket* Flow::atDest(DataPacket *p){
@@ -111,6 +112,9 @@ AckPacket* Flow::atDest(DataPacket *p){
 }
 
 void Flow::handlePacket(AckPacket *p) {
+    if (done)
+        return;
+
     SYSTEM_CONTROLLER->checkPackets();
     std::cout << "--Flow " << flowId << " has received an acknowledgement"
         << " packet for packet " << p->getAckId() <<
@@ -128,19 +132,19 @@ void Flow::handlePacket(AckPacket *p) {
 
     double rtt = SYSTEM_CONTROLLER->getCurrentTime() - p->getStartTime();
     updateRTT(rtt);
-    
 
-/*
+
+    /*
     // see if packet recieved before
     if (this->packets[p->getId()] != DBL_MAX){
-        // update progress
-        this->progress++;
-        // done with that packet ID, so set its timeout to super long
-        // so it'll never get sent
-        this->packets[p->getId()] = DBL_MAX; 
-        std::cout << "changed to dbl_max";
+    // update progress
+    this->progress++;
+    // done with that packet ID, so set its timeout to super long
+    // so it'll never get sent
+    this->packets[p->getId()] = DBL_MAX; 
+    std::cout << "changed to dbl_max";
     }  
-*/
+    */
 
     // update window size
     congestionAlgorithm_p->ackRecieved(p);
@@ -150,14 +154,17 @@ void Flow::handlePacket(AckPacket *p) {
         " out of " << totalPackets << " received\n";
     this->dataReceived += p->getSize();
 
-    if (progress == totalPackets) SYSTEM_CONTROLLER->decrementFlowsLeft();
+    if (progress == totalPackets) {
+        SYSTEM_CONTROLLER->decrementFlowsLeft();
+        done = true;
+    }
 
 
     delete p;
 }
 
 void Flow::resetPackets(int id){
-    
+
     for (id = 0; id < this->totalPackets; id++){
         if (this->packets[id] != DBL_MAX) this->packets[id] = 0;
     }
@@ -175,7 +182,7 @@ double Flow::getPacketTime(int id){
 }
 
 
-           
+
 Host *Flow::getStart(){
     return source;
 }
@@ -190,6 +197,8 @@ int Flow::getId() {
 }
 
 double Flow::getStats(std::string stat, int period) {
+    if (done)
+        return 0;
     if (stat.compare("send rate") == 0) {
         return (((double)this->dataSent) / (double)period) *
             ((double) 8/ (double) 1000);
@@ -216,11 +225,11 @@ double Flow::getStats(std::string stat, int period) {
         return congestionAlgorithm_p->numOutstanding();
     }
     /*else if (stat.compare("thresh") == 0) {
-        return congestionAlgorithm_p->getThresh();
-    }
-    else if (stat.compare("outstanding") == 0) {
-        return congestionAlgorithm_p->getOutstanding();
-    }*/
+      return congestionAlgorithm_p->getThresh();
+      }
+      else if (stat.compare("outstanding") == 0) {
+      return congestionAlgorithm_p->getOutstanding();
+      }*/
 }
 
 

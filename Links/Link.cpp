@@ -235,3 +235,6 @@ int Link::getId(){
     return this->ID;
 }
 
+double Link::getCapacity() {
+    return capacity;
+}

@@ -6,9 +6,6 @@ const double START_RTT = 10000;
 const double TIMEOUT_CONST = 10;
 const double FAST_WINDOW_PERIOD = 1000;
 
-const double ALPHA = 0.2;
-const double BETA = 0.25;
-
 void maintainVegas(void *arg);
 
     Vegas::Vegas(Flow *f)
@@ -25,72 +22,17 @@ void maintainVegas(void *arg);
     packetNumberAfterRetransmission = 3;
     rttcurrent = DBL_MAX;
     rttSetFirstTime = false;
-    //GAMMA = SYSTEM_CONTROLLER->caRate(this);
-    GAMMA = ALPHA;
+    rttEstimate = 0;
+}
+
+void firstVegasPacket(void *arg) {
+    Vegas *v = (Vegas *)arg;
+    v->sendPacket(0, SYSTEM_CONTROLLER->getCurrentTime());
 }
 
 void Vegas::scheduleFirstPacket(double startTime) {
-    Event *e = new Event(flow->getStartTime(), &maintainVegas, (void *) this);
+    Event *e = new Event(startTime, &firstVegasPacket, (void *) this);
     SYSTEM_CONTROLLER->add(e);
-}
-
-void maintainVegas(void *arg) {
-    ((Vegas*)arg)->maintain();
-}
-
-void Vegas::slowStart() {
-    // A modification of vegas called "gallop vegas"
-    // see http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=6182775
-    double maxincr = cwnd;
-    double actualRate = cwnd * (1 / rttcurrent);
-    if (actualRate > GAMMA) {
-        mode = CONGESTIONAVOIDANCE;
-        status = 2;
-        /*if (diff >= BETA) {
-          cwnd -= (lastincr + diff - BETA);
-          ssthresh = 2;
-          if (cwnd < 2)
-          cwnd = 2;
-        // Enter congestion avoidance
-        status = 2;
-        mode = CONGESTIONAVOIDANCE;
-        }
-        else {
-        if (status == 0) {
-        incr = (int)(incr / 2);
-        if (incr <= 1) {
-        ssthresh = 2;
-        incr = 1;
-        }
-        status = 1;
-        }
-        else {
-        status = 0;
-        }
-        cwnd += incr;
-        }*/
-    }
-    else {
-        if (parity == 0) {
-            cwnd += incr;
-            if (incr < maxincr)
-                incr += 1;
-            status = 0;
-        }
-        else {
-            parity = 1;
-        }
-    }
-}
-
-void Vegas::congestionAvoidance() {
-    if (status != 2) {
-        // do the motion of original vegas
-    }
-    // gallop vegas resets status to 0
-    else {
-        status = 0;
-    }
 }
 
 // an actual timeout
@@ -105,28 +47,9 @@ void Vegas::retransmissionTimeout(int id) {
     sendNext = id;
 }
 
-void Vegas::maintain() {
-    if (mode == SLOWSTART)
-        slowStart();
-    else if (mode == CONGESTIONAVOIDANCE)
-        congestionAvoidance();
-
-    if (!rttSetFirstTime) {
-        sendAvailablePackets();
-    }
-
-    // the first time this executes, rttcurrent is DBL_MAX
-    if (rttSetFirstTime) {
-        Event *e = new Event(SYSTEM_CONTROLLER->getCurrentTime() + rttcurrent,
-                &maintainVegas, (void *)this);
-        SYSTEM_CONTROLLER->add(e);
-    }
-}
-
 void Vegas::sendAvailablePackets() {
     if (sendNext < lastAckRecieved) {
-        std::cout << "Shouldn't need to send this packet\n";
-        exit(1);
+        sendNext = lastAckRecieved;
     }
 
     // DEBUG
@@ -137,40 +60,37 @@ void Vegas::sendAvailablePackets() {
 
 
     int limit = sendNext + cwnd - outstanding;
+    Link *l = flow->getStart()->getLink();
+    double capacity = l->getCapacity();
+    Buffer *b = l->getBuffer(flow->getStart());
+    double capacityUsed = b->capacityUsed;
+    limit = std::min(limit, 
+            (int)((0.5) * (capacity - capacityUsed)) / Packet::DATASIZE + sendNext);
+    if (limit != sendNext + cwnd - outstanding) {
+        std::cout << "";
+    }
     // if there are packets left to send
     if (limit > sendNext) {
         std::cout << "Sending " << limit - sendNext 
             << " packets "<< std::endl;
-        if (limit - sendNext > 63) {
-            std::cout << "sending too many!\n";
-            exit(1);
-        }
         for (int i = sendNext; i < limit; i++) {
             SLOW_START::sendPacket(i, SYSTEM_CONTROLLER->getCurrentTime()
-                    + (double)(i - sendNext) / 1000);
+                    + (double)(i - sendNext));
             outstanding++;
         }
         sendNext = limit;
     }
 }
 
-/*void sendVegasCallback(void * arg) {
-    Vegas *v = (Vegas *) arg;
-    v->sendAvailablePackets();
-
-    Event *e = new Event(SYSTEM_CONTROLLER->getCurrentTime() + 2,
-        &sendVegasCallback, arg);
-    SYSTEM_CONTROLLER->add(e);
-}*/
-
 void Vegas::ackRecieved(AckPacket *p) {
-    outstanding--;
-    if (outstanding < 0)
-        outstanding = 0;
 
     if (p->getStartTime() < lastDroppedTime) {
         return;
     }
+
+    outstanding--;
+    if (outstanding < 0)
+        outstanding = 0;
 
     int id = p->getAckId();
     rttcurrent = SYSTEM_CONTROLLER->getCurrentTime() - p->getStartTime();
@@ -181,11 +101,27 @@ void Vegas::ackRecieved(AckPacket *p) {
         rttmin = rttcurrent;
     }
 
-    if (!rttSetFirstTime) {
-        rttSetFirstTime = true;
-        maintain();
-        //sendVegasCallback((void *)this);
+    if (mode == SLOWSTART) {
+        double gamma = 0.95;
+        /*double damped = gamma * rttmin + (1 - gamma) * rttcurrent;
+          double actualRate = cwnd / damped;
+          if (cwnd > actualRate * rttmin + 1) {*/
+        std::cout << "current window size: " << cwnd << "\n";
+        std::cout << "diff: " << getDiff() << "\n";
+        if (getDiff() > 0.3) {
+            mode = CONGESTIONAVOIDANCE;
+        }
+        else {
+            if (parity == 0) {
+                cwnd += 1;
+                sendAvailablePackets();
+            }
+            else {
+                parity = 1;
+            }
+        }
     }
+
 
     if (mode == CONGESTIONAVOIDANCE) { 
         // normal vegas case
@@ -195,6 +131,9 @@ void Vegas::ackRecieved(AckPacket *p) {
             if (inRecovery) {
                 inRecovery = false;
                 cwnd = ssthresh;
+                mode = SLOWSTART;
+                rttEstimate = 0;
+                return;
             }
 
             packetNumberAfterRetransmission++;
@@ -205,12 +144,20 @@ void Vegas::ackRecieved(AckPacket *p) {
                     outstanding++;
                 }
             }
+            std::cout << "rttmin: " << rttmin << "\n";
+            std::cout << "rttEstimate: " << rttEstimate << "\n";
+            std::cout << "rttcurrent: " << rttcurrent << "\n";
             double diff = getDiff();
             std::cout << "Diff in Vegas CA: " << diff << std::endl;
-            if (diff < ALPHA)
-                cwnd++;
-            else if (diff > BETA)
-                cwnd--;
+            double inc = ((double) 1) / (cwnd);
+            if (diff < 0.5) {
+                cwnd += inc;
+                std::cout << "Incrementing window size\n";
+            }
+            else if (diff > 0.55) {
+                cwnd -= inc;
+                std::cout << "decrementing window size\n";
+            }
         }
         else {
             // if the difference between the current time and the timestamp
@@ -225,19 +172,19 @@ void Vegas::ackRecieved(AckPacket *p) {
                 if (duplicates == 3) {
 
                     // DEBUG
-                    std::cout << "duplicates == 3\n";
-                    std::cout << "cwnd: " << cwnd << std::endl;
-                    std::cout << "outstanding: " << outstanding << std::endl;
-                    std::cout << "diff: " << getDiff()
-                        << std::endl;
-                    std::cout << "rttcurrent: " << rttcurrent << std::endl;
-                    SYSTEM_CONTROLLER->makeDebugPlots(); 
-                    exit(1);
+                    /*std::cout << "duplicates == 3\n";
+                      std::cout << "cwnd: " << cwnd << std::endl;
+                      std::cout << "outstanding: " << outstanding << std::endl;
+                      std::cout << "diff: " << getDiff()
+                      << std::endl;
+                      std::cout << "rttcurrent: " << rttcurrent << std::endl;
+                      SYSTEM_CONTROLLER->makeDebugPlots(); 
+                      exit(1);*/
 
                     packetNumberAfterRetransmission = 0;
                     this->ssthresh = outstanding / 2;
                     this->cwnd = ssthresh + 3;
-                    this->outstanding = cwnd;
+                    //this->outstanding = cwnd;
                     SLOW_START::sendPacket(id, SYSTEM_CONTROLLER->getCurrentTime());
                     this->outstanding++;
                     this->sendNext = id + 1; 
@@ -249,13 +196,13 @@ void Vegas::ackRecieved(AckPacket *p) {
                 }
             }
         }
+        sendAvailablePackets();
     }
 
     lastAckRecieved = id;
-    sendAvailablePackets();
 }
 
-// checks for a timeout to my understanding
+    // checks for a timeout to my understanding
 void Vegas::packetDropped(int id, bool &wasDropped) {
     double tempLastDroppedTime = lastDroppedTime;
     TCP_RENO::packetDropped(id, wasDropped);
@@ -267,5 +214,16 @@ void Vegas::packetDropped(int id, bool &wasDropped) {
 
 
 double Vegas::getDiff() {
-    return cwnd * (1 / rttmin - 1 / rttcurrent);
+    if (rttcurrent == DBL_MAX)
+        return 0;
+    double gamma = 0.5;
+    if (rttEstimate == 0)
+        rttEstimate = rttcurrent;
+    rttEstimate = gamma * rttEstimate + (1 - gamma) * rttcurrent;
+    return cwnd / rttmin - cwnd / rttEstimate;
 }
+
+
+
+
+

@@ -73,12 +73,12 @@ void SLOW_START::sendPacket(int id, double startTime){
     args[0] = (void*) this;
     args[1] = (void*) ((long)id);
 
-    double checkAt = SYSTEM_CONTROLLER->getCurrentTime() 
+    double checkAt = startTime
         + this->getTimeOut();
 
     // make packet and send to flow to put into system
-    DataPacket *p = new DataPacket (id, this->getFlow(), \
-            SYSTEM_CONTROLLER->getCurrentTime());
+    DataPacket *p = new DataPacket (id, this->getFlow(), 
+            startTime);
     this->getFlow()->sendNewPacket(p, checkAt);
 
     // make timeout event 
@@ -124,6 +124,13 @@ void CongestionAlgorithm::scheduleFirstPacket(double startTime){
 
 void SLOW_START::packetDropped(int id, bool &wasDropped){
     wasDropped = false;
+
+    int packetId = flow->nextHostPacket();
+    // done with this flow
+    if (packetId == -1) {
+        return;
+    }
+
     std::cout << "In SLOW_START::packetDropped()" << std::endl;
     // see if packet not actually dropped
     std::cout << "\t Packet " 
@@ -454,4 +461,5 @@ double TCP_TAHOE::getDiff() { return 0; }
 double CongestionAlgorithm::numOutstanding() { return 0; }
 
 double SLOW_START::numOutstanding() { return outstanding; }
+
 

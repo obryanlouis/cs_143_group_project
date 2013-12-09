@@ -316,6 +316,7 @@ void removeOldStatsFiles() {
     filenames.push_back(HOST_RECEIVE_FILE);
     filenames.push_back(FLOW_THRESH_FILE);
     filenames.push_back(FLOW_OUTSTANDING_FILE);
+    filenames.push_back(FLOW_VEGAS_FILE);
 
     filenames.push_back("routers.txt");
 
@@ -586,3 +587,18 @@ double Controller::getLinkLoss(double loss) {
 void Controller::makeDebugPlots() {
     makePlots(&plotOptions); 
 }
+
+void Controller::getVegasParameters(double &ALPHA, double &BETA, 
+        double &GAMMA, Vegas *v) {
+    // in mbps
+    Link *l = v->getFlow()->getStart()->getLink();
+    double rate = l->getRate() / 1000000;
+    double buffer = l->getCapacity() / Packet::DATASIZE;
+    rate = rate * 0.9;
+    ALPHA = rate;
+    BETA = rate;
+    GAMMA = buffer;
+}
+
+
+

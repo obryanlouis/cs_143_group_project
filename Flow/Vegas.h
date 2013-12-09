@@ -17,7 +17,6 @@ class Vegas : public TCP_RENO {
         int parity;
         double incr;
         double maxincr;
-        double lastincr;
             // The last increment of cwnd
         int packetNumberAfterRetransmission;
             // used for the first two packets after retransmission
@@ -26,17 +25,14 @@ class Vegas : public TCP_RENO {
         double rttcurrent;
         bool rttSetFirstTime;
         void sendAvailablePackets();
-        double GAMMA;
+        double rttEstimate;
 
         friend void sendVegasCallback(void *arg);
 
     public:
-        void maintain();
         void ackRecieved(AckPacket *p);
         void packetDropped(int id, bool &wasDropped);
-        void congestionAvoidance();
         void retransmissionTimeout(int id);
-        void slowStart();
         void scheduleFirstPacket(double startTime);
         Vegas(Flow *f);
         double getDiff();

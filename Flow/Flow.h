@@ -68,6 +68,7 @@ class Flow {
     double totalLinkLoss;
     int totalPacketsRecieved;
     double start;
+    bool done;
 
 public:
     Flow(int in_ID, int in_size, Host *in_source, Host *in_destination,

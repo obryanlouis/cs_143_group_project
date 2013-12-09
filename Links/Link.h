@@ -45,9 +45,6 @@ private:
     double nextFree;
         // The next time that the queue will be free (ms)
 
-    Buffer * getBuffer(Node *end);
-        // Gets the buffer of the link that goes to the given node. Fails
-        // if the node is not one of the endpoints.
     double instantaneousOccupancy;
 
 public:
@@ -60,8 +57,12 @@ public:
     ~Link() { }
         // Destroy this instance of Link.
     
+    Buffer * getBuffer(Node *end);
+        // Gets the buffer of the link that goes to the given node. Fails
+        // if the node is not one of the endpoints.
 	void resetStats();
         // Reset the stats on the link (to be used every snapshot time)
+    double getCapacity();
 	double getOccupancy();
         // Returns the occupancy of the link's buffers
 	double getPacketLoss();

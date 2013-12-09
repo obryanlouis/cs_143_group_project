@@ -189,6 +189,7 @@ public:
     void setInputFile(std::string inputFile);
         // Sets the input file to use.
     double routerBufferSize();
+    void getVegasParameters(double &ALPHA, double &BETA, double &GAMMA, Vegas *v);
 
     // Output
     double getThroughput();
