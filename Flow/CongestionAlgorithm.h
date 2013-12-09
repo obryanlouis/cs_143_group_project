@@ -12,6 +12,7 @@ class DataPacket;
 class Flow;
 
 enum CongestionAlgorithmType {
+    DUMB,
     SLOW,
     TAHOE,
     RENO,
@@ -83,6 +84,19 @@ class TCP_TAHOE : public SLOW_START{
         virtual void packetDropped(int id, bool &wasDropped);
         virtual void scheduleFirstPacket(double startTime);
         virtual double getDiff();
+};
+
+class Dumb : public SLOW_START {
+private:
+    int sendNext;
+
+public:
+    Dumb(Flow *in_flow);
+
+    void ackRecieved(AckPacket *p);
+    void scheduleFirstPacket(double startTime);
+    void packetDropped(int id, bool &wasDropped);
+
 };
 
 

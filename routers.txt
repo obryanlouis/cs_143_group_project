@@ -1,4 +1,5 @@
 Routing table print at time 500 (Router 1)
+<<<<<<< HEAD
 Distance to Node (Host 1) is 10 via (Link 5)
 Distance to Node (Host 2) is 10 via (Link 4)
 Distance to Node (Host 3) is 30 via (Link 1)
@@ -17,6 +18,18 @@ Distance to Node (Host 5) is 10 via (Link 6)
 Distance to Node (Host 6) is 30 via (Link 2)
 Distance to Node (Router 3) is 10 via (Link 2)
 Distance to Node (Router 4) is 20 via (Link 2)
+=======
+Distance to Node (Host 1) is 10 via (Link 0)
+Distance to Node (Host 2) is 30 via (Link 2)
+Distance to Node (Router 2) is 10 via (Link 1)
+Distance to Node (Router 3) is 10 via (Link 2)
+Distance to Node (Router 4) is 20 via (Link 2)
+Routing table print at time 500 (Router 2)
+Distance to Node (Host 1) is 20 via (Link 1)
+Distance to Node (Host 2) is 20 via (Link 3)
+Distance to Node (Router 3) is 20 via (Link 3)
+Distance to Node (Router 4) is 10 via (Link 3)
+>>>>>>> 1a8154f2e29ab91ddd4eddb935e53bb5c72230e2
 Distance to Node (Router 1) is 10 via (Link 1)
 Routing table print at time 500 (Router 3)
 Distance to Node (Host 1) is 30 via (Link 2)
@@ -29,6 +42,7 @@ Distance to Node (Router 2) is 10 via (Link 2)
 Distance to Node (Router 4) is 10 via (Link 3)
 Distance to Node (Router 1) is 20 via (Link 2)
 Routing table print at time 500 (Router 4)
+<<<<<<< HEAD
 Distance to Node (Host 1) is 40 via (Link 3)
 Distance to Node (Host 2) is 40 via (Link 3)
 Distance to Node (Host 3) is 20 via (Link 3)
@@ -38,10 +52,18 @@ Distance to Node (Host 6) is 10 via (Link 9)
 Distance to Node (Router 2) is 20 via (Link 3)
 Distance to Node (Router 3) is 10 via (Link 3)
 Distance to Node (Router 1) is 30 via (Link 3)
+=======
+Distance to Node (Host 1) is 30 via (Link 3)
+Distance to Node (Host 2) is 10 via (Link 5)
+Distance to Node (Router 2) is 10 via (Link 3)
+Distance to Node (Router 3) is 10 via (Link 4)
+Distance to Node (Router 1) is 20 via (Link 3)
+>>>>>>> 1a8154f2e29ab91ddd4eddb935e53bb5c72230e2
 
 
 
 Routing table print at time 5500 (Router 1)
+<<<<<<< HEAD
 Distance to Node (Host 1) is 10 via (Link 5)
 Distance to Node (Host 2) is 10 via (Link 4)
 Distance to Node (Host 3) is 76.6944 via (Link 1)
@@ -81,10 +103,36 @@ Distance to Node (Host 6) is 10 via (Link 9)
 Distance to Node (Router 2) is 21.6896 via (Link 3)
 Distance to Node (Router 3) is 10.8704 via (Link 3)
 Distance to Node (Router 1) is 77.5648 via (Link 3)
+=======
+Distance to Node (Host 1) is 10 via (Link 0)
+Distance to Node (Host 2) is 30 via (Link 2)
+Distance to Node (Router 2) is 10 via (Link 1)
+Distance to Node (Router 3) is 10 via (Link 2)
+Distance to Node (Router 4) is 20 via (Link 2)
+Routing table print at time 5500 (Router 2)
+Distance to Node (Host 1) is 20 via (Link 1)
+Distance to Node (Host 2) is 20 via (Link 3)
+Distance to Node (Router 3) is 20 via (Link 3)
+Distance to Node (Router 4) is 10 via (Link 3)
+Distance to Node (Router 1) is 10 via (Link 1)
+Routing table print at time 5500 (Router 3)
+Distance to Node (Host 1) is 20 via (Link 2)
+Distance to Node (Host 2) is 20 via (Link 4)
+Distance to Node (Router 2) is 20 via (Link 2)
+Distance to Node (Router 4) is 10 via (Link 4)
+Distance to Node (Router 1) is 10 via (Link 2)
+Routing table print at time 5500 (Router 4)
+Distance to Node (Host 1) is 30 via (Link 3)
+Distance to Node (Host 2) is 10 via (Link 5)
+Distance to Node (Router 2) is 10 via (Link 3)
+Distance to Node (Router 3) is 10 via (Link 4)
+Distance to Node (Router 1) is 20 via (Link 3)
+>>>>>>> 1a8154f2e29ab91ddd4eddb935e53bb5c72230e2
 
 
 
 Routing table print at time 10500 (Router 1)
+<<<<<<< HEAD
 Distance to Node (Host 1) is 10 via (Link 5)
 Distance to Node (Host 2) is 10 via (Link 4)
 Distance to Node (Host 3) is 75.8752 via (Link 1)
@@ -124,6 +172,31 @@ Distance to Node (Host 6) is 10 via (Link 9)
 Distance to Node (Router 2) is 21.6384 via (Link 3)
 Distance to Node (Router 3) is 10.8192 via (Link 3)
 Distance to Node (Router 1) is 76.6944 via (Link 3)
+=======
+Distance to Node (Host 1) is 10 via (Link 0)
+Distance to Node (Host 2) is 30.8192 via (Link 2)
+Distance to Node (Router 2) is 10 via (Link 1)
+Distance to Node (Router 3) is 10.8192 via (Link 2)
+Distance to Node (Router 4) is 20.8192 via (Link 2)
+Routing table print at time 10500 (Router 2)
+Distance to Node (Host 1) is 20 via (Link 1)
+Distance to Node (Host 2) is 20 via (Link 3)
+Distance to Node (Router 3) is 20 via (Link 3)
+Distance to Node (Router 4) is 10 via (Link 3)
+Distance to Node (Router 1) is 10 via (Link 1)
+Routing table print at time 10500 (Router 3)
+Distance to Node (Host 1) is 20.8192 via (Link 2)
+Distance to Node (Host 2) is 20 via (Link 4)
+Distance to Node (Router 2) is 20.8192 via (Link 2)
+Distance to Node (Router 4) is 10 via (Link 4)
+Distance to Node (Router 1) is 10.8192 via (Link 2)
+Routing table print at time 10500 (Router 4)
+Distance to Node (Host 1) is 30 via (Link 3)
+Distance to Node (Host 2) is 10 via (Link 5)
+Distance to Node (Router 2) is 10 via (Link 3)
+Distance to Node (Router 3) is 10 via (Link 4)
+Distance to Node (Router 1) is 20 via (Link 3)
+>>>>>>> 1a8154f2e29ab91ddd4eddb935e53bb5c72230e2
 
 
 
@@ -138,6 +211,7 @@ Distance to Node (Router 2) is 98.4736 via (Link 1)
 Distance to Node (Router 3) is 108.474 via (Link 1)
 Distance to Node (Router 4) is 119.344 via (Link 1)
 Routing table print at time 15500 (Router 2)
+<<<<<<< HEAD
 Distance to Node (Host 1) is 108.474 via (Link 1)
 Distance to Node (Host 2) is 108.474 via (Link 1)
 Distance to Node (Host 3) is 20 via (Link 2)
@@ -514,3 +588,25 @@ Distance to Node (Router 1) is 56.2144 via (Link 3)
 
 
 
+=======
+Distance to Node (Host 1) is 20 via (Link 1)
+Distance to Node (Host 2) is 20 via (Link 3)
+Distance to Node (Router 3) is 20 via (Link 1)
+Distance to Node (Router 4) is 10 via (Link 3)
+Distance to Node (Router 1) is 10 via (Link 1)
+Routing table print at time 15500 (Router 3)
+Distance to Node (Host 1) is 20 via (Link 2)
+Distance to Node (Host 2) is 20.8192 via (Link 4)
+Distance to Node (Router 2) is 20 via (Link 2)
+Distance to Node (Router 4) is 10.8192 via (Link 4)
+Distance to Node (Router 1) is 10 via (Link 2)
+Routing table print at time 15500 (Router 4)
+Distance to Node (Host 1) is 30 via (Link 3)
+Distance to Node (Host 2) is 10 via (Link 5)
+Distance to Node (Router 2) is 10 via (Link 3)
+Distance to Node (Router 3) is 10.8192 via (Link 4)
+Distance to Node (Router 1) is 20 via (Link 3)
+
+
+
+>>>>>>> 1a8154f2e29ab91ddd4eddb935e53bb5c72230e2

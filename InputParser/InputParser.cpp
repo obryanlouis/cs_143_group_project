@@ -259,6 +259,9 @@ void InputParser::run(int                   &snapshotTime,
         else if (ctext.compare("vegas") == 0) {
             congestionAlgorithmType = VEGAS;
         }
+        else if (ctext.compare("dumb") == 0) {
+            congestionAlgorithmType = DUMB;
+        }
         else {
             std::cout << "Invalid congestion control algorithm: "
                       << ctext

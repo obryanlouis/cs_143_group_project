@@ -66,10 +66,10 @@
         <flow id="1" print="1" >
             <source>1</source>
             <destination>2</destination>
-            <flowSize>20</flowSize>
+            <flowSize>2</flowSize>
             <flowStartTime>0.5</flowStartTime>
-            <!-- Options: reno, vegas, slow, tahoe, cubic -->
-            <congestionAlgorithmType>vegas</congestionAlgorithmType>
+            <!-- Options: reno, cubic, slow, tahoe, cubic -->
+            <congestionAlgorithmType>dumb</congestionAlgorithmType>
         </flow>
     </networkFlows>
 </Network>

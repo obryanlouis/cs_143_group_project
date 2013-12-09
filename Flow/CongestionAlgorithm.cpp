@@ -42,6 +42,8 @@ AckPacket *CongestionAlgorithm::makeAckPacket(DataPacket *p){
 {
 }
 
+
+
 double SLOW_START::getTimeOut(){
     return this->timeout;
 }
@@ -73,7 +75,7 @@ void SLOW_START::sendPacket(int id, double startTime){
     args[0] = (void*) this;
     args[1] = (void*) ((long)id);
 
-    double checkAt = startTime
+    double checkAt = startTime 
         + this->getTimeOut();
 
     // make packet and send to flow to put into system
@@ -461,5 +463,61 @@ double TCP_TAHOE::getDiff() { return 0; }
 double CongestionAlgorithm::numOutstanding() { return 0; }
 
 double SLOW_START::numOutstanding() { return outstanding; }
+
+Dumb::Dumb(Flow *in_flow)
+    : SLOW_START(in_flow)
+    , sendNext(1)
+{
+    cwnd = 5.0;
+}
+
+
+void Dumb::packetDropped(int id, bool &wasDropped) {
+    if (flow->getPacketTime(id) > SYSTEM_CONTROLLER->getCurrentTime()){
+        std::cout << "\t Packet not actually dropped" << std::endl;
+        return;
+    }
+
+    if (flow->getPacketTime(id) == 0 ) {
+        std::cout << "\t Packet got reset by previous timeout " << std::endl;
+        return;
+    }
+
+    std::cout << "\t Packet DID get dropped" << std::endl;
+
+    this->flow->resetPackets(id);
+
+    sendNext = flow->nextHostPacket();
+    for (int i = 0; i < cwnd; i++){
+        this->sendPacket(sendNext, SYSTEM_CONTROLLER->getCurrentTime());
+        sendNext++;
+    }
+
+
+
+}
+
+void Dumb::ackRecieved(AckPacket *p) {
+    
+    SLOW_START::sendPacket(sendNext, SYSTEM_CONTROLLER->getCurrentTime());
+    sendNext++;
+    
+
+}
+
+void Dumb::scheduleFirstPacket(double startTime){
+    // make event to make first packet
+    void (*fp)(void*) = &SLOW_START_sendFirstPacket;
+    for (int i = 0; i < cwnd; i++){
+       void **args = (void **)malloc(2* sizeof (void *));  
+        args[0] = (void*) this;
+        args[1] = (void*) ((long) i);
+ 
+
+        Event *e = new Event(startTime, fp, (void *) args);
+        SYSTEM_CONTROLLER->add(e);
+        }
+    sendNext = cwnd;
+}
 
 

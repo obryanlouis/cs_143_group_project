@@ -131,6 +131,7 @@ void Cubic::packetDropped(int id, bool &wasDropped){
     cubic_reset();
     // END TAKEN FROM PAPER
 
+    packet_loss();
     SLOW_START::sendPacket(id, SYSTEM_CONTROLLER->getCurrentTime());
     outstanding++;
     sendNext = flow->nextHostPacket();

@@ -99,6 +99,7 @@ public:
         // make packets of >= id behave as though they have not been
         // sent
     int nextHostPacket();
+    int getDroppedPacket();
 
 
     void resetStats();
