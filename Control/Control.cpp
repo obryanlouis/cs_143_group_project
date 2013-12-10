@@ -171,7 +171,8 @@ void Controller::printMySystem() {
 
     //std::cout << "  Outputting Flow information." << std::endl;
     std::ofstream flowSendFile, flowReceiveFile, flowRTTFile, flowWindowFile,
-        flowThreshFile, flowOutstandingFile, flowRenoFile, flowVegasFile;
+        flowThreshFile, flowOutstandingFile, flowRenoFile, flowVegasFile,
+        flowDelayFile;
     flowSendFile.open(FLOW_SEND_FILE.data(), std::ios::app);
     flowReceiveFile.open(FLOW_RECEIVE_FILE.data(), std::ios::app);
     flowRTTFile.open(FLOW_RTT_FILE.data(), std::ios::app);
@@ -180,10 +181,12 @@ void Controller::printMySystem() {
     flowOutstandingFile.open(FLOW_OUTSTANDING_FILE.data(), std::ios::app);
     flowRenoFile.open(FLOW_RENO_FILE, std::ios::app);
     flowVegasFile.open(FLOW_VEGAS_FILE, std::ios::app);
+    flowDelayFile.open(FLOW_DELAY_FILE, std::ios::app);
     files.clear();
     files["send rate"] = &flowSendFile;
     files["receive rate"] = &flowReceiveFile;
-    files["delay"] = &flowRTTFile;
+    files["delay"] = &flowDelayFile;
+    files["rtt"] = &flowRTTFile;
     files["window"] = &flowWindowFile;
     files["reno"] = &flowRenoFile;
     files["vegas"] = &flowVegasFile;
@@ -317,6 +320,7 @@ void removeOldStatsFiles() {
     filenames.push_back(FLOW_THRESH_FILE);
     filenames.push_back(FLOW_OUTSTANDING_FILE);
     filenames.push_back(FLOW_VEGAS_FILE);
+    filenames.push_back(FLOW_DELAY_FILE);
 
     filenames.push_back("routers.txt");
 
@@ -588,17 +592,13 @@ void Controller::makeDebugPlots() {
     makePlots(&plotOptions); 
 }
 
-void Controller::getVegasParameters(double &ALPHA, double &BETA, 
-        double &GAMMA, Vegas *v) {
-    // in mbps
-    Link *l = v->getFlow()->getStart()->getLink();
-    double rate = l->getRate() / 1000000;
-    double buffer = l->getCapacity() / Packet::DATASIZE;
-    rate = rate * 0.9;
-    ALPHA = rate;
-    BETA = rate;
-    GAMMA = buffer;
+
+void Controller::deleteFlow(Packet *p) {
+    Host *h = (Host *)p->getSource();
+    Flow *f = h->getFlow();
+    f->end();
+    std::cout << "\n\n\nFlow " << f->infoString() << " can't reach its "
+        << "destination.\nConsequently, it will be terminated.\n\n\n";
+    sleep(5);
 }
-
-
 

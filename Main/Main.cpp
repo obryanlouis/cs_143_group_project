@@ -16,15 +16,15 @@ int main(int argc, char **argv) {
     // DEBUG: Uncomment these lines when we want to get a file from a
     // specific location.
 
-    /*if (argc != 2) {
+    if (argc != 2) {
       cout << "usage: read_input inputFile" << endl;
       exit(1);
       }
 
-      char* input = argv[1];*/
+      char* input = argv[1];
 
     // DEBUG: use a default file input.xml
-    string input = "testcase2.xml";
+    //string input = "testcase2.xml";
     ///string input = "testcase2.xml";
 
     // Initialize the System Controller

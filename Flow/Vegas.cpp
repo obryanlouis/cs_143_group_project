@@ -6,6 +6,10 @@ const double START_RTT = 10000;
 const double TIMEOUT_CONST = 10;
 const double FAST_WINDOW_PERIOD = 1000;
 
+const double GAMMA = 0.3;
+const double ALPHA = 0.5;
+const double BETA  = 0.55;
+
 void maintainVegas(void *arg);
 
     Vegas::Vegas(Flow *f)
@@ -53,12 +57,16 @@ void Vegas::sendAvailablePackets() {
     }
 
     // DEBUG
-    std::cout << "Number of outstanding packets: " << outstanding << "\n";
+    /*std::cout << "Number of outstanding packets: " << outstanding << "\n";
     std::cout << "Number of packets in system: " 
-        << SYSTEM_CONTROLLER->numberOfPacketsInSystem() << "\n";
+        << SYSTEM_CONTROLLER->numberOfPacketsInSystem() << "\n";*/
 
 
 
+    // Send packets up to the minimum of 
+    // 1. The number of packets within the window minus the outstanding
+    // 2. The number of packets that can fit into the link buffer at the
+    //    current host.
     int limit = sendNext + cwnd - outstanding;
     Link *l = flow->getStart()->getLink();
     double capacity = l->getCapacity();
@@ -96,19 +104,16 @@ void Vegas::ackRecieved(AckPacket *p) {
     rttcurrent = SYSTEM_CONTROLLER->getCurrentTime() - p->getStartTime();
 
     if (rttcurrent + 0.00001 < rttmin) {
-        std::cout << "rttmin has become rttcurrent at time: " <<
-            SYSTEM_CONTROLLER->getCurrentTime() << std::endl;
+        /*std::cout << "rttmin has become rttcurrent at time: " <<
+            SYSTEM_CONTROLLER->getCurrentTime() << std::endl;*/
         rttmin = rttcurrent;
     }
 
     if (mode == SLOWSTART) {
         double gamma = 0.95;
-        /*double damped = gamma * rttmin + (1 - gamma) * rttcurrent;
-          double actualRate = cwnd / damped;
-          if (cwnd > actualRate * rttmin + 1) {*/
-        std::cout << "current window size: " << cwnd << "\n";
-        std::cout << "diff: " << getDiff() << "\n";
-        if (getDiff() > 0.3) {
+        /*std::cout << "current window size: " << cwnd << "\n";
+        std::cout << "diff: " << getDiff() << "\n";*/
+        if (getDiff() > GAMMA) {
             mode = CONGESTIONAVOIDANCE;
         }
         else {
@@ -150,11 +155,11 @@ void Vegas::ackRecieved(AckPacket *p) {
             double diff = getDiff();
             std::cout << "Diff in Vegas CA: " << diff << std::endl;
             double inc = ((double) 1) / (cwnd);
-            if (diff < 0.5) {
+            if (diff < ALPHA) {
                 cwnd += inc;
                 std::cout << "Incrementing window size\n";
             }
-            else if (diff > 0.55) {
+            else if (diff > BETA) {
                 cwnd -= inc;
                 std::cout << "decrementing window size\n";
             }
@@ -171,20 +176,9 @@ void Vegas::ackRecieved(AckPacket *p) {
                 duplicates++;
                 if (duplicates == 3) {
 
-                    // DEBUG
-                    /*std::cout << "duplicates == 3\n";
-                      std::cout << "cwnd: " << cwnd << std::endl;
-                      std::cout << "outstanding: " << outstanding << std::endl;
-                      std::cout << "diff: " << getDiff()
-                      << std::endl;
-                      std::cout << "rttcurrent: " << rttcurrent << std::endl;
-                      SYSTEM_CONTROLLER->makeDebugPlots(); 
-                      exit(1);*/
-
                     packetNumberAfterRetransmission = 0;
                     this->ssthresh = outstanding / 2;
                     this->cwnd = ssthresh + 3;
-                    //this->outstanding = cwnd;
                     SLOW_START::sendPacket(id, SYSTEM_CONTROLLER->getCurrentTime());
                     this->outstanding++;
                     this->sendNext = id + 1; 
@@ -202,10 +196,10 @@ void Vegas::ackRecieved(AckPacket *p) {
     lastAckRecieved = id;
 }
 
-    // checks for a timeout to my understanding
 void Vegas::packetDropped(int id, bool &wasDropped) {
     double tempLastDroppedTime = lastDroppedTime;
     TCP_RENO::packetDropped(id, wasDropped);
+    // If there was actually a timeout
     if (wasDropped && 
             (tempLastDroppedTime + rttcurrent < SYSTEM_CONTROLLER->getCurrentTime())) {
         retransmissionTimeout(id);
@@ -214,6 +208,8 @@ void Vegas::packetDropped(int id, bool &wasDropped) {
 
 
 double Vegas::getDiff() {
+    // If rttcurrent hasn't been set for the first time, return a placeholder
+    // value. This occurs when graphing the parameter.
     if (rttcurrent == DBL_MAX)
         return 0;
     double gamma = 0.5;

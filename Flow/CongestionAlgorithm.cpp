@@ -13,7 +13,12 @@ const int SEND_LIMIT = 10;
     CongestionAlgorithm::CongestionAlgorithm(Flow *in_flow)
     :cwnd(1.0)
      ,flow(in_flow)
+     ,done(false)
 {}
+
+void CongestionAlgorithm::end() {
+    done = true;
+}
 
 Flow *CongestionAlgorithm::getFlow(){
     return this->flow;
@@ -126,6 +131,9 @@ void CongestionAlgorithm::scheduleFirstPacket(double startTime){
 
 void SLOW_START::packetDropped(int id, bool &wasDropped){
     wasDropped = false;
+
+    if (done)
+        return;
 
     int packetId = flow->nextHostPacket();
     // done with this flow

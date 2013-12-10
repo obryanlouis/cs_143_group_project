@@ -158,8 +158,7 @@ void Flow::handlePacket(AckPacket *p) {
     this->dataReceived += p->getSize();
 
     if (progress == totalPackets) {
-        SYSTEM_CONTROLLER->decrementFlowsLeft();
-        done = true;
+        end();
     }
 
 
@@ -210,16 +209,19 @@ double Flow::getStats(std::string stat, int period) {
         return (((double)this->dataReceived) / (double)period) *
             ((double) 8/ (double) 1000);
     }
-    // TODO:
     else if (stat.compare("delay") == 0) {
         return totalPacketDelay / packetsReceived;
     }
     else if (stat.compare("window") == 0) {
         return congestionAlgorithm_p->getWindowSize();
     }
+    else if (stat.compare("rtt") == 0) {
+        return getRTT();
+    }
     else if (stat.compare("reno") == 0) {
         return SYSTEM_CONTROLLER->getThroughput() * getRTT() *
-            std::sqrt(SYSTEM_CONTROLLER->getLinkLoss(totalLinkLoss)/totalPacketsRecieved) -1.22;
+            std::sqrt(SYSTEM_CONTROLLER->getLinkLoss(totalLinkLoss)
+                    / totalPacketsRecieved) -1.22;
     }
     else if (stat.compare("vegas") == 0) {
         return congestionAlgorithm_p->getDiff();
@@ -315,4 +317,10 @@ void Flow::printRemainingPacketIds() {
     }
     file << "\n\n\n";
     file.close();
+}
+
+
+void Flow::end() {
+    done = true;
+    SYSTEM_CONTROLLER->decrementFlowsLeft();
 }
