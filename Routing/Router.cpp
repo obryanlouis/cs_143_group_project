@@ -20,8 +20,8 @@ Router::Router(int id) {
     this->nodeId = id;
 }
 
-Router::Router(int in_id, std::list<Link*> l)
-    : Node(in_id)
+    Router::Router(int in_id, std::list<Link*> l)
+: Node(in_id)
 {
     this->links = l;
 }
@@ -39,12 +39,12 @@ std::string Router::infoString(){
 void Router::handlePacket(Packet *packet){
     Node::handlePacket(packet);
     /*std::cout << "T"
-              << SYSTEM_CONTROLLER->getCurrentTime()
-              << ":"
-              << this->infoString()
-              << " is handling "
-              << packet->infoString()
-              << std::endl;*/
+      << SYSTEM_CONTROLLER->getCurrentTime()
+      << ":"
+      << this->infoString()
+      << " is handling "
+      << packet->infoString()
+      << std::endl;*/
     assert(packet != NULL);
 
     bool  updated;   // to be used if the packet is for Routing Table Updates
@@ -54,41 +54,54 @@ void Router::handlePacket(Packet *packet){
     AckPacket *A = (AckPacket *) packet;
     DataPacket *D = (DataPacket *)packet;
     HostRoutingPacket *H = (HostRoutingPacket *) packet;
+    Link *l;
 
     switch (packet->getType())
     {
-    case Packet::HOSTROUTE:
-        // the host is telling this router that it exists 
-        this->updateSingleNode(H->getHost(), H->getLink());
-        delete H;
-        break;
-    case Packet::ROUTERROUTE:
-        // handing routing table information
-        updated = updateRoutingTable(R->getRoutingTable(), R->getLink());
-        // If the routing table was updated, broadcast this to all
-        // neighbors.
-        if (updated) {
-            this->broadcastRoutingTable();
-        }
-        delete R;
-        break;
-    case Packet::ACK:
-        // handle acknowledgement packets: same as data packets
-    case Packet::DATA:
-        // handle data packets
-        (getNextLink(D->getDestination()))->handlePacket(packet);
-        break;
-    default:
-        std::cout << "INVALID PACKET TYPE" << std::endl;
-        assert(0);
-        exit(0);
-        break;
+        case Packet::HOSTROUTE:
+            // the host is telling this router that it exists 
+            this->updateSingleNode(H->getHost(), H->getLink());
+            delete H;
+            break;
+        case Packet::ROUTERROUTE:
+            // handing routing table information
+            updated = updateRoutingTable(R->getRoutingTable(), R->getLink());
+            // If the routing table was updated, broadcast this to all
+            // neighbors.
+            if (updated) {
+                this->broadcastRoutingTable();
+            }
+            delete R;
+            break;
+        case Packet::ACK:
+            // handle acknowledgement packets: same as data packets
+        case Packet::DATA:
+            // handle data packets
+            l = getNextLink(D->getDestination());
+            if (l != NULL) {
+                l->handlePacket(packet);
+            }
+            else {
+                std::cout << "Can't reach Host "
+                    << packet->getDestination()->infoString()
+                    << " from Router "
+                    << infoString()
+                    << ".\n Allow more time for routing table updates "
+                    << "or change the network configuration.\n";
+                SYSTEM_CONTROLLER->deleteFlow(packet);
+            }
+            break;
+        default:
+            std::cout << "INVALID PACKET TYPE" << std::endl;
+            assert(0);
+            exit(0);
+            break;
     }
 }
 
 void Router::broadcastRoutingTable() {
     /*std::cout << this->infoString() << " starting broadcasting routing table"
-        << " at time " << SYSTEM_CONTROLLER->getCurrentTime() << "\n";*/
+      << " at time " << SYSTEM_CONTROLLER->getCurrentTime() << "\n";*/
     for (std::list<Link* >::iterator it = this->links.begin();
             it != this->links.end(); it++)
     {
@@ -98,26 +111,12 @@ void Router::broadcastRoutingTable() {
         (*it)->handlePacket(newRoutingPacket);
     }
     /*std::cout << this->infoString() << " finished broadcasting routing table"
-        << " at time " << SYSTEM_CONTROLLER->getCurrentTime() << "\n";*/
+      << " at time " << SYSTEM_CONTROLLER->getCurrentTime() << "\n";*/
 }    
 
 Link* Router::getNextLink(Node *destination) {
     /*std::cout << "getting next link" <<std::endl;*/
-	return this->routingTable_p->nextLink(destination);
-}
-
-Node* Router::getNextNode(Node *destination) {
-    /*std::cout << "getting next node" << std::endl;*/
-	Node * result = this->routingTable_p->nextNode(destination);
-    if (result == NULL) {
-        std::cout << "Can't reach Host "
-                  << destination->infoString()
-                  << " from Router "
-                  << infoString()
-                  << ".\n Allow more time for routing table updates "
-                  << "or change the network configuration.\n";
-        exit(1);
-    }
+    Link * result = this->routingTable_p->nextLink(destination);
     return result;
 }
 
@@ -137,25 +136,25 @@ bool Router::updateRoutingTable(RoutingTable *t, Link *l) {
     }
     bool changed = false;
     for (std::map<Node*, std::pair<double, Link*> >::iterator it = t->mapping.begin();
-        it != t->mapping.end(); ++it) {
+            it != t->mapping.end(); ++it) {
         Node *r = it->first;
         if (r != this) {
             double linkWgt = l->getDelay() + 
                 ((((double)l->getInstantaneousOccupancy() / (double)l->getRate()) * 
-                        (double)1000));
+                  (double)1000));
             bool noEntry = (routingTable_p->mapping.count(r) == 0);
             if (noEntry) {
                 update(t, linkWgt, changed, r, l);
             }
             else {
                 bool largerWeight = ((*routingTable_p)[r].first > 
-                    linkWgt + t->mapping[r].first);
+                        linkWgt + t->mapping[r].first);
                 bool smallerWeight = ((*routingTable_p)[r].first < 
-                    linkWgt + t->mapping[r].first);
+                        linkWgt + t->mapping[r].first);
                 bool wouldNormallyPassL = (routingTable_p->nextLink(r) == l);
                 bool nextLinkNotThisLink = (t->nextLink(r) != l);
                 /*bool approxEqual = std::abs((*routingTable_p)[r].first -
-                    linkWgt + t->mapping[r].first) == 0;*/
+                  linkWgt + t->mapping[r].first) == 0;*/
                 if (smallerWeight && wouldNormallyPassL || largerWeight) {
                     update(t, linkWgt, changed, r, l);
                 }
@@ -178,20 +177,20 @@ void Router::updateSingleNode(Host *host, Link *link) {
 }
 
 void Router::debugRoutingTable() {
-for (std::map<Node*, std::pair<double, Link* > >::iterator it
+    for (std::map<Node*, std::pair<double, Link* > >::iterator it
             = this->routingTable_p->mapping.begin();
-        it != this->routingTable_p->mapping.end();
-        it++)
+            it != this->routingTable_p->mapping.end();
+            it++)
     {
         Node *node = it->first;
         int id = node->getId();
         int distance = it->second.first;
         Link *link = it->second.second;
         std::cout << "The distance to "
-                  << node->infoString()
-                  << " is "
-                  << distance
-                  << "via ";
+            << node->infoString()
+            << " is "
+            << distance
+            << "via ";
         if (link == 0){
             std::cout << " no idea" << std::endl;
         }

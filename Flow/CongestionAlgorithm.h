@@ -25,10 +25,12 @@ class CongestionAlgorithm{
     protected:
         double cwnd;
         Flow *flow;
+        bool done;
 
     public:
         CongestionAlgorithm(Flow *in_flow);
 
+        void end();
         virtual double getDiff();
         Flow* getFlow();
         double getWindowSize();

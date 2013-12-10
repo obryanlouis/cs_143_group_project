@@ -41,6 +41,7 @@ std::string LINK_FLOW_RATE_FILE = std::string("Output/LinkFlowRate.txt");
 std::string FLOW_SEND_FILE = std::string("Output/FlowSend.txt");
 std::string FLOW_RECEIVE_FILE = std::string("Output/FlowReceive.txt");
 std::string FLOW_RTT_FILE = std::string("Output/FlowRTT.txt");
+std::string FLOW_DELAY_FILE = std::string("Output/FlowDelay.txt");
 std::string FLOW_WINDOW_FILE = std::string("Output/FlowWindow.txt");
 std::string FLOW_THRESH_FILE = std::string("Output/FlowThresh.txt");
 std::string FLOW_OUTSTANDING_FILE = std::string("Output/FlowOutstanding.txt");
@@ -189,7 +190,7 @@ public:
     void setInputFile(std::string inputFile);
         // Sets the input file to use.
     double routerBufferSize();
-    void getVegasParameters(double &ALPHA, double &BETA, double &GAMMA, Vegas *v);
+    void deleteFlow(Packet *p);
 
     // Output
     double getThroughput();

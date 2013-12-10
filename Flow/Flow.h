@@ -77,6 +77,7 @@ public:
     ~Flow();
         // Destroy this instance of Flow
 
+    void end();
     double getStartTime();
     int getProgress();
     void startFlow(double startTime);

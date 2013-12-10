@@ -6,6 +6,7 @@
     <networkHosts separateGraphs="0">
         <host id="1" print="1" />
         <host id="2" print="1" />
+        <host id="3" print="1" />
     </networkHosts>
     <networkRouters>
         <router id="1" />
@@ -69,8 +70,16 @@
             <flowSize>2</flowSize>
             <flowStartTime>0.5</flowStartTime>
             <!-- Options: reno, cubic, slow, tahoe, cubic -->
-            <congestionAlgorithmType>dumb</congestionAlgorithmType>
+            <congestionAlgorithmType>vegas</congestionAlgorithmType>
         </flow>
-    </networkFlows>
+        <flow id="2" print="1" >
+            <source>2</source>
+            <destination>3</destination>
+            <flowSize>2</flowSize>
+            <flowStartTime>0.5</flowStartTime>
+            <!-- Options: reno, cubic, slow, tahoe, cubic -->
+            <congestionAlgorithmType>vegas</congestionAlgorithmType>
+        </flow>
+     </networkFlows>
 </Network>
 

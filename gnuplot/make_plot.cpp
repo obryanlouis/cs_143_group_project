@@ -88,14 +88,16 @@ void makePlots(PlotOptions *plotOptions) {
     files.push_back(std::make_tuple(FLOW_SEND_FILE,
                 "Flow_Send_Rates.svg", "Mbps", FLOWSTAT,
                 "Flow Send Rates"));
-    files.push_back(std::make_tuple(FLOW_RTT_FILE,
-                "Flow_RTT.svg", "ms", FLOWSTAT, "Flow Packet Delays"));
+    files.push_back(std::make_tuple(FLOW_DELAY_FILE,
+                "Flow_Delay.svg", "ms", FLOWSTAT, "Flow Packet Delays"));
     files.push_back(std::make_tuple(FLOW_OUTSTANDING_FILE,
                 "Flow_Outstanding_Packets.svg", "Packets", FLOWSTAT, "Flow Outstanding Packets"));
     files.push_back(std::make_tuple(FLOW_WINDOW_FILE,
                 "Flow_Window.svg","Packets", FLOWSTAT, "Flow Window Size"));
-    files.push_back(std::make_tuple(FLOW_VEGAS_FILE,
-                "Vegas_Diff.svg","Packets / ms", FLOWSTAT, "Vegas Diff Parameter = cwnd * (1 / rttmin - 1 / rttcurrent)"));
+    /*files.push_back(std::make_tuple(FLOW_VEGAS_FILE,
+                "Vegas_Diff.svg","Packets / ms", FLOWSTAT, "Vegas Diff Parameter = cwnd * (1 / rttmin - 1 / rttcurrent)"));*/
+    files.push_back(std::make_tuple(FLOW_RTT_FILE,
+                "Flow_RTT.svg","ms", FLOWSTAT, "Flow Round Trip Time"));
 
     files.push_back(std::make_tuple(LINK_OCCUPANCY_FILE,
                 "Link_Occupancy.svg", "Bytes", LINKSTAT, "Link Occupancy"));
@@ -138,18 +140,6 @@ void makePlots(PlotOptions *plotOptions) {
         commands.push_back("set terminal svg size 1000,550");
         commands.push_back("set output \"" + saveAs + "\"");
         commands.push_back("set object 1 rectangle from screen 0,0 to screen 1,1 fillcolor rgb\"white\" behind");
-        /*std::stringstream multiplotCommand;
-          multiplotCommand << "set multiplot layout ";
-          if (t == FLOWSTAT) {
-          multiplotCommand << SYSTEM_CONTROLLER->numFlowsToPrint() << ",1";
-          }
-          else if (t == HOSTSTAT) {
-          multiplotCommand << SYSTEM_CONTROLLER->numHostsToPrint() << ",1";
-          }
-          else if (t == LINKSTAT) {
-          multiplotCommand << SYSTEM_CONTROLLER->numLinksToPrint() << ",1";
-          }
-          commands.push_back(multiplotCommand.str());*/
         commands.push_back("set xlabel \"Time (s)\"");
         commands.push_back("set ylabel \"" + ylabel + "\"");
         int i = 1;

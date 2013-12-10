@@ -20,7 +20,10 @@ Link* RoutingTable::nextLink(Node *r)
 {
 	if (r == NULL)
 		throw "Router is null";
-	return mapping[r].second;
+    if (mapping.count(r) == 0) {
+        return NULL;
+    }
+ 	return mapping[r].second;
 }
 
 Node* RoutingTable::nextNode(Node *r)

@@ -31,10 +31,9 @@ The simulator will run without giving it any routers, but it will not
 be able to do anything.
 
 networkLinks is a vector of the links in the network. It has a link element
-that can be specified multiple times. The link element has 2 attributes,
-"id" and "print". The id is the same as those of hosts and routers. The
-print attribute determines whether or not stats for that link will be
-recorded. The link element also has 5 elements in it: linkRate, linkDelay,
+that can be specified multiple times. 
+Each link has an id. The id is the same as those of hosts and routers. 
+The link element also has 5 elements in it: linkRate, linkDelay,
 bufferSize, node1, and node2. Each of these elements must be specified.
 linkRate is the rate the link can process
 data in Mbps. linkDelay is the propagation delay of this link in
@@ -75,6 +74,13 @@ error message is printed and the flow is stopped immediately. Thus, if
 a flow starts too early (so that its destination host does not appear in
 routing tables) or does not have a path to follow, the network will drop this
 flow and continue.
+
+Each network host, link, and flow has a "print" attribute that determines
+whether or not it will be included in the output graphs. In addition, the
+networkHosts, networkLinks, and networkFlows elements have a "separateGraphs"
+attribute that determines whether or not each host / link / flow should be
+graphed on the same graph or separately. "0" indicates that they should be
+graphed together, while "1" indicates that they should be graphed separately.
 
 -------------------------------------------------------------------------------
 

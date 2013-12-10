@@ -42,8 +42,6 @@ public:
     // Functions
 	Link *getNextLink(Node *destination);
         // Returns the next link to route to based on a destination
-	Node *getNextNode(Node *destination);
-        // Returns the next router to route to based on destination
 	bool updateRoutingTable(RoutingTable *t, Link *l);
         // Updates the routing table based on received routing table
         // from link l. Returns true if the routing table
