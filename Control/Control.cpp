@@ -261,6 +261,8 @@ void Controller::setRoutingUpdateTime(int t) {
 }
 
 void outputRoutingTables(void * args) {
+    // A debug function
+
     std::ofstream file;
     file.open("routers.txt", std::ios::app);
     for (std::list<Router* >::iterator iter =
@@ -294,9 +296,6 @@ void routerUpdate(void* args) {
     void (*fp)(void*) = &routerUpdate;
     SYSTEM_CONTROLLER->add  \
         (new Event(SYSTEM_TIME + ROUTING_UPDATE_PERIOD, fp, 0));
-    // DEBUG
-    SYSTEM_CONTROLLER->add
-        (new Event(SYSTEM_TIME + 500, &outputRoutingTables, 0));
 }
 
 void printSystem(void* args) {
