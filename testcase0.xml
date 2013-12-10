@@ -11,7 +11,7 @@
     </networkHosts>
     <networkLinks>
         <link id="1" print="1">
-            <linkRate>12.5</linkRate>
+            <linkRate>10</linkRate>
             <linkDelay>10</linkDelay>
             <bufferSize>64</bufferSize>
             <node1 type="0">1</node1>
@@ -23,7 +23,7 @@
         <flow id="1" print="1">
             <source>1</source>
             <destination>2</destination>
-            <flowSize>5</flowSize>
+            <flowSize>20</flowSize>
             <flowStartTime>1.0</flowStartTime>
                 <!-- Options: reno, vegas, slow -->
             <congestionAlgorithmType>vegas</congestionAlgorithmType>

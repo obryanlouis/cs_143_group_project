@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
       char* input = argv[1];*/
 
     // DEBUG: use a default file input.xml
-    string input = "testcase2.xml";
+    string input = "bleh.xml";
     ///string input = "testcase2.xml";
 
     // Initialize the System Controller

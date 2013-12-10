@@ -150,7 +150,7 @@ void Vegas::ackRecieved(AckPacket *p) {
             double diff = getDiff();
             std::cout << "Diff in Vegas CA: " << diff << std::endl;
             double inc = ((double) 1) / (cwnd);
-            if (diff < 0.5) {
+            if (diff < 0.55) {
                 cwnd += inc;
                 std::cout << "Incrementing window size\n";
             }

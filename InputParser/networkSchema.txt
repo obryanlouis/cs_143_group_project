@@ -55,13 +55,26 @@ flowSartTime, and congestionAlgorithmType. Each of these elements must be
 specified. source is the id of the source host of the flow. It must
 be one of the hosts given in networkHosts. destination is the destination
 host of the flow. It must be one of the hosts given in networkHosts.
-flowSize is a double the size of the flow in MB. flowStartTime is
+flowSize is a double the size of the flow in MB. Furthermore, we assume that
+each host has at most one outgoing flow, as TA said. flowStartTime is
 a double the number of seconds after starting the simulation to begin
 sending packets for the flow. congestionAlgorithmType is an enum
 defining which congestion control algorithm to use for this flow. The
 options are "reno" and "vegas". networkFlows must be specified. The
 simulator will run without giving it any flows, but it will not
 do anything (number of flows is the stopping condition of the simulation).
+Additionally, the network is not guaranteed to have paths that will go from
+the source host to the destination host. There is no checking to make sure
+that there is such a path, and so if this is the case, all the flows will
+be created still. The simulation assumes that the initial routing table update
+will finish and contain all the hosts and routers in the network before any
+flows begin. If this is not the case, there will be some hosts and routers
+that will not be present in some routing tables. The behavior of our network
+is that if the destination node is not present in the routing table, an
+error message is printed and the flow is stopped immediately. Thus, if
+a flow starts too early (so that its destination host does not appear in
+routing tables) or does not have a path to follow, the network will drop this
+flow and continue.
 
 -------------------------------------------------------------------------------
 
