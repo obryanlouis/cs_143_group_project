@@ -55,30 +55,9 @@ In this paper, we describe the implementation of a network simulator including i
 
     We chose the pugixml parser because it is lightweight and has a simple, open-source library. The lightweightness was particularly attractive because we did not want the simulator to be spending most of its runtime parsing input files. Furthermore, the pugixml library was easy to use. XML was the chosen input format because as a universally recognized format it was easy to make it fit our desired system parameters. Thus, we ended up using an XML DOM type input, as it could easily describe the objects we wanted for the simulation.
 
-    We chose two TCP congestion control algorithms: TCP Reno and TCP Vegas. We wanted to choose one loss-based congestion control algorithm (Reno) and one delay-based congestion control algorithm (Vegas). We chose Reno because among the loss-based control algorithms (Reno and Tahoe) because it included more advanced congestion control through the use of fast\_recover. Further equations for the analysis are in the notes. Obviously, this section needs some work/deleting.
-    Maybe a paragraph on why we chose gnuplot.
-
-
-\begin{figure}[htbp]
-    \centering
-    \includesvg[width=0.5\textwidth]
-    {reno2/Flow_Recieve_Rates.svg}
-    \caption{ ... caption text ... }
-\end{figure}
-\begin{comment}
-/Flow_Outstanding_Packets.svg
-/Flow_Recieve_Rates.svg
-/Flow_RTT.svg
-/Flow_Send_Rates.svg
-/Flow_Window.svg
-/Host_Receive.svg
-/Host_Send.svg
-/Link_Flow_Rate.svg
-/Link_Occupancy.svg
-/Link_Packet_Loss.svg
-/Vegas_Diff.svg
-\end{comment}
-
+    We chose two TCP congestion control algorithms: TCP Reno and TCP Vegas. We wanted to choose one loss-based congestion control algorithm (Reno) and one delay-based congestion control algorithm (Vegas). We chose Reno because among the loss-based control algorithms (Reno and Tahoe) because it included more advanced congestion control through the use of fast\_recover. Further equations for the analysis are in the notes. 
+    
+    We chose gnuplot to generate our plots because like the pugixml parser, it was easy to use and provided us with the flexibility that we wanted to make the images that we desired. 
 
 
 
@@ -86,8 +65,10 @@ In this paper, we describe the implementation of a network simulator including i
 
 
 \input{architecture.tex}
-\input{plots.tex}
 \input{math.tex}
 \input{finalThoughts.tex}
+
+\input{plots.tex}
+
 
 \end{document}
