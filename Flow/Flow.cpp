@@ -160,6 +160,8 @@ void Flow::handlePacket(AckPacket *p) {
     if (progress == totalPackets) {
         SYSTEM_CONTROLLER->decrementFlowsLeft();
         done = true;
+        // reset things so the graphs work
+        cwnd = 0;
     }
 
 
