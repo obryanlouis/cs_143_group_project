@@ -160,8 +160,6 @@ void Flow::handlePacket(AckPacket *p) {
     if (progress == totalPackets) {
         SYSTEM_CONTROLLER->decrementFlowsLeft();
         done = true;
-        // reset things so the graphs work
-        cwnd = 0;
     }
 
 
@@ -203,7 +201,7 @@ int Flow::getId() {
 
 double Flow::getStats(std::string stat, int period) {
     if (done)
-        return 0;
+        return 0.00000001;
     if (stat.compare("send rate") == 0) {
         return (((double)this->dataSent) / (double)period) *
             ((double) 8/ (double) 1000);
