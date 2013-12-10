@@ -17,7 +17,7 @@ int main(int argc, char **argv) {
     // specific location.
 
     if (argc != 2) {
-      cout << "usage: read_input inputFile" << endl;
+      cout << "usage: bin/test inputFile" << endl;
       exit(1);
       }
 
