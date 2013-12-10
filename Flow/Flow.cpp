@@ -52,9 +52,6 @@ Flow::Flow(int in_ID, int in_size, Host *in_source, Host *in_destination,
         case CUBIC:
             congestionAlgorithm_p = new Cubic(this);
             break;
-        case DUMB:
-            congestionAlgorithm_p = new Dumb(this);
-            break;
         default:
             std::cout << "Invalid routing type" << std::endl;
             exit(1);
@@ -86,7 +83,7 @@ void Flow::sendNewPacket(DataPacket *p, double timeOut){
     }
 }
 
-int Flow::getNextUnrecieved(){
+int Flow::getNextUnreceived(){
     return *(acks.begin());
 }
 
@@ -101,7 +98,7 @@ AckPacket* Flow::atDest(DataPacket *p){
     std::cout << "In Flow:atDest " << std::endl;
     // let the flow know that the destination has recieved the data
     if (*(acks.begin()) == p->getId()) this->acks.erase(p->getId());
-    /*std::cout << "\tTried to erase " << p->getId() << " new next unrecieved " << getNextUnrecieved() << std::endl;*/
+
     // let the congestion control algorithm make the ack packet
     AckPacket *ack = this->congestionAlgorithm_p->makeAckPacket(p);
 
@@ -136,21 +133,8 @@ void Flow::handlePacket(AckPacket *p) {
     double rtt = SYSTEM_CONTROLLER->getCurrentTime() - p->getStartTime();
     updateRTT(rtt);
 
-
-    /*
-    // see if packet recieved before
-    if (this->packets[p->getId()] != DBL_MAX){
-    // update progress
-    this->progress++;
-    // done with that packet ID, so set its timeout to super long
-    // so it'll never get sent
-    this->packets[p->getId()] = DBL_MAX; 
-    std::cout << "changed to dbl_max";
-    }  
-    */
-
     // update window size
-    congestionAlgorithm_p->ackRecieved(p);
+    congestionAlgorithm_p->ackReceived(p);
 
     // update other stats: dataSent, dataReceived
     std::cout << "Flow " << flowId << " progress: " << progress <<
@@ -160,7 +144,6 @@ void Flow::handlePacket(AckPacket *p) {
     if (progress == totalPackets) {
         end();
     }
-
 
     delete p;
 }
@@ -223,18 +206,9 @@ double Flow::getStats(std::string stat, int period) {
             std::sqrt(SYSTEM_CONTROLLER->getLinkLoss(totalLinkLoss)
                     / totalPacketsRecieved) -1.22;
     }
-    else if (stat.compare("vegas") == 0) {
-        return congestionAlgorithm_p->getDiff();
-    }
     else if (stat.compare("outstanding packets") == 0) {
         return congestionAlgorithm_p->numOutstanding();
     }
-    /*else if (stat.compare("thresh") == 0) {
-      return congestionAlgorithm_p->getThresh();
-      }
-      else if (stat.compare("outstanding") == 0) {
-      return congestionAlgorithm_p->getOutstanding();
-      }*/
 }
 
 
@@ -302,23 +276,6 @@ void Flow::checkAllRecieved(int sendNext) {
         }
     }
 }
-
-void Flow::printRemainingPacketIds() {
-    std::ofstream file;
-    file.open("flow.txt");
-    for (std::map<int, double>::iterator it = packets.begin();
-            it != packets.end(); it++)
-    {
-        int i = it->first;
-        double time = it->second;
-        if (time == 0) {
-            file << i << "\n";
-        }        
-    }
-    file << "\n\n\n";
-    file.close();
-}
-
 
 void Flow::end() {
     done = true;

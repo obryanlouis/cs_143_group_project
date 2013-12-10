@@ -12,9 +12,9 @@ const double BETA  = 0.55;
 
 void maintainVegas(void *arg);
 
-    Vegas::Vegas(Flow *f)
+Vegas::Vegas(Flow *f)
     : rttmin(DBL_MAX)
-      , TCP_RENO(f)
+    , TCP_RENO(f)
 {
     maxincr = 2;
     incr = 0;
@@ -52,16 +52,9 @@ void Vegas::retransmissionTimeout(int id) {
 }
 
 void Vegas::sendAvailablePackets() {
-    if (sendNext < lastAckRecieved) {
-        sendNext = lastAckRecieved;
+    if (sendNext < lastAckReceived) {
+        sendNext = lastAckReceived;
     }
-
-    // DEBUG
-    /*std::cout << "Number of outstanding packets: " << outstanding << "\n";
-    std::cout << "Number of packets in system: " 
-        << SYSTEM_CONTROLLER->numberOfPacketsInSystem() << "\n";*/
-
-
 
     // Send packets up to the minimum of 
     // 1. The number of packets within the window minus the outstanding
@@ -90,7 +83,7 @@ void Vegas::sendAvailablePackets() {
     }
 }
 
-void Vegas::ackRecieved(AckPacket *p) {
+void Vegas::ackReceived(AckPacket *p) {
 
     if (p->getStartTime() < lastDroppedTime) {
         return;
@@ -104,15 +97,11 @@ void Vegas::ackRecieved(AckPacket *p) {
     rttcurrent = SYSTEM_CONTROLLER->getCurrentTime() - p->getStartTime();
 
     if (rttcurrent + 0.00001 < rttmin) {
-        /*std::cout << "rttmin has become rttcurrent at time: " <<
-            SYSTEM_CONTROLLER->getCurrentTime() << std::endl;*/
         rttmin = rttcurrent;
     }
 
     if (mode == SLOWSTART) {
         double gamma = 0.95;
-        /*std::cout << "current window size: " << cwnd << "\n";
-        std::cout << "diff: " << getDiff() << "\n";*/
         if (getDiff() > GAMMA) {
             mode = CONGESTIONAVOIDANCE;
         }
@@ -130,7 +119,7 @@ void Vegas::ackRecieved(AckPacket *p) {
 
     if (mode == CONGESTIONAVOIDANCE) { 
         // normal vegas case
-        if (id != lastAckRecieved) {
+        if (id != lastAckReceived) {
             // if in recovery previously, not in recovery anymore
             // set cwnd to ssthresh
             if (inRecovery) {
@@ -193,12 +182,19 @@ void Vegas::ackRecieved(AckPacket *p) {
         sendAvailablePackets();
     }
 
-    lastAckRecieved = id;
+    lastAckReceived = id;
 }
 
 void Vegas::packetDropped(int id, bool &wasDropped) {
     double tempLastDroppedTime = lastDroppedTime;
-    TCP_RENO::packetDropped(id, wasDropped);
+
+    TCP_TAHOE::packetDropped(id, wasDropped);
+    if (wasDropped) {
+        inRecovery = false;
+        lastAckReceived = -1;
+        duplicates = 0;
+    }
+
     // If there was actually a timeout
     if (wasDropped && 
             (tempLastDroppedTime + rttcurrent < SYSTEM_CONTROLLER->getCurrentTime())) {

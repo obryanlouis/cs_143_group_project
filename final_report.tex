@@ -40,9 +40,8 @@ The makefile is in the top level directory. You do not need to specify a target;
 \section{Architecture}
 
 \subsection{Simulation}
-    Classes in this category: Controller, Scheduler, Event
-    The Simulation classes function to keep track of high-level system parameters as the simulation runs. 
-The Controller class has a few main tasks. One instance of this class is created upon program start. (For simplicity, we will refer to this one instance of the Controller class as “the controller”.) It is the Controller to which the InputParser adds system objects. (See Input/Output below.) The controller is what keeps track of system time. It also contains an instance of Scheduler (hence forth called “the scheduler”). It is also the object that interfaces with network objects when the network objects want to make events. The controller also initializes the first routing update and system print events. In essence, the controller runs the entire simulation.
+    The Simulation classes function to keep track of high-level system parameters as the simulation runs. These classes include the Controller, Scheduler, and Event.
+The Controller class has a few main tasks. One instance of this class is created upon program start. To initialize the network, it makes a call to the InputParser class, which parses the system information from the xml file. The controller also contains an instance of the Scheduler class. It is also the object that interfaces with network objects when the network objects want to make events. The controller also initializes the first routing update and system print events. In essence, the controller runs the entire simulation.
 
 The scheduler contains a priority queue, ordered by event time, which contains all of the system’s events. In this scheduler, there is a doNext() function which is called by the controller until the system has finished running of all of its flows. This function enacts the next event in the queue. 
 

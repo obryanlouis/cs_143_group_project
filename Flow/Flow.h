@@ -88,7 +88,7 @@ public:
         
     double getPacketTime(int id);
         // Returns the packets with the given id's start time
-    int getNextUnrecieved();
+    int getNextUnreceived();
         // Returns the id of the next unreceived packet
  
     void handlePacket(AckPacket *p);
@@ -129,12 +129,16 @@ public:
         //          "thresh", "outstanding"
     int getTotalPackets();
         // Returns the total number of packets in this flow
+    double getRTT();
+        // Returns the current round trip time, averaged over the last
+        // packets in the time interval. Used only for stat recording.
+    void updateRTT(double rtt);
+        // Updates the round trip time by adding the given rtt to the
+        // average.
 
     // DEBUG
     void checkAllRecieved(int sendNext);
-    void printRemainingPacketIds();
-    double getRTT();
-    void updateRTT(double rtt);
+        // Checks that all packets have been recieved by this flow
 
 };
 

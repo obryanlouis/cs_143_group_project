@@ -12,7 +12,6 @@ class DataPacket;
 class Flow;
 
 enum CongestionAlgorithmType {
-    DUMB,
     SLOW,
     TAHOE,
     RENO,
@@ -31,15 +30,14 @@ class CongestionAlgorithm{
         CongestionAlgorithm(Flow *in_flow);
 
         void end();
-        virtual double getDiff();
         Flow* getFlow();
         double getWindowSize();
 
         virtual void scheduleFirstPacket(double startTime);
 
-        virtual void ackRecieved(AckPacket *packet) = 0;
+        virtual void ackReceived(AckPacket *packet) = 0;
         AckPacket* makeAckPacket(DataPacket *p);
-        // when DataPacket recieved at destination host, determines
+        // when DataPacket received at destination host, determines
         // what AckPacket should be sent. 
         virtual double numOutstanding();
 
@@ -65,42 +63,26 @@ class SLOW_START : public CongestionAlgorithm{
 
         virtual void scheduleFirstPacket(double startTime);
         virtual void packetDropped(int id, bool &wasDropped);
-        virtual void ackRecieved(AckPacket *p);
+        virtual void ackReceived(AckPacket *p);
         void sendPacket(int id, double startTime);
         void updateTimeout(double time);
         AckPacket *makeAckPacket(DataPacket *p);
-        virtual double getDiff();
         virtual double numOutstanding();
 };
 
 
 class TCP_TAHOE : public SLOW_START{
     protected:
-        int lastAckRecieved;
+        int lastAckReceived;
         int duplicates;
 
     public:
         TCP_TAHOE(Flow *in_flow);
 
-        virtual void ackRecieved(AckPacket *p);
+        virtual void ackReceived(AckPacket *p);
         virtual void packetDropped(int id, bool &wasDropped);
         virtual void scheduleFirstPacket(double startTime);
-        virtual double getDiff();
 };
-
-class Dumb : public SLOW_START {
-private:
-    int sendNext;
-
-public:
-    Dumb(Flow *in_flow);
-
-    void ackRecieved(AckPacket *p);
-    void scheduleFirstPacket(double startTime);
-    void packetDropped(int id, bool &wasDropped);
-
-};
-
 
 class TCP_RENO : public TCP_TAHOE {
     protected:
@@ -108,10 +90,9 @@ class TCP_RENO : public TCP_TAHOE {
 
     public:
         TCP_RENO(Flow *in_flow);
-        virtual void ackRecieved(AckPacket *p);
+        virtual void ackReceived(AckPacket *p);
         virtual void packetDropped(int id, bool &wasDropped);
         virtual void scheduleFirstPacket(double startTime);
-        virtual double getDiff();
 
 };
 

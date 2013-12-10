@@ -13,19 +13,12 @@ int main(int argc, char **argv) {
     // input should just have one argument, and it should be the xml file
     // containing the specification
 
-    // DEBUG: Uncomment these lines when we want to get a file from a
-    // specific location.
-
     if (argc != 2) {
       cout << "usage: bin/test inputFile" << endl;
       exit(1);
       }
 
-      char* input = argv[1];
-
-    // DEBUG: use a default file input.xml
-    //string input = "testcase2.xml";
-    ///string input = "testcase2.xml";
+    char* input = argv[1];
 
     // Initialize the System Controller
     SYSTEM_CONTROLLER = new Controller();

@@ -5,7 +5,6 @@
 #include <cmath>
 #include <list>
 
-
 class Vegas : public TCP_RENO {
     private:
         enum Mode {
@@ -17,9 +16,9 @@ class Vegas : public TCP_RENO {
         int parity;
         double incr;
         double maxincr;
-            // The last increment of cwnd
+        // The last increment of cwnd
         int packetNumberAfterRetransmission;
-            // used for the first two packets after retransmission
+        // used for the first two packets after retransmission
 
         double rttmin;
         double rttcurrent;
@@ -30,13 +29,13 @@ class Vegas : public TCP_RENO {
         friend void sendVegasCallback(void *arg);
 
     public:
-        void ackRecieved(AckPacket *p);
+        void ackReceived(AckPacket *p);
         void packetDropped(int id, bool &wasDropped);
         void retransmissionTimeout(int id);
         void scheduleFirstPacket(double startTime);
         Vegas(Flow *f);
         double getDiff();
- 
+
 };
 
 #endif

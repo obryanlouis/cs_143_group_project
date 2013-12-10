@@ -171,16 +171,16 @@ void Controller::printMySystem() {
 
     //std::cout << "  Outputting Flow information." << std::endl;
     std::ofstream flowSendFile, flowReceiveFile, flowRTTFile, flowWindowFile,
-        flowThreshFile, flowOutstandingFile, flowRenoFile, flowVegasFile,
+        /*flowThreshFile,*/ flowOutstandingFile, /*flowRenoFile, flowVegasFile,*/
         flowDelayFile;
     flowSendFile.open(FLOW_SEND_FILE.data(), std::ios::app);
     flowReceiveFile.open(FLOW_RECEIVE_FILE.data(), std::ios::app);
     flowRTTFile.open(FLOW_RTT_FILE.data(), std::ios::app);
     flowWindowFile.open(FLOW_WINDOW_FILE.data(), std::ios::app);
-    flowThreshFile.open(FLOW_THRESH_FILE.data(), std::ios::app);
+    //flowThreshFile.open(FLOW_THRESH_FILE.data(), std::ios::app);
     flowOutstandingFile.open(FLOW_OUTSTANDING_FILE.data(), std::ios::app);
-    flowRenoFile.open(FLOW_RENO_FILE, std::ios::app);
-    flowVegasFile.open(FLOW_VEGAS_FILE, std::ios::app);
+    //flowRenoFile.open(FLOW_RENO_FILE, std::ios::app);
+    //flowVegasFile.open(FLOW_VEGAS_FILE, std::ios::app);
     flowDelayFile.open(FLOW_DELAY_FILE, std::ios::app);
     files.clear();
     files["send rate"] = &flowSendFile;
@@ -188,8 +188,8 @@ void Controller::printMySystem() {
     files["delay"] = &flowDelayFile;
     files["rtt"] = &flowRTTFile;
     files["window"] = &flowWindowFile;
-    files["reno"] = &flowRenoFile;
-    files["vegas"] = &flowVegasFile;
+    //files["reno"] = &flowRenoFile;
+    //files["vegas"] = &flowVegasFile;
     files["outstanding packets"] = &flowOutstandingFile;
     /*files["thresh"] = &flowThreshFile;
       files["outstanding"] = &flowOutstandingFile;*/
@@ -474,12 +474,6 @@ void Controller::checkPackets() {
                     dp->getId() << ")\n";
                 exit(1);
             }
-            /*            if (dp->getId() > 10000) {
-                          std::cout << "Packet id ("
-                          << dp->getId() 
-                          << ") pretty large. It's probably wrong\n";
-                          exit(1);
-                          } */
         }
     }
 }
@@ -562,10 +556,19 @@ double Scheduler::getCurrentTime() {
 }
 
 // Event functions
+Event::Event(double in_time, void (*fp)(void*), void *arg)
+    :time(in_time)
+    ,arg(arg)
+    ,fp(fp)
+{ }
+
 void Event::execute() {
     this->fp(this->arg);
 }
 
+const double Event::getTime() { 
+    return time; 
+}
 
 double Controller::getThroughput() {
     double t = 0;
