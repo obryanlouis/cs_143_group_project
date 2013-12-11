@@ -22,9 +22,9 @@ $$\mu_3 (x_1 - 10) = 0$$
 
 Solving these equations gives the solutions $x_1=10$Mbps, and $\mu_1 = 0.055, \mu_2 = 0, \mu_3 = 0$ (although these may be chosen arbitrarily to satisfy nonnegativity and the top equation). This rate matches the realized rate of flow 1 during simulation after the initial slow start.
 
-The propogation delay $d_1$ is 100ms because each of the 5 links along the path from S1 to T1 has the same delay of 10ms. The base RTT is approximately 110ms because of the queueing delay. By Little's law, the equilibrium queueing delay is $\alpha /  x_1$, where in our simulation, $\alpha = 0.55 packets/ms$. This is equal to $\frac{0.55 packets/ms}{10 Mbps} * \frac{1024 B}{packet} * \frac{Mb}{10^6 b} * \frac{8 b}{B} * \frac{10^3 ms}{s} * (110 ms) = 50 ms$. So the equilibrium RTT is 150 ms. This calculation also agrees with the round trip time in our simulation. The corresponding window size is $150ms * 10Mbps = 183 packets$.
+The propagation delay $d_1$ is 100ms because each of the 5 links along the path from S1 to T1 has the same delay of 10ms. The base RTT is approximately 110ms because of the queueing delay. By Little's law, the equilibrium queueing delay is $\alpha /  x_1$, where in our simulation, $\alpha = 0.55 packets/ms$. This is equal to $\frac{0.55 packets/ms}{10 Mbps} * \frac{1024 B}{packet} * \frac{Mb}{10^6 b} * \frac{8 b}{B} * \frac{10^3 ms}{s} * (110 ms) = 50 ms$. So the equilibrium RTT is 150 ms. This calculation also agrees with the round trip time in our simulation. The corresponding window size is $150ms * 10Mbps = 183 packets$.
 
-When flow 2 enters, its base RTT includes the queueing delay at link 1. The queueing delay is approximately 50 ms by the above, assuming that the queueing delay is the same as the previous equilibrium queueing delay. In addition, the propogation delay is approximately 66 ms. The KKT conditions to the minimization become
+When flow 2 enters, its base RTT includes the queueing delay at link 1. The queueing delay is approximately 50 ms by the above, assuming that the queueing delay is the same as the previous equilibrium queueing delay. In addition, the propagation delay is approximately 66 ms. The KKT conditions to the minimization become
 
 $$\frac{\alpha_1}{x_1}=\mu_1+\mu_2+\mu_3$$
 $$\frac{\alpha_2}{x_2}=\mu_1$$
@@ -34,9 +34,9 @@ $$\mu_3 (x_1 - 10) = 0$$
 
 Solving these equations gives the solutions $x_1 = 5$Mbps, $x_2 = 5$ Mbps, and $\mu_1 = 0.110, \mu_2 = 0, \mu_3 = 0$. The simulation's flow rates of flow 1 and flow 2 converge toward this common value in the period before flow 3 is added, although they do not quite reach it before that time.
 
-With the same base RTT for flow 1, the new equilibrium queueing delay is  $\frac{0.55 packets/ms}{5 Mbps} * \frac{1024 B}{packet} * \frac{Mb}{10^6 b} * \frac{8 b}{B} * \frac{10^3 ms}{s} * (110 ms) = 100 ms$. The new RTT of flow 1 is 200 ms, which agrees with the simulation's RTT. The equilibrium queueing delay for flow 2 is $\frac{0.55 packets/ms}{5 Mbps} * \frac{1024 B}{packet} * \frac{Mb}{10^6 b} * \frac{8 b}{B} * \frac{10^3 ms}{s} * (66ms + 50ms) = 105 ms$ since the base RTT is $66 ms + 50 ms$. So the equilibrium RTT for flow 2 is $105ms + 66ms = 171 ms$. This RTT does not match the simulation exactly, which produces round trip times of about 150 ms, but it is within a reasonable margin of error.  The corresponding window sizes for flows 1 and 2 are 122 packets and 104 packets. In turn, these measurements slightly differ from the simulation's values.
+With the same base RTT for flow 1, the new equilibrium queueing delay is  $\frac{0.55 packets/ms}{5 Mbps} * \frac{1024 B}{packet} * \frac{Mb}{10^6 b} * \frac{8 b}{B} * \frac{10^3 ms}{s} * (110 ms) = 100 ms$. The new RTT of flow 1 is 200 ms, which agrees with the simulation's RTT. The equilibrium queueing delay for flow 2 is $\frac{0.55 packets/ms}{5 Mbps} * \frac{1024 B}{packet} * \frac{Mb}{10^6 b} * \frac{8 b}{B} * \frac{10^3 ms}{s} * (66ms + 50ms) = 105 ms$ since the base RTT is $66 ms + 50 ms$ (the propagation delay plus the equilibrium queueing delay from the first interval). So the equilibrium RTT for flow 2 is $105ms + 66ms = 171 ms$. This RTT does not match the simulation exactly, which produces round trip times of about 150 ms, but it is within a reasonable margin of error.  The corresponding window sizes for flows 1 and 2 are 122 packets and 104 packets. In turn, these measurements slightly differ from the simulation's values. A possible reason for shorter round trip times is that the links in our simulation allowed for higher throughputs than advertised on the simulation specifications because of the buffers on both ends, as we explained previously.
 
-When flow 3 enters, its base RTT only depends on the propogation delay to T3 since the buffer at L3 is empty. So its base RTT is 66 ms, and its propogation delay is 60 ms. The KKT conditions become
+When flow 3 enters, its base RTT only depends on the propagation delay to T3 since the buffer at L3 is empty. So its base RTT is 66 ms, and its propagation delay is 60 ms. The KKT conditions become
 
 $$\frac{\alpha_1}{x_1}=\mu_1+\mu_2+\mu_3$$
 $$\frac{\alpha_2}{x_2}=\mu_1$$
@@ -61,7 +61,7 @@ $$w_1 = 102 packets$$
 $$w_2 = 117 packets$$
 $$w_3 = 90 packets $$
 
-These correspond to RTT's of $T_1 = 250$ ms, $T_2 = 144$ ms, and $T_3 = 111$ ms. These results agree approximately with the simulation's results, however the simulation shows round trip times slightly lower. The windows sizes also approximately agree, however, they seem to converge to slightly lower results as well.
+These correspond to RTT's of $T_1 = 250$ ms, $T_2 = 144$ ms, and $T_3 = 111$ ms. These results agree approximately with the simulation's results, however the simulation shows round trip times slightly lower. The windows sizes also approximately agree, however, they seem to converge to slightly lower results as well. Again, this could be due to the altered link buffer behavior.
 
 When flow 2 finishes, the new equilibrium equations are analogous to those given above for the case when only flow 1 and flow 2 are in the system; $x_1 = 5$ Mbps and $x_3 = 5$ Mbps, and $\mu_1 = 0, \mu_2 = 0, \mu_3 = .110$. The new queueing delays are 
 
@@ -74,7 +74,7 @@ and the window sizes are
 $$w_1 = 122 packets$$
 $$w_2 = 77 packets$$
 
-The new RTT's are $T_1 = 200$ ms and $T_2 = 126$ ms. Again, these do not exactly match the simulation's results, however they are not too far away from the results, which were approximately 225 ms and 140 ms. The simulation window sizes were about 135 packets for flow 1 and 60 packets for flow 2.
+The new RTT's are $T_1 = 200$ ms and $T_2 = 126$ ms. Again, these do not exactly match the simulation's results, however they are not too far away from the results, which were approximately 225 ms and 140 ms. The simulation window sizes were about 135 packets for flow 1 and 60 packets for flow 2. These results may be lower again due to the link buffers.
 
 Finally, when flow 3 is the only flow left, the KKT equations become
 
