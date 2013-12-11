@@ -1,5 +1,11 @@
 % !TEX root = Report.tex
 
-\section{How to use}
+\section{Usage guide}
 
-The makefile is in the top level directory. You do not need to specify a target; the "all" target is the one you want anyway. Once the code has compiled, run "bin/test input.xml" or whatever input file you have as the first command line argument after the program name. An example of sample input and documentation of the schema is in InputParser/networkSchema.txt. Once the simulation is done, graphs will be made in the Output directory.
+The makefile is in the top level directory. You do not need to specify a target; the "all" target is the one you want anyway.
+
+It may be necessary to create a "bin" folder in the top level directory if one does not already exist.
+
+Once the code has compiled, run "bin/test input.xml" or whatever input file you have as the first command line argument after the program name. An example of sample input and documentation of the schema is in InputParser/networkSchema.txt. Once the simulation is done, graphs will be made in the Output directory.
+
+For convenience, we have included testcase0.xml, testcase1.xml, and testcase2.xml. The only lines that need to be changed are the ones relating to the congestion algorithm type. 

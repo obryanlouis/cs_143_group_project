@@ -3,46 +3,106 @@
 
 \section{Architecture}
 
-
-
-io.png
-Input/output structure of our system. Yellow denotes input/output files. Cyan denotes helper libraries. Blue rectangle denotes simulator objects. Blue diamond denotes simulator events. 
-packetTransfer.png
-Packet transfer process between nodes (hosts, routers) and links. Arrows here represent packet transfer in the system. Arrowhead direction denotes passing of packets between functions. Arrow label denotes time offset added, as perceived by scheduler. (Time offset is zero when not labeled.)
-hierarchy.png
-An image of hierarchy of network object classes in our system. Arrows denote inheritance. Boxes inside of boxes denote a single instance of an object of a class being initiated as part of every instance of another class. (Ex. a link always contains 2 buffers)
-
-\subsection{System Classes}
     The network design was split into the groups of classes as follows: Simulation, Network, and Input. The Simulation group contains the classes Event, Scheduler, and Controller. These classes are used to hold the network objects as well as manage the event-based simulation. The Network group contains the classes Node, Host, Router, Link, Buffer, Router, RoutingTable, Packet, RoutingPacket, RouterRoutingPacket, HostRoutingPacket, DataPacket, AckPacket, Flow, CongestionAlgorithm, SLOW\_START, TCP\_TAHOE, TCP\_RENO, Vegas, and Cubic. These classes are used to simulate network objects and their behavior. Their exact behavior and hierarchy are described in more detail below. Finally, the Input group of classes contains InputParser, SystemInfo, HostInfo, RouterInfo, LinkInfo, and FlowInfo. The InputParser is used to read in information from the input XML file and that information is used in Controller to create the objects.
 
 \subsection{Simulation Classes}
     Classes in this category: Controller, Scheduler, Event
 
     The Simulation classes function to keep track of high-level system parameters as the simulation runs. 
-The Controller class has a few main tasks. One instance of this class is created upon program start. (For simplicity, we will refer to this one instance of the Controller class as “the controller”.) It is the Controller to which the InputParser adds system objects. (See Input/Output below.) The controller is what keeps track of system time. It also contains an instance of Scheduler (hence forth called “the scheduler”). It is also the object that interfaces with network objects when the network objects want to make events. The controller also initializes the first routing update and system print events. In essence, the controller runs the entire simulation.
+The Controller class has a few main tasks. One instance of this class is created upon program start. (For simplicity, we will refer to this one instance of the Controller class as “the controller”.) It is the Controller to which the InputParser adds system objects. (See Input/Output below.) The controller is what keeps track of system time. It also contains an instance of Scheduler (hence forth called “the scheduler”). It is also the object that interfaces with network objects when the network objects want to make events. The controller also initializes the first routing update and system print events. After initialization, these Events will schedule the next instance of themsleves.
+
+ In essence, the controller runs the entire simulation.
+
 The scheduler contains a priority queue, ordered by event time, which contains all of the system’s events. In this scheduler, there is a doNext() function which is called by the controller until the system has finished running of all of its flows. This function enacts the next event in the queue. 
 
-The Event class contains 3 things: a timestamp for when the event should be executed, a function pointer to the QQTQTQTQTQT
-It has a Scheduler, inputFile, and all the network objects. The Controller works by getting an input file to use, and initializing the system by using an InputParser instance to parse the file and return the information necessary to create the actual objects. The objects are created, and the network simulation begins. This starts with the initial router updates to get the routing update tables of all the routers. The network is designed to handle static routers and hosts. No changes can be made to the network topography. Thus, this initial routing update runs until the whole network is mapped. Then, while the flows are running, the network events will continue to be executed by the scheduler until there are no more flows. At this point, the plots are made and the simulation is completed.
+The Event class contains 3 things: a timestamp for when the event should be executed, a function pointer to the function scheduled, and a pointer to arguments that the function may need for execution. When an Event is executed, the function is called with the arguments.
+
+    To do event-based simulation, each element in the system that wants to call some function in the future will create a new Event with the time of execution, the function, and appropriate arguments. It will then call the controller's add(Event *e) function in order to put this new Event into the scheduler's queue. Until the simulation finishes, the controller pops off the top Event off of the scheduler queue, executing it. It then checks if there are any flows left. If there still exist flows, it pops the top Even off of the scheduler queue again, and so on and so forth. 
+
+    In order to make sure that periodic events like router updates and system snapshot happen, the controller is initialized with the first Event of these. For system snapshot, the controller iterates through all links, routers, hosts, and flows, writing appropriate data to output files and resetting necessary statistics. Router updates trigger the creation of routing packets at each router, which are put into the different links. When these packets are recieved by routers and hosts, they create packets as appropriate, sending them back to the routers which are used for updates.  
+
+
 
 \subsection{Network Classes}
-    The Network classes are used to hold information of the various network objects. They are split into a few general subgroups: Node, Link, Routing, Packet, and Flow.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.5\textwidth]{hierarchy.png}
+    \caption{An image of hierarchy of network object classes in our system. Arrows denote inheritance. Boxes inside of boxes denote a single instance of an object of a class being initiated as part of every instance of another class. (Ex. a link always contains 2 buffers)}
+\end{figure}
+
+    The Network classes are used to hold information of the various network objects. They are split into a few general subgroups: Node, Link, Packet. Node is further split into Host and Routing. Because Host and Routing is fairly involved, we will explain these in detail as well. 
+
+    \paragraph{Node} The Node subgroup consists of Node, Host, and Router. Node is an abstract class that contains the id of the node as well as the list of links to which is connected. The Node class guarantees a function handlePacket(Packet *p). We choose to implement this abstract class because class Router and Host both have this as part of their interface. 
     
-The Node subgroup consists of Node, Host, and Router. These were designed together because Hosts and Routers share many things in common and can be used interchangeably in some situations, such as the endpoints of a link or the destination of a packet.. As such, Node is an abstract class that contains the common values such as id, and the links it is connected to. Host and Router then inherit from Node and add in their unique attributes such as the flow that a host may be a source of.
-
-    The Link subgroup consists of Link and Buffer. The Buffer class is used to simulate the buffers on the links. Each link has two buffers, one in each direction. The buffers are implemented as FIFO queues of Packets. The Link class uses the buffers and its own fields to manage the link’s activities. Specifically, links need to be able to schedule the events of transmitting the packets in its buffers and record stats for every interval.
-
-    The Routing subgroup consists of Router and RoutingTable. Each router contains its own RoutingTable pointer which describes the behavior it will follow when routing packets. The RoutingTable itself is a map from Node pointers to pairs of weight and Link pointers. The key is the destination Node of the packet to route. It is a Node (as opposed to Host) because while all DataPackets must be sent to Hosts, RoutingPackets can also be sent to Routers. The weights are then the weight of that path and the Link is the next link to follow on that path. In addition to the routing table, the primary function of the Router class is to handle packets that it receives. Data and ack packets are simply forwarded to the next link in the path. Routing packets, on the other hand, are used to update the router’s own routing table. This is done in the routing table update steps every routingTableUpdateTime. 
+    \paragraph{Router} The Routing subsubgroup consists of Router and RoutingTable. Each router contains its own RoutingTable pointer which describes the behavior it will follow when routing packets. The RoutingTable itself is a map from Node pointers to pairs of weight and Link pointers. The key is the destination Node of the packet to route. It is a Node (as opposed to Host) because while all DataPackets must be sent to Hosts, RoutingPackets can also be sent to Routers. The weights are then the weight of that path and the Link is the next link to follow on that path. In addition to the routing table, the primary function of the Router class is to handle packets that it receives. Data and ack packets are simply forwarded to the next link in the path. Routing packets, on the other hand, are used to update the router’s own routing table. This is done in the routing table update steps every routingTableUpdateTime. 
 
 As far as the actual routing updates are done, we implement the Bellman-Ford algorithm. We chose to use this algorithm because it utilizes local knowledge of the graph as opposed to Dijkstra’s algorithm, which depends on global knowledge of the network. As such, it seems more natural to use Bellman-Ford for the routing table updates. Dynamic routing is calculated through a combination of buffer delay and propagation delay. Buffer weights are only calculated once per routing update period so that the routing table weights -- stored as doubles -- stabilize. This behavior mimics real routing table updates because otherwise the routing weights constantly change by slight amounts.
 
-    The Packet subgroup consists of the large variety of Packet classes. All of these stem from the abstract Packet class. Packet contains core information of the packet such as id, size, source, and destination, and packet type. One level down, we have RoutingPacket, which adds the link the packet came from to use in the routing table updating. Inheriting from RoutingPacket, we have RouterRoutingPacket and HostRoutingPacket. HostRoutingPackets are merely used to tell Routers that the hosts still exist at that link. RouterRoutingPackets contain routing tables to tell the routers whether or not they have to update their routing tables. On the other end of the spectrum, we have DataPacket, which inherits from Packet. Data packets use extra information for the flow it is part of and the start time, which is used for calculating stats such as RTT and packet delay. Finally, we have AckPacket, which inherits from DataPacket. The main differences between a data packet and ack packet are their behavior when being handled by hosts and their size, so it is reasonable to inherit from DataPacket.
+    \paragraph{Host} The Host subsubgroup consists of the Host class, the Flow class, as well as all of the congestion control algorithm classes. These classes together are responsible for the creation and tracking of data and acknowledgement packets sent throughout the system.
+    
+    The Host class is responsible for data collection and passing packets from Links to Flows. 
+    
+    The Flow class holds onto the information needed to handle the flow, including size, progress, outstanding packets, acks received, and relevant stat fields. Flows also include an instance of CongestionAlgorithm. The Flows create DataPackets upon request from the CongestionAlgorithm, which it sends to its source Host for transfer. When a DataPacket is received by the recieve Host, the Flow keeps track of which id it should use to create an AckPacket for in response to the reception of that DataPacket. When a Flow is added to the Controller, an initial event is scheduled to cause the first data packet transmission. 
+    
+    CongestionAlgorithm is the abstract base class used to simulate the congestion control algorithms. It holds onto fields necessary for congestion control such as window size and ssthresh. We then have several different congestion control algorithms that implement various types of TCP congestion control. 
+    
+    The simplest of these is SLOW\_START, which inherits from CongestionAlgorithm. SLOW\_START implements slow start for that part of TCP, and then uses very basic congestion avoidance. While not in slow start, it increments cwnd by 1/cwnd every ack. Otherwise, it increments cwnd by 1. When packets time out, it sets ssthresh to half cwnd and sets cwnd to 1. With SLOW\_START, it is possible to see network behavior while running just only multiplictive increase and congestion avoidance. 
+    
+    Next, we have TCP\_TAHOE, which inherits from SLOW\_START. TCP\_TAHOE implements fast\_retransmit. In fast\_retransmit, when 3 duplicate ACKs are recieved, it is treated the same as a timeout. Rather than having to wait a full round trip time in order to send a new packet, TCP\_TAHOE detects packets sooner than SLOW\_START. Thus, we can implement Additive Increase, Multiplicative Decrease efficiently. 
+    
+    After this, we have TCP\_RENO, which then inherits from TCP\_TAHOE. This adds fast\_recovery. Rather than sending a single packet upon detecting packet loss from triple acknowledgement, TCP\_RENO includes a modified algorithm which temporarily inflates the window size to compensate for packets as they go missing. Thus, rather than collapsing the window size to 1 as soon as packet loss is detected, TCP\_RENO can adjust to a more reasonable size and adjust from there. 
+    
+    We also have Vegas, which inherits from TCP\_RENO. The Vegas algorithm is very similar to TCP\_RENO except that it has a different window update rule in Congestion Avoidance. Rather than using packet loss as its main metric, it uses packet delay. This allows more fine-grained tuning of network status as packets are being sent and recieved. The idea of Vegas is that there is some ideal range for the value of the current window size divided by what the round trip time would be of the system if there were no queuing delays compared to if there were. By keeping this difference within a constant set of values, we can ensure that window size is not too big or not too small. 
+    
+    Finally, we have Cubic, which inherits from SLOW\_START. It is a TCP algorithm based on a window update algorithm using a Cubic function. While this class currently does not currently run successfully on simulation, we have included it nonetheless for possible future work. 
+    
 
-    The Flow subgroup consists of the Flow class as well as all of the congestion control algorithm classes, and is responsible for managing most of the work done in the simulations. The Flow class holds onto the information needed to handle the flow, including size, progress, outstanding packets, acks received, and relevant stat fields. Most importantly, every flow will have its own CongestionAlgorithm pointer. CongestionAlgorithm is the abstract base class used to simulate the congestion control algorithms. It holds onto fields necessary for congestion control such as window size and ssthresh. We then have several different congestion control algorithms that implement various types of TCP congestion control. The simplest of these is SLOW\_START, which inherits from CongestionAlgorithm. SLOW\_START simply implements slow start for that part of TCP, and then uses very basic congestion avoidance. While not in slow start, it increments cwnd by 1/cwnd every ack. When packets time out, it sets ssthresh to half cwnd and sets cwnd to 1. Next, we have TCP\_TAHOE, which inherits from SLOW\_START and, as expected, implements TCP\_TAHOE congestion control. After this, we have TCP\_RENO, which then inherits from TCP\_TAHOE, and thus only needs to add fast\_recovery. We also have Vegas, which inherits from TCP\_RENO. This is useful because the Vegas algorithm is essentially the Reno algorithm with a modified congestion avoidance algorithm. Finally, we have Cubic, which inherits from SLOW\_START. While not complete, it is a partial implementation of TCP Cubic, which was an interesting extra TCP algorithm we were interested in exploring.
+    \paragraph{Link} The Link subgroup consists of Link and Buffer. The Buffer class is used to simulate the buffers on the links. Each link has two buffers, one in each direction and each have the capacity described in the input file. It also consists of pointers to the Nodes to which an instance of Link is attached.
+    
+    The buffers are implemented as FIFO queues of Packets. The Link class uses the buffers and its own fields to manage the link’s activities. 
+
+    The Link also includes various functions to handle packet transfer. We describe them in the section Packet Transfer below. 
+
+    \paragraph{Packet} The Packet subgroup consists of the large variety of Packet classes. All of these stem from the abstract Packet class. Packet contains core information of the packet such as id, size, source, and destination, and packet type. 
+    
+    There are two subgroups of Packets: RoutingPacket and Datapacket. 
+    
+    Inheriting from Packet, we have RoutingPacket, which are the packets used to update the Router's RoutingTables. In class RoutingPacket, we add a field to describe the link that a RoutingPacket packet came from. 
+    Inheriting from RoutingPacket, we have RouterRoutingPacket and HostRoutingPacket. HostRoutingPackets tell Routers that the hosts still exist at that link. RouterRoutingPackets contain routing tables to tell the routers whether or not they have to update their routing tables. 
+    
+    In class DataPacket, we inherit from Packet. Data packets use extra information for the flow it is part of and the start time, which is used for calculating stats such as RTT and packet delay. Finally, we have AckPacket, which inherits from DataPacket. We inherit from AckPacket as many of the properties (such as flow) are the same between the two. This also aids in debugging, as we can print which DataPacket triggered the creation of which AckPacket. DataPacket and AckPacket are both created by the Flow. 
+
+
+\subsubsection{Packet Transfer}    
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{packetTransfer.png}
+    \caption{Packet transfer process between nodes (hosts, routers) and links. Arrows here represent packet transfer in the system. Arrowhead direction denotes passing of packets between functions. Arrow label denotes time offset added, as perceived by scheduler. (Time offset is zero when not labeled.) }
+\end{figure}
+
+Because the packet transfer structure may be a bit confusing without explaination, we provide one here.
+
+When a node puts a packet into the link, it will call that link's handlePacket(Packet *p) function. Because there may be other packets traveling the link at the same time, we first schedule an event which calls sendAnotherPacket on the link. This event is scheduled at a time so that delays that may be incurred at the head of a link (queue delay, processing delay) are included.
+
+When sendAnotherPacket is called, we schedule an event that calls sendPacketCallback. This simulates the delay time that a link would have in transmitting the packet over its length. 
+
+Finally, when sendAnotherPacket is called again, we know the packet has finished transmitting the length of the link. Thus, it can be sent on to the next node in the system.  
 
 \subsection{Input/Output}
     The InputParser class uses the pugixml C++ XML parsing ability to parse input files and store the information in lists of the various Info objects. One thing to note is that pugixml does not provide any method of checking the XML file against an XSD schema. As such, the expected input and some behavior is described in much greater detail in the networkSchema.txt file in the InputParser directory.
     
-    The SystemInfo class is used as the parent class for the other Info classes. All it holds is the printing flag for the object. The other Info classes each contain values specific to the type of object it is designed to hold information of. For example, LinkInfo will hold members such as linkRate. Again, these are explained in more detail in the networkSchema.txt file.
+    The SystemInfo class is used as the parent class for the other Info classes. All it holds is the printing flag for the object. The other Info classes each contain values specific to the type of object it is designed to hold information of. For example, LinkInfo will hold members such as linkRate. These are explained in more detail in the networkSchema.txt file.
     
-If the input file is formatted correctly, the InputParser can call its run function, which takes in references to the values it will set, to parse the file and set the fields. The fields it sets are snapshotTime, routingUpdateTime, hosts, routers, links, flows, and plotOptions. snapshotTime is the time interval between stat-collecting events. The smaller this is, the finer the resolution. routingUpdateTime is the time interval between updating the routing tables. hosts, routers, links, and flows are lists of their corresponding Info objects that will be used to create the objects later. plotOptions does stuff.
+    If the input file is formatted correctly, the InputParser can call its run function, which takes in references to the values it will set, to parse the file, set global parameter fields, and create network objects. The global parameter fields set are snapshotTime, routingUpdateTime, hosts, routers, links, flows, and plotOptions. snapshotTime is the time interval between stat-collecting events. The smaller this is, the finer the resolution. routingUpdateTime is the time interval between updating the routing tables. hosts, routers, links, and flows are lists of their corresponding Info objects that will be used to create the objects later. plotOptions sets various plot settings for gnuplot for the output graphs.
+           
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{io.png}
+    \caption{Input/output structure of our system. Yellow denotes input/output files. Cyan denotes helper libraries. Blue rectangle denotes simulator objects. Blue diamond denotes simulator events. }
+\end{figure}
+
+    System output is done via periodic printing to data files. At the start of the simulation, the controller schedules an event which calls printSystem(). This function iterates through all links, flows, and hosts, requesting and then resetting data as appropriate. This data is written to a series of output files. At the end of the call to printSystem(), the printSystem() function will schedule an event to call itself again at a time snapshotTime later.
+    Once the controller has finished running the simulation, it will make a function call to appropriate library functions in gnuplot. This will take the data from the files we have written to above and graph it. 
+
+

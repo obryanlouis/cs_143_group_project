@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2013.9.17)  10 DEC 2013 13:55
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2013.9.17)  10 DEC 2013 16:57
 entering extended mode
  %&-line parsing enabled.
 **Report.tex
@@ -245,46 +245,7 @@ File: umsb.fd 2009/06/22 v3.00 AMS symbols B
 Missing character: There is no ‚ in font cmr10!
 Missing character: There is no Ä in font cmr10!
 Missing character: There is no ô in font cmr10!
-
-! Undefined control sequence.
-l.64     \includesvg
-                    [width=0.5\textwidth]
-? 
-! Missing number, treated as zero.
-<to be read again> 
-                   ]
-l.64     \includesvg[width=0.5\textwidth]
-                                         
-? 
-! Illegal unit of measure (pt inserted).
-<to be read again> 
-                   ]
-l.64     \includesvg[width=0.5\textwidth]
-                                         
-? 
-! Missing $ inserted.
-<inserted text> 
-                $
-l.65     {reno2/Flow_
-                     Recieve_Rates.svg}
-? 
-! Extra }, or forgotten $.
-l.65     {reno2/Flow_Recieve_Rates.svg}
-                                       
-? 
-! Missing $ inserted.
-<inserted text> 
-                $
-l.66     \caption{ ... caption text ... }
-                                         
-? 
-! Missing } inserted.
-<inserted text> 
-                }
-l.67 \end{figure}
-                 
-? 
-(./architecture.tex [2]
+ (./architecture.tex [2]
 Missing character: There is no ‚ in font cmr10!
 Missing character: There is no Ä in font cmr10!
 Missing character: There is no ú in font cmr10!
@@ -300,54 +261,220 @@ Missing character: There is no ù in font cmr10!
 Missing character: There is no ‚ in font cmr10!
 Missing character: There is no Ä in font cmr10!
 Missing character: There is no ô in font cmr10!
-Missing character: There is no ‚ in font cmr10!
-Missing character: There is no Ä in font cmr10!
-Missing character: There is no ô in font cmr10!
-Missing character: There is no ‚ in font cmr10!
-Missing character: There is no Ä in font cmr10!
-Missing character: There is no ô in font cmr10!
-Missing character: There is no ‚ in font cmr10!
-Missing character: There is no Ä in font cmr10!
-Missing character: There is no ô in font cmr10!
- [3]) (./plots.tex) (./math.tex [4] [5])
-(./finalThoughts.tex [6]
-Missing character: There is no ‚ in font cmr10!
-Missing character: There is no Ä in font cmr10!
-Missing character: There is no ô in font cmr10!
-) [7]
 
-! LaTeX Error: Float(s) lost.
+<hierarchy.png, id=17, 1909.1325pt x 1176.395pt>
+File: hierarchy.png Graphic file (type png)
+ <use hierarchy.png>
+Missing character: There is no ‚ in font cmr10!
+Missing character: There is no Ä in font cmr10!
+Missing character: There is no ô in font cmr10!
+ [3]
+Missing character: There is no ‚ in font cmr10!
+Missing character: There is no Ä in font cmr10!
+Missing character: There is no ô in font cmr10!
 
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.93 \end{document}
-                   
-? 
-(./Report.aux) ) 
+Overfull \hbox (12.42242pt too wide) in paragraph at lines 52--53
+[]\OT1/cmr/m/n/10 Next, we have TCP[]TAHOE, which in-her-its from SLOW[]START. 
+TCP[]TAHOE im-ple-ments fast[]retransmit.
+ []
+
+[4 <./hierarchy.png>]
+Missing character: There is no ‚ in font cmr10!
+Missing character: There is no Ä in font cmr10!
+Missing character: There is no ô in font cmr10!
+ <packetTransfer.png, id=26, 2055.68pt x 164.615pt>
+File: packetTransfer.png Graphic file (type png)
+
+<use packetTransfer.png> [5 <./packetTransfer.png>]
+<io.png, id=31, 1234.6125pt x 468.75125pt>
+File: io.png Graphic file (type png)
+ <use io.png>) (./howtouse.tex
+[6 <./io.png>]) (./math.tex [7] [8]) (./finalThoughts.tex) (./plots.tex
+[9] [10] [11] <vegas0/Flow_RTT.png, id=58, 803.0pt x 441.65pt>
+File: vegas0/Flow_RTT.png Graphic file (type png)
+
+<use vegas0/Flow_RTT.png>
+<vegas0/Flow_Send_Rates.png, id=59, 803.0pt x 441.65pt>
+File: vegas0/Flow_Send_Rates.png Graphic file (type png)
+
+<use vegas0/Flow_Send_Rates.png>
+<vegas0/Flow_Window.png, id=60, 803.0pt x 441.65pt>
+File: vegas0/Flow_Window.png Graphic file (type png)
+
+<use vegas0/Flow_Window.png>
+<vegas0/Link_Flow_Rate.png, id=61, 803.0pt x 441.65pt>
+File: vegas0/Link_Flow_Rate.png Graphic file (type png)
+
+<use vegas0/Link_Flow_Rate.png>
+<vegas0/Link_Occupancy.png, id=62, 803.0pt x 441.65pt>
+File: vegas0/Link_Occupancy.png Graphic file (type png)
+
+<use vegas0/Link_Occupancy.png>
+<vegas0/Link_Packet_Loss.png, id=63, 803.0pt x 441.65pt>
+File: vegas0/Link_Packet_Loss.png Graphic file (type png)
+
+<use vegas0/Link_Packet_Loss.png> [12 <./vegas0/Flow_RTT.png>] [13 <./vegas0/Fl
+ow_Send_Rates.png> <./vegas0/Flow_Window.png>] [14 <./vegas0/Link_Flow_Rate.png
+> <./vegas0/Link_Occupancy.png>] [15 <./vegas0/Link_Packet_Loss.png>]
+<vegas1/Flow_RTT.png, id=83, 803.0pt x 441.65pt>
+File: vegas1/Flow_RTT.png Graphic file (type png)
+ <use vegas1/Flow_RTT.png>
+<vegas1/Flow_Send_Rates.png, id=84, 803.0pt x 441.65pt>
+File: vegas1/Flow_Send_Rates.png Graphic file (type png)
+
+<use vegas1/Flow_Send_Rates.png>
+<vegas1/Flow_Window.png, id=85, 803.0pt x 441.65pt>
+File: vegas1/Flow_Window.png Graphic file (type png)
+
+<use vegas1/Flow_Window.png>
+<vegas1/Link_Flow_Rate.png, id=86, 803.0pt x 441.65pt>
+File: vegas1/Link_Flow_Rate.png Graphic file (type png)
+
+<use vegas1/Link_Flow_Rate.png>
+<vegas1/Link_Occupancy.png, id=87, 803.0pt x 441.65pt>
+File: vegas1/Link_Occupancy.png Graphic file (type png)
+
+<use vegas1/Link_Occupancy.png>
+<vegas1/Link_Packet_Loss.png, id=88, 803.0pt x 441.65pt>
+File: vegas1/Link_Packet_Loss.png Graphic file (type png)
+
+<use vegas1/Link_Packet_Loss.png> [16
+
+ <./vegas1/Flow_RTT.png>] [17 <./vegas1/Flow_Send_Rates.png> <./vegas1/Flow_Win
+dow.png>] [18 <./vegas1/Link_Flow_Rate.png> <./vegas1/Link_Occupancy.png>] [19 
+<./vegas1/Link_Packet_Loss.png>]
+<vegas2/Flow_RTT.png, id=108, 803.0pt x 441.65pt>
+File: vegas2/Flow_RTT.png Graphic file (type png)
+ <use vegas2/Flow_RTT.png>
+<vegas2/Flow_Send_Rates.png, id=109, 803.0pt x 441.65pt>
+File: vegas2/Flow_Send_Rates.png Graphic file (type png)
+
+<use vegas2/Flow_Send_Rates.png>
+<vegas2/Flow_Window.png, id=110, 803.0pt x 441.65pt>
+File: vegas2/Flow_Window.png Graphic file (type png)
+
+<use vegas2/Flow_Window.png>
+<vegas2/Link_Flow_Rate.png, id=111, 803.0pt x 441.65pt>
+File: vegas2/Link_Flow_Rate.png Graphic file (type png)
+
+<use vegas2/Link_Flow_Rate.png>
+<vegas2/Link_Occupancy.png, id=112, 803.0pt x 441.65pt>
+File: vegas2/Link_Occupancy.png Graphic file (type png)
+
+<use vegas2/Link_Occupancy.png>
+<vegas2/Link_Packet_Loss.png, id=113, 803.0pt x 441.65pt>
+File: vegas2/Link_Packet_Loss.png Graphic file (type png)
+
+<use vegas2/Link_Packet_Loss.png> [20
+
+ <./vegas2/Flow_RTT.png>] [21 <./vegas2/Flow_Send_Rates.png> <./vegas2/Flow_Win
+dow.png>] [22 <./vegas2/Link_Flow_Rate.png> <./vegas2/Link_Occupancy.png>] [23 
+<./vegas2/Link_Packet_Loss.png>]
+<reno0/Flow_RTT.png, id=132, 803.0pt x 441.65pt>
+File: reno0/Flow_RTT.png Graphic file (type png)
+ <use reno0/Flow_RTT.png>
+<reno0/Flow_Send_Rates.png, id=133, 803.0pt x 441.65pt>
+File: reno0/Flow_Send_Rates.png Graphic file (type png)
+
+<use reno0/Flow_Send_Rates.png>
+<reno0/Flow_Window.png, id=134, 803.0pt x 441.65pt>
+File: reno0/Flow_Window.png Graphic file (type png)
+
+<use reno0/Flow_Window.png>
+<reno0/Link_Flow_Rate.png, id=135, 803.0pt x 441.65pt>
+File: reno0/Link_Flow_Rate.png Graphic file (type png)
+
+<use reno0/Link_Flow_Rate.png>
+<reno0/Link_Occupancy.png, id=136, 803.0pt x 441.65pt>
+File: reno0/Link_Occupancy.png Graphic file (type png)
+
+<use reno0/Link_Occupancy.png>
+<reno0/Link_Packet_Loss.png, id=137, 803.0pt x 441.65pt>
+File: reno0/Link_Packet_Loss.png Graphic file (type png)
+
+<use reno0/Link_Packet_Loss.png> [24
+
+ <./reno0/Flow_RTT.png>] [25 <./reno0/Flow_Send_Rates.png> <./reno0/Flow_Window
+.png>] [26 <./reno0/Link_Flow_Rate.png> <./reno0/Link_Occupancy.png>] [27 <./re
+no0/Link_Packet_Loss.png>]
+<reno1/Flow_RTT.png, id=157, 803.0pt x 441.65pt>
+File: reno1/Flow_RTT.png Graphic file (type png)
+ <use reno1/Flow_RTT.png>
+<reno1/Flow_Send_Rates.png, id=158, 803.0pt x 441.65pt>
+File: reno1/Flow_Send_Rates.png Graphic file (type png)
+
+<use reno1/Flow_Send_Rates.png>
+<reno1/Flow_Window.png, id=159, 803.0pt x 441.65pt>
+File: reno1/Flow_Window.png Graphic file (type png)
+
+<use reno1/Flow_Window.png>
+<reno1/Link_Flow_Rate.png, id=160, 803.0pt x 441.65pt>
+File: reno1/Link_Flow_Rate.png Graphic file (type png)
+
+<use reno1/Link_Flow_Rate.png>
+<reno1/Link_Occupancy.png, id=161, 803.0pt x 441.65pt>
+File: reno1/Link_Occupancy.png Graphic file (type png)
+
+<use reno1/Link_Occupancy.png>
+<reno1/Link_Packet_Loss.png, id=162, 803.0pt x 441.65pt>
+File: reno1/Link_Packet_Loss.png Graphic file (type png)
+
+<use reno1/Link_Packet_Loss.png> [28
+
+ <./reno1/Flow_RTT.png>] [29 <./reno1/Flow_Send_Rates.png> <./reno1/Flow_Window
+.png>] [30 <./reno1/Link_Flow_Rate.png> <./reno1/Link_Occupancy.png>] [31 <./re
+no1/Link_Packet_Loss.png>]
+<reno2/Flow_RTT.png, id=182, 1003.75pt x 552.0625pt>
+File: reno2/Flow_RTT.png Graphic file (type png)
+ <use reno2/Flow_RTT.png>
+<reno2/Flow_Send_Rates.png, id=183, 1003.75pt x 552.0625pt>
+File: reno2/Flow_Send_Rates.png Graphic file (type png)
+
+<use reno2/Flow_Send_Rates.png>
+<reno2/Flow_Window.png, id=184, 1003.75pt x 552.0625pt>
+File: reno2/Flow_Window.png Graphic file (type png)
+
+<use reno2/Flow_Window.png>
+<reno2/Link_Flow_Rate.png, id=185, 1003.75pt x 552.0625pt>
+File: reno2/Link_Flow_Rate.png Graphic file (type png)
+
+<use reno2/Link_Flow_Rate.png>
+<reno2/Link_Occupancy.png, id=186, 1003.75pt x 552.0625pt>
+File: reno2/Link_Occupancy.png Graphic file (type png)
+
+<use reno2/Link_Occupancy.png>
+<reno2/Link_Packet_Loss.png, id=187, 1003.75pt x 552.0625pt>
+File: reno2/Link_Packet_Loss.png Graphic file (type png)
+
+<use reno2/Link_Packet_Loss.png> [32
+
+ <./reno2/Flow_RTT.png (PNG copy)>]
+[33 <./reno2/Flow_Send_Rates.png (PNG copy)> <./reno2/Flow_Window.png (PNG copy
+)>] [34 <./reno2/Link_Flow_Rate.png (PNG copy)> <./reno2/Link_Occupancy.png (PN
+G copy)>] [35 <./reno2/Link_Packet_Loss.png (PNG copy)>]) (./Report.aux) ) 
 Here is how much of TeX's memory you used:
- 2240 strings out of 495061
- 27797 string characters out of 1182621
- 93839 words of memory out of 3000000
- 5382 multiletter control sequences out of 15000+50000
+ 2416 strings out of 495061
+ 32412 string characters out of 1182621
+ 90839 words of memory out of 3000000
+ 5539 multiletter control sequences out of 15000+50000
  16767 words of font info for 62 fonts, out of 3000000 for 9000
  28 hyphenation exceptions out of 8191
- 27i,11n,43p,1708b,234s stack positions out of 5000i,500n,10000p,200000b,50000s
-</usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmbx10
-.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/
-share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texmf
--texlive/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texmf-texlive/fo
-nts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texmf-texlive/fonts/type1/pu
-blic/amsfonts/cm/cmr10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfont
-s/cm/cmr12.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmr17.p
-fb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/shar
-e/texmf-texlive/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texmf-texli
-ve/fonts/type1/public/amsfonts/cm/cmsl10.pfb></usr/share/texmf-texlive/fonts/ty
-pe1/public/amsfonts/cm/cmsy10.pfb>
-Output written on Report.pdf (8 pages, 173953 bytes).
+ 28i,11n,43p,1207b,236s stack positions out of 5000i,500n,10000p,200000b,50000s
+</usr
+/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texm
+f-texlive/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texmf-texlive/f
+onts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texmf-texlive/fonts/type1/
+public/amsfonts/cm/cmmi10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsf
+onts/cm/cmmi7.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmr1
+0.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/
+share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texmf-
+texlive/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/share/texmf-texlive/fonts
+/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texmf-texlive/fonts/type1/public
+/amsfonts/cm/cmsl10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/c
+m/cmsy10.pfb>
+Output written on Report.pdf (36 pages, 1595351 bytes).
 PDF statistics:
- 77 PDF objects out of 1000 (max. 8388607)
+ 238 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 196 words of extra memory for PDF output out of 10000 (max. 10000000)
 

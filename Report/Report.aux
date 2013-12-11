@@ -2,5 +2,64 @@
 \@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{2}}
 \@writefile{toc}{\contentsline {section}{\numberline {2}Simulator Description}{2}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Design Decisions}{2}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}InputParser}{4}}
-\@writefile{toc}{\contentsline {section}{\numberline {3}Mathematical Analysis}{4}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Architecture}{2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Simulation Classes}{3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Network Classes}{3}}
+\@writefile{toc}{\contentsline {paragraph}{Node}{3}}
+\@writefile{toc}{\contentsline {paragraph}{Router}{3}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces An image of hierarchy of network object classes in our system. Arrows denote inheritance. Boxes inside of boxes denote a single instance of an object of a class being initiated as part of every instance of another class. (Ex. a link always contains 2 buffers)}}{4}}
+\@writefile{toc}{\contentsline {paragraph}{Host}{4}}
+\@writefile{toc}{\contentsline {paragraph}{Link}{5}}
+\@writefile{toc}{\contentsline {paragraph}{Packet}{5}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.2.1}Packet Transfer}{5}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Packet transfer process between nodes (hosts, routers) and links. Arrows here represent packet transfer in the system. Arrowhead direction denotes passing of packets between functions. Arrow label denotes time offset added, as perceived by scheduler. (Time offset is zero when not labeled.) }}{5}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Input/Output}{6}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Input/output structure of our system. Yellow denotes input/output files. Cyan denotes helper libraries. Blue rectangle denotes simulator objects. Blue diamond denotes simulator events. }}{6}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Usage guide}{6}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Mathematical Analysis}{7}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Workflow and Project Thoughts}{9}}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Test Case Simulation Plots and Commentary}{10}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}TCP Vegas}{10}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.1}Test Case 0}{10}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.2}Test Case 1}{10}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.1.3}Test Case 2}{11}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}TCP Reno}{11}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.2.1}Test Case 0}{11}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.2.2}Test Case 1}{11}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.2.3}Test Case 2}{11}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces TCP VEGAS, Case 0: Flow Round Trip Time}}{12}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces TCP VEGAS, Case 0: Flow Send Rates}}{13}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces TCP VEGAS, Case 0: Flow Window}}{13}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces TCP VEGAS, Case 0: Host Send Rate}}{14}}
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces TCP VEGAS, Case 0: Host Send Rate}}{14}}
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces TCP VEGAS, Case 0: Host Send Rate}}{15}}
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces TCP VEGAS, Case 1: Flow Round Trip Time}}{16}}
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces TCP VEGAS, Case 1: Flow Send Rates}}{17}}
+\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces TCP VEGAS, Case 1: Flow Window}}{17}}
+\@writefile{lof}{\contentsline {figure}{\numberline {13}{\ignorespaces TCP VEGAS, Case 1: Host Send Rate}}{18}}
+\@writefile{lof}{\contentsline {figure}{\numberline {14}{\ignorespaces TCP VEGAS, Case 1: Host Send Rate}}{18}}
+\@writefile{lof}{\contentsline {figure}{\numberline {15}{\ignorespaces TCP VEGAS, Case 1: Host Send Rate}}{19}}
+\@writefile{lof}{\contentsline {figure}{\numberline {16}{\ignorespaces TCP VEGAS, Case 2: Flow Round Trip Time}}{20}}
+\@writefile{lof}{\contentsline {figure}{\numberline {17}{\ignorespaces TCP VEGAS, Case 2: Flow Send Rates}}{21}}
+\@writefile{lof}{\contentsline {figure}{\numberline {18}{\ignorespaces TCP VEGAS, Case 2: Flow Window}}{21}}
+\@writefile{lof}{\contentsline {figure}{\numberline {19}{\ignorespaces TCP VEGAS, Case 2: Host Send Rate}}{22}}
+\@writefile{lof}{\contentsline {figure}{\numberline {20}{\ignorespaces TCP VEGAS, Case 2: Host Send Rate}}{22}}
+\@writefile{lof}{\contentsline {figure}{\numberline {21}{\ignorespaces TCP VEGAS, Case 2: Host Send Rate}}{23}}
+\@writefile{lof}{\contentsline {figure}{\numberline {22}{\ignorespaces TCP RENO, Case 0: Flow Round Trip Time}}{24}}
+\@writefile{lof}{\contentsline {figure}{\numberline {23}{\ignorespaces TCP RENO, Case 0: Flow Send Rates}}{25}}
+\@writefile{lof}{\contentsline {figure}{\numberline {24}{\ignorespaces TCP RENO, Case 0: Flow Window}}{25}}
+\@writefile{lof}{\contentsline {figure}{\numberline {25}{\ignorespaces TCP RENO, Case 0: Host Send Rate}}{26}}
+\@writefile{lof}{\contentsline {figure}{\numberline {26}{\ignorespaces TCP RENO, Case 0: Host Send Rate}}{26}}
+\@writefile{lof}{\contentsline {figure}{\numberline {27}{\ignorespaces TCP RENO, Case 0: Host Send Rate}}{27}}
+\@writefile{lof}{\contentsline {figure}{\numberline {28}{\ignorespaces TCP RENO, Case 1: Flow Round Trip Time}}{28}}
+\@writefile{lof}{\contentsline {figure}{\numberline {29}{\ignorespaces TCP RENO, Case 1: Flow Send Rates}}{29}}
+\@writefile{lof}{\contentsline {figure}{\numberline {30}{\ignorespaces TCP RENO, Case 1: Flow Window}}{29}}
+\@writefile{lof}{\contentsline {figure}{\numberline {31}{\ignorespaces TCP RENO, Case 1: Host Send Rate}}{30}}
+\@writefile{lof}{\contentsline {figure}{\numberline {32}{\ignorespaces TCP RENO, Case 1: Host Send Rate}}{30}}
+\@writefile{lof}{\contentsline {figure}{\numberline {33}{\ignorespaces TCP RENO, Case 1: Host Send Rate}}{31}}
+\@writefile{lof}{\contentsline {figure}{\numberline {34}{\ignorespaces TCP RENO, Case 2: Flow Round Trip Time}}{32}}
+\@writefile{lof}{\contentsline {figure}{\numberline {35}{\ignorespaces TCP RENO, Case 2: Flow Send Rates}}{33}}
+\@writefile{lof}{\contentsline {figure}{\numberline {36}{\ignorespaces TCP RENO, Case 2: Flow Window}}{33}}
+\@writefile{lof}{\contentsline {figure}{\numberline {37}{\ignorespaces TCP RENO, Case 2: Host Send Rate}}{34}}
+\@writefile{lof}{\contentsline {figure}{\numberline {38}{\ignorespaces TCP RENO, Case 2: Host Send Rate}}{34}}
+\@writefile{lof}{\contentsline {figure}{\numberline {39}{\ignorespaces TCP RENO, Case 2: Host Send Rate}}{35}}
