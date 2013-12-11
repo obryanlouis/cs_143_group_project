@@ -3,14 +3,6 @@
 
 \section{Mathematical Analysis}
 
-* Test Case 2 can be solved analytically. Set up
-the TCP equations that TCP Vegas / FAST-TCP are
-engineered to solve, and then find (and justify!)
-the equilibrium point for each phase of Test Case
-2's operation. Compare your calculated results to
-your experimental results; if they are wildly
-different, discuss why this might be so.
-
 In this section, we provide a mathematical analysis of TCP Vegas as applied to testcase 2 of our system. 
 
 By example 9 of chapter 3 (3.9), the equilibrium solution to Vegas is the same as the optimal minimization of $\displaystyle\sum\limits_{i=0}^n \alpha_i \log(x_i)$ subject to the link capacity constraints $Rx <= c$. In the first time interval, there is only one flow, so this problem becomes
